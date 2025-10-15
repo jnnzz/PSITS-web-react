@@ -15,9 +15,9 @@ const StudentLayout = () => {
   const userData = getInformationData();
   const [label, setLabel] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isYearUpdated, setIsYearUpdated] = useState(false)
+  const [isYearUpdated, setIsYearUpdated] = useState();
   const [isModalOpen, setIsModalOpen] = useState(true);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const pathParts = location.pathname.split("/");
@@ -62,14 +62,14 @@ const StudentLayout = () => {
   useEffect(() => {
     const fetchYearUpdated = async () => {
       setIsYearUpdated(await isStudentYearUpdated(userData.id_number));
-      setIsModalOpen(true)
+      setIsModalOpen(true);
     };
     fetchYearUpdated();
   }, []);
 
   return (
     <div className="min-h-screen relative">
-      {!isYearUpdated && (
+      {isYearUpdated === false && (
         <ForcedInputModal
           studentIdNumber={userData.id_number}
           isOpen={isModalOpen}
