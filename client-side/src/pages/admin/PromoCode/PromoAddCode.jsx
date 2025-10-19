@@ -3,11 +3,17 @@ import { activePublishMerchandise } from "../../../api/admin";
 
 const PromoAddCode = ({ onCancel }) => {
   const [type, setType] = useState("");
+  const [promoName, setPromoName] = useState("");
+  const [studentType, setStudentType] = useState("");
   const [limitType, setLimitType] = useState("Limited");
   const [selectedStudents, setSelectedStudents] = useState([]);
-  const [selectedOrganizations, setSelectedOrganizations] = useState([]);
+  const [selectedMembers, setSelectedMembers] = useState([]);
   const [selectedMerchandise, setSelectedMerchandise] = useState([]);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [quantity, setQuantity] = useState(0);
   const [activeMerchandise, setActiveMerchandise] = useState([]);
+  const [discount, setDiscount] = useState(0);
 
   const fetchData = async () => {
     try {
@@ -23,13 +29,36 @@ const PromoAddCode = ({ onCancel }) => {
     fetchData();
   }, []);
 
-  const merchandiseList = [
-    "T-Shirt",
-    "Hoodie",
-    "Sticker Pack",
-    "Lanyard",
-    "Tumbler",
-  ];
+  const handleCreatePromoCode = async () => {
+    const promoFormData = new FormData();
+    const selectedAudience =
+      type === "Members"
+        ? selectedMembers
+        : studentType === "Specific"
+        ? selectedStudents
+        : "No Participants";
+    const formFields = {
+      promoName,
+      type,
+      limitType,
+      selectedAudience,
+      discount,
+      quantity,
+      startDate,
+      endDate,
+      selectedMerchandise,
+    };
+
+    Object.entries(formFields).forEach(([key, value]) => {
+      promoFormData.append(key, value);
+    });
+
+    console.log(selectedMerchandise);
+
+    for (let [key, value] of promoFormData.entries()) {
+      console.log(`${key}:`, value);
+    }
+  };
 
   const handleStudentChange = (e) => {
     const values = e.target.value.split(",").map((v) => v.trim());
@@ -37,7 +66,7 @@ const PromoAddCode = ({ onCancel }) => {
   };
 
   const handleOrgChange = (org) => {
-    setSelectedOrganizations((prev) =>
+    setSelectedMembers((prev) =>
       prev.includes(org) ? prev.filter((o) => o !== org) : [...prev, org]
     );
   };
@@ -64,6 +93,8 @@ const PromoAddCode = ({ onCancel }) => {
             type="text"
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
             placeholder="Enter promo name"
+            value={promoName}
+            onChange={(e) => setPromoName(e.target.value)}
           />
         </div>
 
@@ -78,14 +109,31 @@ const PromoAddCode = ({ onCancel }) => {
             onChange={(e) => setType(e.target.value)}
           >
             <option value="">Select type</option>
-            <option value="Specific">Specific</option>
-            <option value="Organization">Organization</option>
-            <option value="All Students">All Students</option>
+
+            <option value="Members">Members</option>
+            <option value="Students">Students</option>
           </select>
+          {type === "Students" && (
+            <>
+              <label className="block text-sm font-medium text-gray-600 mb-1 mt-2">
+                Type of Students
+              </label>
+              <select
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
+                value={studentType}
+                onChange={(e) => setStudentType(e.target.value)}
+              >
+                <option value="">Select Student type</option>
+                <option value="Specific">Specific</option>
+                <option value="All Students">All Students</option>
+              </select>
+            </>
+          )}
+          <div></div>
         </div>
 
         {/* Conditional Fields */}
-        {type === "Specific" && (
+        {studentType === "Specific" && (
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Student IDs (comma separated)
@@ -99,17 +147,17 @@ const PromoAddCode = ({ onCancel }) => {
           </div>
         )}
 
-        {type === "Organization" && (
+        {type === "Members" && (
           <div>
             <p className="block text-sm font-medium text-gray-600 mb-1">
-              Sub Organizations
+              Sub Members
             </p>
             <div className="flex flex-wrap gap-3">
               {["Officers", "Media", "Developers", "Volunteers"].map((org) => (
                 <label key={org} className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    checked={selectedOrganizations.includes(org)}
+                    checked={selectedMembers.includes(org)}
                     onChange={() => handleOrgChange(org)}
                     className="accent-blue-600"
                   />
@@ -119,18 +167,6 @@ const PromoAddCode = ({ onCancel }) => {
             </div>
           </div>
         )}
-
-        {/* Quantity */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Quantity
-          </label>
-          <input
-            type="number"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
-            placeholder="Enter quantity"
-          />
-        </div>
 
         {/* Limited / Unlimited */}
         <div>
@@ -153,6 +189,22 @@ const PromoAddCode = ({ onCancel }) => {
             ))}
           </div>
         </div>
+
+        {/* Quantity */}
+        {limitType === "Limited" && (
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Quantity
+            </label>
+            <input
+              type="number"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
+              placeholder="Enter quantity"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+            />
+          </div>
+        )}
 
         {/* Merchandise */}
         <div>
@@ -183,6 +235,8 @@ const PromoAddCode = ({ onCancel }) => {
             <input
               type="date"
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
             />
           </div>
           <div>
@@ -192,6 +246,8 @@ const PromoAddCode = ({ onCancel }) => {
             <input
               type="date"
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
             />
           </div>
         </div>
@@ -205,6 +261,8 @@ const PromoAddCode = ({ onCancel }) => {
             type="number"
             placeholder="Enter discount percentage"
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
+            value={discount}
+            onChange={(e) => setDiscount(e.target.value)}
           />
         </div>
 
@@ -216,8 +274,11 @@ const PromoAddCode = ({ onCancel }) => {
           >
             Cancel
           </button>
-          <button className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">
-            Save Promo
+          <button
+            className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+            onClick={() => handleCreatePromoCode()}
+          >
+            Create Promo Code
           </button>
         </div>
       </div>

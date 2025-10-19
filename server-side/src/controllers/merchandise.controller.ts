@@ -172,20 +172,22 @@ export const retrieveActiveAndPublishMerchandiseController = async (
   req: Request,
   res: Response
 ) => {
-  const now = new Date();
   try {
+    const now = new Date();
+
     const merches: IMerch[] = await Merch.find({
       is_active: true,
-    });
-    if (!merches) {
-      res.status(400).json({ message: "No Available Merchandise" });
-    }
-    const data = merches.filter((merch) => new Date(merch.end_date) > now);
+      end_date: { $gt: now }, // filter directly in the query
+    }).select("_id name"); // only include _id and name
 
-    res.status(200).json(data);
+    if (!merches || merches.length === 0) {
+      return res.status(400).json({ message: "No Available Merchandise" });
+    }
+
+    res.status(200).json(merches);
   } catch (error) {
-    console.error("Error fetching merches:", error);
-    res.status(500).send(error);
+    console.error("Error retrieving merchandise:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
