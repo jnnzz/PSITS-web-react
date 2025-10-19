@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { activePublishMerchandise } from "../../../api/admin";
 import ConfirmationModal from "../../../components/common/modal/ConfirmationModal";
 import { ConfirmActionType } from "../../../enums/commonEnums";
+import { createPromoCode } from "../../../api/promo";
 
 const PromoAddCode = ({ onCancel }) => {
   const [type, setType] = useState("");
@@ -39,7 +40,7 @@ const PromoAddCode = ({ onCancel }) => {
         ? selectedMembers
         : studentType === "Specific"
         ? selectedStudents
-        : "No Participants";
+        : "All Students";
     const formFields = {
       promoName,
       type,
@@ -53,10 +54,17 @@ const PromoAddCode = ({ onCancel }) => {
     };
 
     Object.entries(formFields).forEach(([key, value]) => {
-      promoFormData.append(key, value);
+      if (key === "selectedMerchandise") {
+        promoFormData.append(key, JSON.stringify(value));
+      } else {
+        promoFormData.append(key, value);
+      }
     });
 
-    setConfirmModal(false);
+    if (createPromoCode(promoFormData)) {
+      onCancel;
+      setConfirmModal(false);
+    }
 
     console.log(selectedMerchandise);
 

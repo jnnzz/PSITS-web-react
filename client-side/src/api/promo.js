@@ -20,9 +20,11 @@ export const createPromoCode = async (data) => {
     );
 
     if (response.status === 200) {
-      showToast("success", response.data.message);
+        showToast("success", response.data.message);
+        return true;
     } else {
-      showToast("error", response.data.message);
+        showToast("error", response.data.message);
+        return false;
     }
   } catch (error) {
     if (error.response && error.response.data) {

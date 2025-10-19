@@ -15,6 +15,7 @@ import privateRoutes from "./routes/private.route";
 import logRoutes from "./routes/logs.route";
 import merchRoutes from "./routes/merchandise.route";
 import eventRoutes from "./routes/events.route";
+import promoRoutes from "./routes/promo.route";
 
 //Declaration
 const app: Express = express();
@@ -55,6 +56,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/promo", promoRoutes);
 app.use("/api", privateRoutes);
 
 app.listen(PORT, () => {
