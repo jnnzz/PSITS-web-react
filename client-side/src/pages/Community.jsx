@@ -1,27 +1,31 @@
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import president from "../assets/Core Officers/4.jpg";
-import viceInternal from "../assets/Core Officers/5.jpg";
-import viceExternal from "../assets/Core Officers/3.png";
-import secretary from "../assets/Core Officers/sec.jpg";
-import auditor from "../assets/Core Officers/8.png";
-import treasurer from "../assets/Core Officers/6.png";
-import assistantTreasurer from "../assets/Core Officers/7.png";
-import pio from "../assets/Core Officers/9.png";
-import pro from "../assets/Core Officers/10.png";
-import firstRep from "../assets/Core Officers/12.jpg";
-import secondRep from "../assets/Core Officers/13.png";
-import thirdRep from "../assets/Core Officers/14.png";
-import fourthRep from "../assets/Core Officers/15.png";
-import chiefVol from "../assets/Core Officers/11.png";
+import president from "../assets/Core Officers 2025/1.png";
+import viceInternal from "../assets/Core Officers 2025/2.png";
+import viceExternal from "../assets/Core Officers 2025/3.png";
+import secretary from "../assets/Core Officers 2025/4.png";
+import auditor from "../assets/Core Officers 2025/6.png";
+import treasurer from "../assets/Core Officers 2025/7.png";
+import assistantTreasurer from "../assets/Core Officers 2025/5.png";
+import pio from "../assets/Core Officers 2025/8.png";
+import pro from "../assets/Core Officers 2025/10.png";
+import firstRep from "../assets/Core Officers 2025/11.png";
+import secondRep from "../assets/Core Officers 2025/13.png";
+import thirdRep from "../assets/Core Officers 2025/12.png";
+import fourthRep from "../assets/Core Officers 2025/14.png";
+import chiefVol from "../assets/Core Officers 2025/9.png";
 import Carousel from "../components/Carousel/Carousel";
-import dennis from "../assets/Faculty/35.png";
+import dennis from "../assets/Faculty/15.png";
 import barral from "../assets/Faculty/34.png";
-import jia from "../assets/Faculty/36.png";
-import beans from "../assets/Development Team/29.png";
-import driane from "../assets/Development Team/30.png";
-import jims from "../assets/Development Team/28.png";
-import marianne from "../assets/Development Team/31.png";
+import jia from "../assets/Faculty/16.png";
+import beans from "../assets/Development Team 2025/18.png";
+import driane from "../assets/Development Team 2025/17.png";
+// import jims from "../assets/Development Team 2025/28.png";
+import marianne from "../assets/Development Team 2025/19.png";
+import ram from "../assets/Development Team 2025/20.png";
+import jan from "../assets/Development Team 2025/21.png";
+import jacinth from "../assets/Development Team 2025/22.png";
+import arvin from "../assets/Development Team 2025/23.png";
 
 const faculty = [
   { name: "Dennis Durano", image: dennis, role: "Advisor" },
@@ -29,43 +33,48 @@ const faculty = [
 ];
 
 const teamMembers = [
-  {
-    name: "Anton James Genabio",
-    image: jims,
-    role: "Lead / Backend Developer",
-  },
-  { name: "Vince Datanagan", image: beans, role: "Front End Developer" },
-  { name: "Ralph Adriane Dilao", image: driane, role: "FullStack Developer" },
-  { name: "Marianne Joy Ybrado Napisa", image: marianne, role: "Web Designer" },
+  // {
+  //   name: "Anton James Genabio",
+  //   image: jims,
+  //   role: "Lead / Backend Developer",
+  // },
+  { name: "Marianne Joy Ybrado Napisa", image: marianne, role: "Project Manager" },
+  { name: "Ralph Adriane Dilao", image: driane, role: "Lead Developer" },
+  { name: "Arvin Albeos", image: arvin, role: "Quality And Assurance" },
+  { name: "Vince Datanagan", image: beans, role: "Fullstack Developer" },
+  { name: "Jan Lorenz Laroco", image: jan, role: "Frontend Developer" },
+  { name: "Jacinth Cedric Barral", image: jacinth, role: "Backend Developer" },
+  { name: "Ram Riley Alin", image: ram, role: "Backend Developer" },
+
 ];
 
 const officersAndReps = [
-  { role: "President", name: "Aubrey Leyros", image: president },
+  { role: "President", name: "Marlou Tadlip", image: president },
   {
     role: "Vice President Internal",
-    name: "Marlou Tadlip",
+    name: "Clint Louie Tuyor",
     image: viceInternal,
   },
   {
     role: "Vice President External",
-    name: "Clint Louie Tuyor",
+    name: "Ralph Theodore Alon",
     image: viceExternal,
   },
   { role: "Secretary", name: "Sainth Anneshka N. Cuico", image: secretary },
-  { role: "Auditor", name: "Daisy Lyn Laygan", image: auditor },
-  { role: "Treasurer", name: "Jeraiza Gacang", image: treasurer },
+  { role: "Auditor", name: "Riza Mae Peresores", image: auditor },
+  { role: "Treasurer", name: "Daisy Lyn Laygan", image: treasurer },
   {
     role: "Asst. Treasurer",
-    name: "Stephanie Echavez",
+    name: "Khrysha Espanol",
     image: assistantTreasurer,
   },
-  { role: "P.I.O", name: "Princess Villanueva", image: pio },
-  { role: "P.R.O", name: "John Paul Costillas", image: pro },
-  { role: "Chief Volunteer", name: "Arvin Albeos", image: chiefVol },
-  { role: "1st Year Rep", name: "Lee Vincent Laurito", image: firstRep },
-  { role: "2nd Year Rep", name: "Christ Hanzen Rallos", image: secondRep },
-  { role: "3rd Year Rep", name: "Angela Postrero", image: thirdRep },
-  { role: "4th Year Rep", name: "Shainnah Lhyn Taborada", image: fourthRep },
+  { role: "P.I.O", name: "Angela Postrero", image: pio },
+  { role: "P.R.O", name: "Vince Bryant Cabunilas", image: pro },
+  { role: "Chief Volunteer", name: "Kisses Penera", image: chiefVol },
+  { role: "1st Year Rep", name: "Bryle De Luna", image: firstRep },
+  { role: "2nd Year Rep", name: "Lee Vincent Laurito", image: secondRep },
+  { role: "3rd Year Rep", name: "Christ Hanzen Rallos", image: thirdRep },
+  { role: "4th Year Rep", name: "Princess Villanueva", image: fourthRep },
 ];
 
 const Community = () => {
@@ -109,7 +118,7 @@ const Community = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-primary min-h-main-md relative overflow-hidden">
+    <div className="bg-gradient-to-b from-primary min-h-main relative overflow-hidden">
       <div className="text-center">
         <ul className="absolute z-30 pt-20 left-1/2 transform -translate-x-1/2 flex justify-center space-x-4 text-white">
           {["Advisors", "Officers", "Developers"].map((tab) => (
