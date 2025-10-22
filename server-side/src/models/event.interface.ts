@@ -1,5 +1,11 @@
 import { Types } from "mongoose";
 import { IAttendee } from "./attendee.interface";
+
+export interface IRequirement {
+  key: string;
+  label: string;
+}
+
 export interface IEvent {
   eventId: Types.ObjectId;
   eventName: string;
@@ -15,21 +21,26 @@ export interface IEvent {
   sales_data: ISalesData[];
   totalUnitsSold: number;
   totalRevenueAll: number;
+  requirements: IRequirement[];
 }
+
 export interface ISalesData {
   campus: "UC-Main" | "UC-Banilad" | "UC-LM" | "UC-PT" | "UC-CS";
   unitsSold: number;
   totalRevenue: number;
 }
+
 export interface ISessionConfigType {
   enabled: boolean;
   timeRange: string;
 }
+
 export interface ISessionConfig {
   morning?: ISessionConfigType;
   afternoon?: ISessionConfigType;
   evening?: ISessionConfigType;
 }
+
 export interface ICampusLimit {
   campus: "UC-Main" | "UC-Banilad" | "UC-LM" | "UC-PT" | "UC-CS";
   limit: number;

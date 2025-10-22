@@ -4,6 +4,7 @@ import {
   ISessionConfigType,
   IEvent,
   ISessionConfig,
+  IRequirement,
 } from "./event.interface";
 import { attendeeSchema } from "./attendee.model";
 
@@ -12,6 +13,7 @@ export interface ISessionConfigDocument extends ISessionConfig, Document {}
 export interface ISessionConfigTypeDocument
   extends ISessionConfigType,
     Document {}
+export interface IRequirementDocument extends IRequirement, Document {}
 export interface IEventDocument extends IEvent, Document {}
 
 const salesDataSchema = new Schema<ISalesDataDocument>({
@@ -20,14 +22,8 @@ const salesDataSchema = new Schema<ISalesDataDocument>({
     enum: ["UC-Main", "UC-Banilad", "UC-LM", "UC-PT", "UC-CS"],
     required: true,
   },
-  unitsSold: {
-    type: Number,
-    default: 0,
-  },
-  totalRevenue: {
-    type: Number,
-    default: 0,
-  },
+  unitsSold: { type: Number, default: 0 },
+  totalRevenue: { type: Number, default: 0 },
 });
 
 const sessionConfigTypeSchema = new Schema<ISessionConfigTypeDocument>(
@@ -38,26 +34,25 @@ const sessionConfigTypeSchema = new Schema<ISessionConfigTypeDocument>(
   { _id: false }
 );
 
+/** New sub-schema for event-level requirements */
+const requirementSchema = new Schema<IRequirementDocument>(
+  {
+    key: { type: String, required: true },
+    label: { type: String, required: true },
+  },
+  { _id: false }
+);
+
 const eventSchema = new Schema<IEventDocument>({
   eventId: {
     type: Schema.Types.ObjectId,
     ref: "Merch",
     required: true,
   },
-  eventName: {
-    type: String,
-    required: true,
-  },
-  eventImage: {
-    type: Array,
-  },
-  eventDate: {
-    type: Date,
-  },
-  eventDescription: {
-    type: String,
-    required: true,
-  },
+  eventName: { type: String, required: true },
+  eventImage: { type: Array },
+  eventDate: { type: Date },
+  eventDescription: { type: String, required: true },
   attendanceType: {
     type: String,
     enum: ["ticketed", "open"],
@@ -79,14 +74,13 @@ const eventSchema = new Schema<IEventDocument>({
     },
   },
   createdBy: { type: String, required: true },
-  attendees: {
-    type: [attendeeSchema],
+  attendees: { type: [attendeeSchema], default: [] },
+  status: { type: String, required: true },
+  requirements: {
+    type: [requirementSchema],
     default: [],
   },
-  status: {
-    type: String,
-    required: true,
-  },
+
   limit: {
     type: [
       {
@@ -95,10 +89,7 @@ const eventSchema = new Schema<IEventDocument>({
           enum: ["UC-Main", "UC-Banilad", "UC-LM", "UC-PT", "UC-CS"],
           required: true,
         },
-        limit: {
-          type: Number,
-          required: true,
-        },
+        limit: { type: Number, required: true },
       },
     ],
     default: [
@@ -119,14 +110,8 @@ const eventSchema = new Schema<IEventDocument>({
       { campus: "UC-CS", unitsSold: 0, totalRevenue: 0 },
     ],
   },
-  totalUnitsSold: {
-    type: Number,
-    default: 0,
-  },
-  totalRevenueAll: {
-    type: Number,
-    default: 0,
-  },
+  totalUnitsSold: { type: Number, default: 0 },
+  totalRevenueAll: { type: Number, default: 0 },
 });
 
 export const Event = mongoose.model<IEventDocument>("event", eventSchema);
