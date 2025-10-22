@@ -15,7 +15,8 @@ const StudentLayout = () => {
   const userData = getInformationData();
   const [label, setLabel] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isYearUpdated, setIsYearUpdated] = useState();
+  const [isYearUpdated, setIsYearUpdated] = useState(undefined);
+  const [hasFetchedYearUpdated, setHasFetchedYearUpdated] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -61,22 +62,29 @@ const StudentLayout = () => {
 
   useEffect(() => {
     const fetchYearUpdated = async () => {
-      setIsYearUpdated(await isStudentYearUpdated(userData.id_number));
-      setIsModalOpen(true);
+      try {
+        const result = await isStudentYearUpdated(userData.id_number);
+        setIsYearUpdated(result);
+      } catch (error) {
+        console.error("Error fetching year updated:", error);
+      } finally {
+        setHasFetchedYearUpdated(true);
+      }
     };
     fetchYearUpdated();
   }, []);
 
   return (
     <div className="min-h-screen relative">
-      {isYearUpdated === false && (
-        <ForcedInputModal
-          studentIdNumber={userData.id_number}
-          isOpen={isModalOpen}
-          onSubmit={handleUpdateYearLevel}
-          loading={loading}
-        />
-      )}
+      {hasFetchedYearUpdated &&
+        (isYearUpdated === false || isYearUpdated == null) && (
+          <ForcedInputModal
+            studentIdNumber={userData.id_number}
+            isOpen={isModalOpen}
+            onSubmit={handleUpdateYearLevel}
+            loading={loading}
+          />
+        )}
       <AsideBar
         navItems={navItems}
         isSidebarOpen={isSidebarOpen}
