@@ -25,7 +25,7 @@ export const user_model = (user: IStudent): IUserModelData => {
     email: user.email,
     course: user.course,
     year: user.year,
-    role: "Student",
+    role: user.role,
     position: "Student",
     campus: user.campus,
     status: user.status,

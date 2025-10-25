@@ -9,7 +9,7 @@ export const createPromoCode = async (req: Request, res: Response) => {
     promoName,
     type,
     limitType,
-    selectedAudience,
+    singleStudent,
     discount,
     quantity,
     startDate,
@@ -45,6 +45,7 @@ export const createPromoCode = async (req: Request, res: Response) => {
       promo_name: promoCodeGenerator(promoName),
       type,
       limit_type: limitType,
+      one_person_limit: singleStudent === "yes" ? true : false,
       discount,
       start_date: startDate,
       end_date: endDate,
@@ -98,7 +99,7 @@ export const deletePromo = async (req: Request, res: Response) => {
 export const verifyPromo = async (req: Request, res: Response) => {
   try {
     const { promo_code, merchId } = req.params;
-    const student = req.student;
+    const student = req.both;
     const currentDate = new Date();
 
     const promo = await Promo.findOne({ promo_name: promo_code });
@@ -111,10 +112,31 @@ export const verifyPromo = async (req: Request, res: Response) => {
     const isIncluded = promo.selected_merchandise.some(
       (item) => item._id.toString() === merchId
     );
+
     if (!isIncluded) {
       return res.status(403).json({ message: "Merchandise not eligible" });
     }
 
+    if (promo.limit_type === "Limited" && promo.one_person_limit) {
+      const merch = promo.selected_merchandise.find(
+        (m) => m._id.toString() === merchId
+      );
+
+      if (!merch) {
+        return res.status(404).json({ message: "Merchandise not found" });
+      }
+
+      // Check if student already used the promo for this merchandise
+      const alreadyUsed = merch.items?.some(
+        (item) => item.id_number === student.id_number
+      );
+
+      if (alreadyUsed) {
+        return res
+          .status(403)
+          .json({ message: "You have already used this promo" });
+      }
+    }
     switch (promo.type) {
       case "All Students":
         return res
@@ -129,7 +151,7 @@ export const verifyPromo = async (req: Request, res: Response) => {
         }
         break;
 
-      case "Specific":
+      case "Students":
         if (promo.selected_specific_students.includes(student.id_number)) {
           return res
             .status(200)

@@ -29,7 +29,7 @@ const StudentDashboard = () => {
   const currentDate = new Date();
   const end = new Date(currentDate.getFullYear(), 10, 30);
   const token = sessionStorage.getItem("Token");
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [newUserData, setNewUserData] = useState([]);
 
   const fetchAllEvents = async () => {

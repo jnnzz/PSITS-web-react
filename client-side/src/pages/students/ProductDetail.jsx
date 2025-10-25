@@ -125,10 +125,19 @@ const ProductDetail = () => {
         setPromoVerified(true);
       } else {
         setIsVerified(false);
+        setPromoDiscount(0);
+        setPromoVerified(false);
       }
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleClear = () => {
+    setIsVerified(false);
+    setPromoDiscount(0);
+    setPromoVerified(false);
+    setCode("");
   };
 
   useEffect(() => {
@@ -298,11 +307,8 @@ const ProductDetail = () => {
   const handleBuyNow = () => {
     setCartIndicator(false);
     if (validate()) {
-      const id_number = user.id_number;
-      const rfid = user.rfid ? user.rfid : "N/A";
-      const course = user.course;
-      const year = user.year;
-      const student_name = user.name;
+      const promo_discount = promoVerified ? true : false;
+      const promo_name = code;
 
       const items = {
         product_id: _id,
@@ -312,11 +318,8 @@ const ProductDetail = () => {
       };
 
       setFormData({
-        id_number,
-        rfid,
-        course,
-        year,
-        student_name,
+        promo_discount,
+        promo_name,
         items,
       });
 
@@ -459,14 +462,21 @@ const ProductDetail = () => {
                 type="text"
                 placeholder="Enter code"
                 value={code}
+                disabled={promoVerified}
                 onChange={(e) => setCode(e.target.value)}
                 className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
-                onClick={() => handleVerify()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                onClick={
+                  promoVerified ? () => handleClear() : () => handleVerify()
+                }
+                className={`${
+                  promoVerified
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-blue-600 hover:bg-blue-700"
+                } text-white px-4 py-2 rounded-lg  transition`}
               >
-                Verify
+                {promoVerified ? "Clear" : "Verify"}
               </button>
 
               {isVerified === true && (
@@ -517,7 +527,7 @@ const ProductDetail = () => {
             {/* Buy Now Pop Up Details Modal */}
 
             <div className="flex gap-2">
-              {!cartLimited && orderId !== _id && (
+              {!cartLimited && orderId !== _id && !promoVerified && (
                 <button
                   onClick={handleCart}
                   className={`flex gap-2 px-4 py-3 font-medium 

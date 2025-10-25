@@ -20,7 +20,7 @@ const PromoAddCode = ({ onCancel }) => {
   const [discount, setDiscount] = useState(0);
   const [confirmModal, setConfirmModal] = useState(false);
   const [searchStudentId, setSearchStudentId] = useState("");
-  const [handleSearch, setHandleSearch] = useState(false);
+  const [singleStudent, setSingleStudent] = useState("no");
   const [studentSearched, setStudentSearched] = useState([]);
   const [errorName, setErrorName] = useState("");
 
@@ -87,6 +87,7 @@ const PromoAddCode = ({ onCancel }) => {
       promoName,
       type: type === "Members" ? type : studentType,
       limitType,
+      singleStudent,
       selectedAudience,
       discount,
       quantity,
@@ -302,6 +303,22 @@ const PromoAddCode = ({ onCancel }) => {
             ))}
           </div>
         </div>
+        {limitType === "Limited" && (
+          <>
+            <label className="block text-sm font-medium text-gray-600 mb-1 mt-2">
+              Single Student?
+            </label>
+            <select
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
+              value={singleStudent}
+              onChange={(e) => setSingleStudent(e.target.value)}
+            >
+              <option value="">--Select--</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </>
+        )}
 
         {/* Quantity */}
         {limitType === "Limited" && (

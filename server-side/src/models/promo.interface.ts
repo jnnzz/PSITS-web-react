@@ -22,6 +22,7 @@ export interface IPromo {
   promo_name: string;
   type: string;
   limit_type: string;
+  one_person_limit: boolean;
   selected_audience: String[];
   selected_specific_students: String[];
   discount: number;

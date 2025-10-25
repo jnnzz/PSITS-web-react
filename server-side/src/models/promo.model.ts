@@ -1,11 +1,5 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
-import {
-  IPromo,
-  ISelectMerchandise,
-  ISelectedSpecificStudent,
-  IItemsAvail,
-  ISelectedAudience,
-} from "./promo.interface";
+import { IPromo, ISelectMerchandise, IItemsAvail } from "./promo.interface";
 
 export interface IPromoDocument extends IPromo, Document {}
 
@@ -44,19 +38,6 @@ const SelectMerchandiseSchema = new Schema<ISelectMerchandise>(
   { _id: false }
 );
 
-const SelectSpecificStudentSchema = new Schema<ISelectedSpecificStudent>({
-  id_number: {
-    type: String,
-    ref: "Student",
-  },
-});
-
-const SelectAudienceSchema = new Schema<ISelectedAudience>({
-  role: {
-    type: String,
-  },
-});
-
 const promoSchema = new Schema<IPromoDocument>({
   promo_name: {
     type: String,
@@ -68,6 +49,10 @@ const promoSchema = new Schema<IPromoDocument>({
   },
   limit_type: {
     type: String,
+    required: true,
+  },
+  one_person_limit: {
+    type: Boolean,
     required: true,
   },
   selected_audience: {
