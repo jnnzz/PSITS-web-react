@@ -230,12 +230,33 @@ const PromoAddCode = ({ onCancel }) => {
               </>
             )}
 
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
-              value={selectedStudents}
-              disabled
-            />
+            <div className="w-full border border-gray-300 rounded-md px-3 py-2 min-h-[42px] flex flex-wrap gap-2 bg-white">
+              {selectedStudents.length > 0 ? (
+                selectedStudents.map((student, index) => (
+                  <span
+                    key={index}
+                    className="flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm"
+                  >
+                    {student}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedStudents((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        )
+                      }
+                      className="ml-2 text-red-500 hover:text-red-700"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-400 text-sm">
+                  No students selected
+                </span>
+              )}
+            </div>
           </div>
         )}
 

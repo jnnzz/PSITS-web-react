@@ -23,6 +23,7 @@ function ConfirmationModal({ confirmType, onConfirm, onCancel, type }) {
 
   const confirmButtonColor =
     confirmType === ConfirmActionType.DELETION ||
+    confirmType === ConfirmActionType.DELETE ||
     confirmType === ConfirmActionType.SUSPEND ||
     confirmType === ConfirmActionType.RENEWAL ||
     confirmType === ConfirmActionType.ORDER ||
@@ -89,7 +90,7 @@ function ConfirmationModal({ confirmType, onConfirm, onCancel, type }) {
               ? " this event"
               : confirmTypeWord === "change"
               ? " this fee"
-              : confirmTypeWord === "create"
+              : confirmTypeWord === "create" || confirmTypeWord === "delete"
               ? " this promo"
               : " this student"}
             ?

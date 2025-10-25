@@ -3,10 +3,15 @@ import ButtonsComponent from "../../../components/Custom/ButtonsComponent";
 import { motion } from "framer-motion";
 import PromoAddCode from "./PromoAddCode";
 import React from "react";
-import { getAllPromoCode } from "../../../api/promo";
+import { getAllPromoCode, deletePromo } from "../../../api/promo";
+import { FaTrash } from "react-icons/fa";
+import ConfirmationModal from "../../../components/common/modal/ConfirmationModal";
+import { ConfirmActionType } from "../../../enums/commonEnums";
 const PromoDashboard = () => {
   const [addModal, setAddModal] = React.useState(false);
   const [promoCodes, setAllPromoCodes] = React.useState([]);
+  const [isDelete, setIsDelete] = React.useState(false);
+  const [deleteId, setDeleteId] = React.useState("");
 
   const fetchAllPromoCodes = async () => {
     try {
@@ -17,6 +22,24 @@ const PromoDashboard = () => {
       console.error(error);
     }
   };
+
+  const handleDelete = (id) => {
+    setDeleteId(id);
+    setIsDelete(true);
+  };
+
+  const handleDeletion = async () => {
+    try {
+      if (await deletePromo(deleteId)) {
+        setIsDelete(false);
+        setDeleteId("");
+        fetchAllPromoCodes();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   React.useEffect(() => {
     fetchAllPromoCodes();
     if (!addModal) {
@@ -62,7 +85,16 @@ const PromoDashboard = () => {
     {
       key: "actions",
       label: "",
-      cell: (row) => <ButtonsComponent></ButtonsComponent>,
+      cell: (row) => (
+        <ButtonsComponent>
+          <button
+            onClick={() => handleDelete(row._id)}
+            className="ml-2 text-red-500 hover:text-red-700 transition-colors duration-200"
+          >
+            <FaTrash />
+          </button>
+        </ButtonsComponent>
+      ),
     },
   ];
 
@@ -87,6 +119,15 @@ const PromoDashboard = () => {
         {addModal && <PromoAddCode onCancel={() => setAddModal(false)} />}
         <TableComponent data={promoCodes} columns={columns} />
       </div>
+      {isDelete && (
+        <>
+          <ConfirmationModal
+            confirmType={ConfirmActionType.DELETION}
+            onCancel={() => setIsDelete(false)}
+            onConfirm={() => handleDeletion()}
+          />
+        </>
+      )}
     </>
   );
 };

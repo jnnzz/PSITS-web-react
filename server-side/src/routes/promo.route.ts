@@ -7,6 +7,7 @@ import {
 import {
   createPromoCode,
   getAllPromoCode,
+  deletePromo,
 } from "../controllers/promo.controller";
 const router = Router();
 
@@ -17,5 +18,6 @@ router.post(
   createPromoCode
 );
 router.get("/fetch", both_authenticate, getAllPromoCode);
+router.delete("/delete/:id", admin_authenticate, deletePromo);
 
 export default router;

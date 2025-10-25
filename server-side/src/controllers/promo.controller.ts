@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { Promo } from "../models/promo.model";
 import { IPromo } from "../models/promo.interface";
 import { promoCodeGenerator } from "../custom_function/promo_code_generator";
@@ -72,5 +72,26 @@ export const getAllPromoCode = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error! " + error });
+  }
+};
+
+export const deletePromo = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid promo ID" });
+    }
+
+    const promo = await Promo.findByIdAndDelete(new Types.ObjectId(id));
+
+    if (!promo) {
+      return res.status(404).json({ message: "Promo not found" });
+    }
+
+    res.status(200).json({ message: "Promo deleted successfully" });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: "Server error! " + error.message });
   }
 };
