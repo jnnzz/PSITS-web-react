@@ -61,10 +61,10 @@ app.use("/api/events", eventRoutes);
 app.use("/api/promo", promoRoutes);
 app.use("/api", privateRoutes);
 
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
   console.log(`Server started, listening at port ${PORT}`);
   //Check Promo
-  await checkPromos();
+
   cron.schedule("0 0 * * *", async () => {
     console.log("Running daily promo check...");
     await checkPromos();
