@@ -21,6 +21,7 @@ import AllOfficers from "./pages/admin/officers/AllOfficers";
 import Request from "./pages/admin/officers/Request";
 
 import Raffle from "./pages/admin/events/EventRaffle";
+import RaffleTwo from './pages/admin/events/EventRaffleTwo'
 import AddAttendeeForm from "./pages/admin/Attendance/AddAttendeeForm";
 import AdminEvents from "./pages/admin/events/Events";
 
@@ -135,7 +136,7 @@ const App = () => {
           />
           <Route
             path="raffle/:eventId"
-            element={<PrivateRouteAdmin element={Raffle} />}
+            element={<PrivateRouteAdmin element={RaffleTwo} />}
           />
 
           <Route
