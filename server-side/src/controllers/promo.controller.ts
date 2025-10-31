@@ -83,6 +83,7 @@ export const updatePromoCode = async (req: Request, res: Response) => {
     const parsedAudience = selectedAudience ? JSON.parse(selectedAudience) : [];
 
     if (
+      !promoId ||
       !promoName ||
       !type ||
       !limitType ||
@@ -104,7 +105,7 @@ export const updatePromoCode = async (req: Request, res: Response) => {
       ).values()
     );
 
-    const promo = await Promo.findById(promoId);
+    const promo = await Promo.findById(new mongoose.Types.ObjectId(promoId));
     if (!promo) {
       return res.status(404).json({ message: "Promo not found!" });
     }
@@ -176,6 +177,9 @@ export const verifyPromo = async (req: Request, res: Response) => {
 
     if (currentDate < promo.start_date || currentDate > promo.end_date) {
       return res.status(400).json({ message: "Expired Promo Code" });
+    }
+    if (promo.quantity <= 0 && promo.limit_type === "Limited") {
+      return res.status(400).json({ message: "Out of Stocks" });
     }
 
     const isIncluded = promo.selected_merchandise.some(

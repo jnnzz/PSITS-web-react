@@ -108,6 +108,21 @@ const PromoDashboard = () => {
       ),
     },
     {
+      key: "quantity",
+      label: "Stocks",
+      sortable: true,
+      cell: (row) => (
+        <div
+          style={{
+            color: row.quantity <= 0 ? "red" : "inherit",
+            fontWeight: row.quantity <= 0 ? "bold" : "normal",
+          }}
+        >
+          {row.quantity <= 0 ? "Out of Stocks" : `${row.quantity} `}
+        </div>
+      ),
+    },
+    {
       key: "status",
       label: "Status",
       cell: (row) => (

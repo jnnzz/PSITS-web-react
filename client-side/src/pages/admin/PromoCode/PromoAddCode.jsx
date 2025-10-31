@@ -27,7 +27,7 @@ const PromoAddCode = ({ onCancel }) => {
   const fetchData = async () => {
     try {
       const data = await activePublishMerchandise();
-
+      console.log(data);
       setActiveMerchandise(data ? data : []);
       console.log(data);
     } catch (error) {

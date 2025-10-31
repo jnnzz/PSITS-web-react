@@ -33,7 +33,9 @@ const PromoEdit = ({ data, onCancel }) => {
     return new Date(data.end_date).toISOString().split("T")[0];
   });
   const [quantity, setQuantity] = useState(data.quantity);
-  const [activeMerchandise, setActiveMerchandise] = useState([]);
+  const [activeMerchandise, setActiveMerchandise] = useState(
+    data.selected_merchandise
+  );
   const [discount, setDiscount] = useState(data.discount);
   const [confirmModal, setConfirmModal] = useState(false);
   const [searchStudentId, setSearchStudentId] = useState("");
@@ -47,7 +49,16 @@ const PromoEdit = ({ data, onCancel }) => {
     try {
       const data = await activePublishMerchandise();
 
-      setActiveMerchandise(data ? data : []);
+      setActiveMerchandise((prev) => {
+        const combined = [...prev, ...(data || [])];
+
+        const unique = combined.filter(
+          (item, index, self) =>
+            index === self.findIndex((t) => t._id === item._id)
+        );
+
+        return unique;
+      });
       console.log(data);
     } catch (error) {
       console.error(error);

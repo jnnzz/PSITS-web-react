@@ -216,28 +216,31 @@ export const studentAndAdminOrderController = async (
       processedItems.push(processedItem);
       orderTotal += itemSubtotal;
       if (promo_discount) {
-        await Promo.updateOne(
-          {
-            promo_name,
-            "selected_merchandise._id": item.product_id,
-            "selected_merchandise.items.id_number": { $ne: both.id_number },
-          },
-          {
-            $push: {
-              "selected_merchandise.$.items": {
-                id_number: both.id_number,
-                promo_used: new Date(),
-              },
-            },
-            $inc: { quantity: -1 },
+        promo = await Promo.findOne({ promo_name });
+        if (promo) {
+          if (promo.quantity <= 0 && promo.limit_type === "Limited") {
+            return res
+              .status(404)
+              .json({ message: `Promo Code out of Stocks` });
           }
-        );
-      }
-    }
-    if (promo_discount) {
-      promo = await Promo.findOne({ promo_name });
-      if (promo) {
-        orderTotal = orderTotal - orderTotal * (promo.discount / 100);
+          await Promo.updateOne(
+            {
+              promo_name,
+              "selected_merchandise._id": item.product_id,
+              "selected_merchandise.items.id_number": { $ne: both.id_number },
+            },
+            {
+              $push: {
+                "selected_merchandise.$.items": {
+                  id_number: both.id_number,
+                  promo_used: new Date(),
+                },
+              },
+              $inc: { quantity: -1 },
+            }
+          );
+          orderTotal = orderTotal - orderTotal * (promo.discount / 100);
+        }
       }
     }
 

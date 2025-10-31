@@ -4,11 +4,6 @@ import { IPromo, ISelectMerchandise, IItemsAvail } from "./promo.interface";
 export interface IPromoDocument extends IPromo, Document {}
 
 const ItemsAvailSchema = new Schema<IItemsAvail>({
-  _id: {
-    type: Schema.Types.ObjectId,
-    ref: "Merch",
-    required: true,
-  },
   id_number: {
     type: String,
     ref: "Student",

@@ -177,8 +177,8 @@ export const retrieveActiveAndPublishMerchandiseController = async (
 
     const merches: IMerch[] = await Merch.find({
       is_active: true,
-      end_date: { $gt: now }, // filter directly in the query
-    }).select("_id name"); // only include _id and name
+      end_date: { $gt: now },
+    }).select("_id name");
 
     if (!merches || merches.length === 0) {
       return res.status(400).json({ message: "No Available Merchandise" });
