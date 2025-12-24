@@ -10,8 +10,8 @@ interface Vision {
 interface Props {
   title?: string;
   subtitle?: string;
-  mission: string;
-  vision: Vision | string;
+  mission?: string;
+  vision?: Vision | string;
   headerClassName?: string;
 }
 
@@ -40,45 +40,42 @@ export const InsitutionalIdentityContent = ({
         </CardHeader>
       )}
       {/* Mission */}
-      <div className="space-y-3">
-        <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-          Mission
-        </h3>
-        <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-          {mission}
-        </p>
-      </div>
+      {mission && (
+        <div className="space-y-3">
+          <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Mission</h3>
+          <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
+            {mission}
+          </p>
+        </div>
+      )}
 
       {/* Vision */}
-      <div className="space-y-3">
-        <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-          Vision
-        </h3>
+      {vision && (
         <div className="space-y-3">
-          {typeof vision === 'string' ? (
-            <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-              {vision}
-            </p>
-          ) : (
-            <>
+          <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Vision</h3>
+          <div className="space-y-3">
+            {typeof vision === 'string' ? (
               <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                {vision.intro}
+                {vision}
               </p>
-              <ul className="space-y-2">
-                {vision.points.map((point, i) => (
-                  <li
-                    key={i}
-                    className="text-muted-foreground leading-relaxed flex items-start gap-3 text-sm md:text-base"
-                  >
-                    <Check className="w-4 h-4 md:w-5 md:h-5 text-primary mt-1 shrink-0" />
-                    <span className="flex-1">{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
+            ) : (
+              <>
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
+                  {vision.intro}
+                </p>
+                <ul className="space-y-2">
+                  {vision.points.map((point, i) => (
+                    <li key={i} className="text-muted-foreground leading-relaxed flex items-start gap-3 text-sm md:text-base">
+                      <Check className="w-4 h-4 md:w-5 md:h-5 text-primary mt-1 shrink-0" />
+                      <span className="flex-1">{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
