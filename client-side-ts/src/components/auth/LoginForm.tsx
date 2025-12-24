@@ -139,12 +139,16 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           </FieldGroup>
         </form>
       </CardContent>
-      <CardFooter>
+      <CardFooter className='flex flex-col'>
         <Field orientation="horizontal">
           <Button type="submit" form="login-form" className="w-full">
             Sign in
           </Button>
         </Field>
+          <p className='mt-2 text-sm font-extralight text-gray-300 flex flex-row justify-center items-center'>
+            Don't have an account?&nbsp;
+            <Link to="/auth/signup" className='text-black'>Sign up</Link>
+          </p>
       </CardFooter>
     </Card>
   );
