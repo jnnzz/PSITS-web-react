@@ -38,12 +38,18 @@ export default createBrowserRouter([
         path: "auth",
         Component: AuthLayout,
         children: [
-          { path: "login", Component: Login },
-          { path: "signup", Component: SignUp },
-          { path: "forgot-password", Component: ForgotPassword },
-          { path: "otp", Component: OtpCode },
-          { path: "reset-password", Component: SetNewPassword },
+          { path: 'login', Component: Login },
+          { path: 'signup', Component: Signup },
+          { path: 'forgot-password', Component: ForgotPassword },
+          { path: 'otp', Component: OtpCode },
+          { path: 'reset-password', Component: SetNewPassword },
         ],
+      },
+      // Admin Routes
+      {
+        path: "admin",
+        Component: AdminLayout,
+        children: [{ index: true, Component: Dashboard }],
       },
       // Admin Routes
       {

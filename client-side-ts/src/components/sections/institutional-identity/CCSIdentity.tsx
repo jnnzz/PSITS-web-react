@@ -81,7 +81,7 @@ export const CCSIdentity = ({ data }: Props) => {
                     0% 100%, 
                     100% 100%, 
                     100% 0%
-                  )`
+                  )`,
                 }}
               >
                 {/* Background Image */}
@@ -95,7 +95,8 @@ export const CCSIdentity = ({ data }: Props) => {
             </div>
 
             {/* Floating Card */}
-            <div className="absolute left-[-20px] sm:left-[-40px] lg:left-[-100px] top-1/2 h-[60%] w-[70%] lg:w-[60%]
+            <div
+              className="absolute left-[-20px] sm:left-[-40px] lg:left-[-100px] top-1/2 h-[60%] w-[70%] lg:w-[60%]
                   -translate-y-1/2 rounded-[2rem]
                   border outline outline-background outline-[0.5rem]
                   z-20 shadow-xl overflow-hidden transition-all duration-300">

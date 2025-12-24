@@ -2,7 +2,7 @@ import { InsitutionalIdentityContent } from "./InsitutionalIdentityContent";
 import type { UCData } from "@/data/sections-data";
 
 interface Props {
-    data: UCData;
+  data: UCData;
 }
 
 export const UCIdentity = ({ data }: Props) => {

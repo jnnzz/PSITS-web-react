@@ -1,6 +1,6 @@
-import { Check } from "lucide-react";
-import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Check } from 'lucide-react';
+import { CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface Vision {
   intro: string;
@@ -20,13 +20,13 @@ export const InsitutionalIdentityContent = ({
   subtitle,
   mission,
   vision,
-  headerClassName
+  headerClassName,
 }: Props) => {
   return (
     <div className="flex-1 w-full flex flex-col gap-6 md:gap-10">
       {/* Header */}
       {(title || subtitle) && (
-        <CardHeader className={cn("p-0 space-y-4", headerClassName)}>
+        <CardHeader className={cn('p-0 space-y-4', headerClassName)}>
           {title && (
             <CardTitle className="text-primary font-bold uppercase tracking-[0.2em] text-sm md:text-base">
               {title}
@@ -77,6 +77,5 @@ export const InsitutionalIdentityContent = ({
         </div>
       )}
     </div>
-  )
-}
-
+  );
+};

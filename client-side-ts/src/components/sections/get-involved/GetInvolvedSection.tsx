@@ -14,7 +14,6 @@ export const GetInvolvedSection = () => {
 
       <div className="container px-4 md:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-
           {/* Header Area */}
           <div className="lg:col-span-5 space-y-8 sticky lg:top-32">
             <div className="space-y-4">
@@ -38,8 +37,11 @@ export const GetInvolvedSection = () => {
 
             <div className="flex flex-wrap gap-4 pt-4">
               <div className="flex -space-x-3 overflow-hidden">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="inline-block h-10 w-10 rounded-full ring-2 ring-background bg-muted border border-border" />
+                {[1, 2, 3, 4].map(i => (
+                  <div
+                    key={i}
+                    className="inline-block h-10 w-10 rounded-full ring-2 ring-background bg-muted border border-border"
+                  />
                 ))}
               </div>
               <p className="flex items-center text-sm font-medium text-muted-foreground">
@@ -60,9 +62,8 @@ export const GetInvolvedSection = () => {
               />
             ))}
           </div>
-
         </div>
       </div>
     </section>
-  )
-}
+  );
+};

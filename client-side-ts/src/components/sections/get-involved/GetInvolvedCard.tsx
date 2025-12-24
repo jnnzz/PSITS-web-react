@@ -1,21 +1,21 @@
-import { Card, CardDescription, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import { ArrowRight } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
-import announcement from '@/assets/announcement.png'
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { ArrowRight } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import announcement from '@/assets/announcement.png';
 
 interface GetInvolvedCardProps {
-    title: string,
-    description: string,
-    icon: LucideIcon,
-    className?: string
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  className?: string;
 }
 
 export const GetInvolvedCard = ({
-    title,
-    description,
-    icon: Icon,
-    className
+  title,
+  description,
+  icon: Icon,
+  className,
 }: GetInvolvedCardProps) => (
     <Card className={cn(
         "group relative overflow-hidden border-none shadow-none bg-transparent p-0 transition-all duration-500 hover:-translate-y-2 flex flex-col min-h-[300px] rounded-[2rem]",
@@ -45,12 +45,12 @@ export const GetInvolvedCard = ({
                 </CardDescription>
             </div>
 
-            <div className="pt-6">
-                <button className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white transition-all hover:gap-3 group-hover:text-primary">
-                    Learn More
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </button>
-            </div>
-        </div>
-    </Card>
-)
+      <div className="pt-6">
+        <button className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white transition-all hover:gap-3 group-hover:text-primary">
+          Learn More
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+        </button>
+      </div>
+    </div>
+  </Card>
+);

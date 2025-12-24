@@ -1,5 +1,3 @@
 export const OtpCode = () => {
-    return (
-        <div>OtpCode</div>
-    );
+  return <div>OtpCode</div>;
 };
