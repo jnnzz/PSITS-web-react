@@ -95,7 +95,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
                     <Input
                       id={field.name}
                       name={field.name}
-                      type='password'
+                      type="password"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={e => field.handleChange(e.target.value)}
@@ -132,23 +132,28 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
                   );
                 }}
               />
-              <Link to="/" className="w-full text-sm text-right font-extralight">
+              <Link
+                to="/"
+                className="w-full text-sm text-right font-extralight"
+              >
                 Forgot Password
               </Link>
             </div>
           </FieldGroup>
         </form>
       </CardContent>
-      <CardFooter className='flex flex-col'>
+      <CardFooter className="flex flex-col">
         <Field orientation="horizontal">
           <Button type="submit" form="login-form" className="w-full">
             Sign in
           </Button>
         </Field>
-          <p className='mt-2 text-sm font-extralight text-gray-300 flex flex-row justify-center items-center'>
-            Don't have an account?&nbsp;
-            <Link to="/auth/signup" className='text-black'>Sign up</Link>
-          </p>
+        <p className="mt-2 text-sm font-extralight text-gray-300 flex flex-row justify-center items-center">
+          Don't have an account?&nbsp;
+          <Link to="/auth/signup" className="text-black">
+            Sign up
+          </Link>
+        </p>
       </CardFooter>
     </Card>
   );

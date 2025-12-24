@@ -4,7 +4,7 @@ import { Home } from './pages/Home';
 import { Events } from './pages/Events';
 import { Organizations } from './pages/Organizations';
 import Login from './pages/auth/Login';
-import { SignUp } from './pages/auth/SignUp';
+import Signup from './pages/auth/SignUp';
 import { ForgotPassword } from './pages/auth/ForgotPassword';
 import { OtpCode } from './pages/auth/OtpCode';
 import { SetNewPassword } from './pages/auth/SetNewPassword';
@@ -25,7 +25,7 @@ export default createBrowserRouter([
         path: 'auth',
         children: [
           { path: 'login', Component: Login },
-          { path: 'signup', Component: SignUp },
+          { path: 'signup', Component: Signup },
           { path: 'forgot-password', Component: ForgotPassword },
           { path: 'otp', Component: OtpCode },
           { path: 'reset-password', Component: SetNewPassword },
