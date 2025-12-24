@@ -4,6 +4,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer utilities {
+    .text-outline {
+        -webkit-text-stroke: 1.5px var(--color-primary);
+        paint-order: stroke fill;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
 @theme {
     /* Fonts */
     --font-switzer: "Switzer", "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -141,6 +157,8 @@
     .container {
         @apply mx-auto px-4;
     }
+
+
 
     .clear-fix {
         @apply overflow-hidden;

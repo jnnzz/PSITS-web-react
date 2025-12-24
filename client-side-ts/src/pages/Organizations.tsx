@@ -1,11 +1,9 @@
-import { Footer } from "@/components/common/Footer";
+import { OrganizationSection } from "@/components/organization/OrganizationSection";
 
 export const Organizations = () => {
     return (
         <>
-        
-        
-            <Footer />
+            <OrganizationSection />
         </>
     );
 };

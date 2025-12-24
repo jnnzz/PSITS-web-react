@@ -1,6 +1,6 @@
-import { Card, CardDescription, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { Bell, Code2, Users2, ArrowRight } from "lucide-react"
+// import { Bell, Code2, Users2 } from "lucide-react" // Icons are now in data file
+import { getInvolvedData } from "@/data/sections-data"
 import { GetInvolvedCard } from "./GetInvolvedCard"
 
 export const GetInvolvedSection = () => {
@@ -19,22 +19,21 @@ export const GetInvolvedSection = () => {
           <div className="lg:col-span-5 space-y-8 sticky lg:top-32">
             <div className="space-y-4">
               <h2 className={cn(
-                "text-sm font-bold uppercase tracking-[0.2em] text-primary/80"
+                "text-primary font-bold uppercase tracking-[0.2em] text-sm md:text-base"
               )}>
-                Join the Community
+                {getInvolvedData.header.subtitle}
               </h2>
               <h1 className={cn(
-                "text-4xl sm:text-5xl md:text-6xl lg:text-7xl",
+                "text-3xl md:text-4xl lg:text-5xl",
                 "font-black uppercase tracking-tighter leading-[0.9]",
                 "bg-gradient-to-br from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent"
               )}>
-                Get <br className="hidden md:block" /> Involved
+                {getInvolvedData.header.titlePrefix} <br className="hidden md:block" /> {getInvolvedData.header.titleSuffix}
               </h1>
             </div>
 
             <p className="text-lg text-muted-foreground max-w-md leading-relaxed">
-              Learning, collaborating, and connecting within the organization.
-              Join our community and shape the future of technology together.
+              {getInvolvedData.header.description}
             </p>
 
             <div className="flex flex-wrap gap-4 pt-4">
@@ -44,31 +43,22 @@ export const GetInvolvedSection = () => {
                 ))}
               </div>
               <p className="flex items-center text-sm font-medium text-muted-foreground">
-                <span className="text-foreground font-bold mr-1">500+</span> ICT Students already joined
+                <span className="text-foreground font-bold mr-1">{getInvolvedData.header.memberCount}</span> IT Students already joined
               </p>
             </div>
           </div>
 
           {/* Cards Grid */}
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <GetInvolvedCard
-              title="Announcements"
-              description="Don't miss out! Stay updated on PSITS-hosted workshops, hackathons, and more events. Follow us for more details!"
-              icon={Bell}
-              className="h-full"
-            />
-            <GetInvolvedCard
-              title="Collaborations"
-              description="Unleash your potential! Aspiring Developers, collaborate with us on cutting-edge projects on GitHub."
-              icon={Code2}
-              className="h-full"
-            />
-            <GetInvolvedCard
-              title="Social Connections"
-              description="Build friendships, find mentors, and grow your network. Connect with like-minded peers and future colleagues!"
-              icon={Users2}
-              className="sm:col-span-2"
-            />
+            {getInvolvedData.cards.map((card, index) => (
+              <GetInvolvedCard
+                key={index}
+                title={card.title}
+                description={card.description}
+                icon={card.icon}
+                className={card.className}
+              />
+            ))}
           </div>
 
         </div>

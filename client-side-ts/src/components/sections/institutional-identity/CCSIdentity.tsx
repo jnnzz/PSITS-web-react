@@ -1,8 +1,9 @@
-import type { CCSData } from "./InstitutionalIdentitySection";
+import type { CCSData } from "@/data/sections-data";
 import imageLogo from "@/assets/ccsidentity.png";
 import announcement from "@/assets/announcement.png"
 import { InsitutionalIdentityContent } from "./InsitutionalIdentityContent";
 import { Card } from "@/components/ui/card";
+import { OptimizedImage } from "../../common/OptimizedImage";
 
 
 interface Props {
@@ -13,21 +14,22 @@ export const CCSIdentity = ({ data }: Props) => {
   return (
     <section className="relative min-h-[60vh] md:min-h-[700px] bg-background z-20 flex items-center">
       {/* Background Image - Subtle & Faded */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center select-none -z-10">
-        <img
+      <div className="absolute inset-1 pointer-events-none flex items-center justify-center scale-115 select-none">
+        <OptimizedImage
           src={imageLogo}
           alt=""
-          className="w-[150%] h-[150%] md:w-[130%] md:h-[130%] object-cover opacity-50 md:opacity-100"
+          className="w-[130%] h-[130%] object-contain opacity-50 md:opacity-100"
+          blur={false}
         />
       </div>
 
       <div className="container relative py-12 md:py-24 px-4 md:px-6 z-10">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 items-center lg:items-start">
           {/* Left Column: Title */}
-          <Card className="w-full lg:flex-3 border-none shadow-none bg-transparent">
+          <Card className="w-full lg:w-3/5 border-none shadow-none bg-transparent">
             <InsitutionalIdentityContent
-              title={data.title}
-              subtitle={data.subtitle}
+              title={data.subtitle}
+              subtitle={data.title}
               mission={data.mission}
               vision={data.vision}
               headerClassName="text-center lg:text-left"
@@ -35,12 +37,12 @@ export const CCSIdentity = ({ data }: Props) => {
           </Card>
 
           {/* Right Column: Content */}
-          <div className="relative w-full lg:flex-2 h-[400px] sm:h-[500px] lg:h-auto lg:self-stretch">
+          <div className="relative w-full lg:w-2/5 h-[400px] sm:h-[500px] lg:h-auto lg:self-stretch">
 
             {/* Clipped Background Area */}
             <div className="absolute inset-0 rounded-[2rem] overflow-hidden z-10 w-full h-full lg:translate-x-0">
               <div
-                className="w-full h-full bg-black relative"
+                className="w-full h-full relative"
                 style={{
                   clipPath: `polygon(
                     /* Top Left vertical edge */
@@ -83,9 +85,10 @@ export const CCSIdentity = ({ data }: Props) => {
                 }}
               >
                 {/* Background Image */}
-                <img
+                <OptimizedImage
                   src={announcement}
                   alt=""
+                  containerClassName="w-full h-full"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -94,13 +97,14 @@ export const CCSIdentity = ({ data }: Props) => {
             {/* Floating Card */}
             <div className="absolute left-[-20px] sm:left-[-40px] lg:left-[-100px] top-1/2 h-[60%] w-[70%] lg:w-[60%]
                   -translate-y-1/2 rounded-[2rem]
-                  bg-primary border outline outline-background outline-[0.5rem]
+                  border outline outline-background outline-[0.5rem]
                   z-20 shadow-xl overflow-hidden transition-all duration-300">
 
               {/* Inner Image */}
-              <img
+              <OptimizedImage
                 src={announcement}
                 alt=""
+                containerClassName="w-full h-full"
                 className="relative z-40 w-full h-full object-cover"
               />
             </div>

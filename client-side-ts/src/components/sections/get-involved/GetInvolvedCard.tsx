@@ -18,25 +18,29 @@ export const GetInvolvedCard = ({
     className
 }: GetInvolvedCardProps) => (
     <Card className={cn(
-        "group relative overflow-hidden border border-white/10 bg-black p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20 flex flex-col min-h-[300px]",
+        "group relative overflow-hidden border-none shadow-none bg-transparent p-0 transition-all duration-500 hover:-translate-y-2 flex flex-col min-h-[300px] rounded-[2rem]",
         className
     )}>
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
             <img
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 src={announcement}
                 alt=""
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+            <div className="absolute inset-0 bg-black/80 group-hover:bg-black/70 transition-colors duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         </div>
 
-        <div className="relative z-10 flex flex-col h-full">
+        <div className="relative z-10 flex flex-col h-full p-8">
             <div className="space-y-3 flex-1">
-                <CardTitle className="text-2xl font-bold tracking-tight text-white group-hover:text-primary transition-colors">
+                <div className="mb-4 inline-flex p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 text-white w-fit group-hover:scale-110 group-hover:bg-primary/20 group-hover:border-primary/20 group-hover:text-primary transition-all duration-300">
+                    <Icon className="w-6 h-6" />
+                </div>
+                <CardTitle className="text-2xl md:text-3xl font-bold tracking-tight text-white group-hover:text-primary transition-colors">
                     {title}
                 </CardTitle>
-                <CardDescription className="text-gray-300 leading-relaxed text-base">
+                <CardDescription className="text-gray-300 leading-relaxed text-sm md:text-base">
                     {description}
                 </CardDescription>
             </div>
