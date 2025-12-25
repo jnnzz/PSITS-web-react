@@ -1,0 +1,689 @@
+name: Discord PR Notifications
+
+on:
+  pull_request:
+    # Trigger for PRs to any branch (scalable for all branches)
+    types: [opened, closed, reopened, synchronize, ready_for_review, review_requested]
+  pull_request_review:
+    types: [submitted]
+
+env:
+  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+jobs:
+  notify-pr-event:
+    name: Send Discord Notification
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # Note: For fork PRs, secrets (DISCORD_WEBHOOK_URL) are not available for security reasons
+          # The workflow will run but Discord notifications will be skipped
+
+      - name: Detect changed services and file statistics
+        id: detect-changes
+        run: |
+          set -e
+          echo "Detecting changed services and file statistics in PR..."
+
+          # Get changed files (handle errors gracefully)
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.sha }}"
+          
+          CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" 2>/dev/null || echo "")
+          
+          # Get detailed file statistics
+          FILES_ADDED=$(git diff --name-only --diff-filter=A "$BASE_SHA" "$HEAD_SHA" 2>/dev/null | wc -l || echo "0")
+          FILES_REMOVED=$(git diff --name-only --diff-filter=D "$BASE_SHA" "$HEAD_SHA" 2>/dev/null | wc -l || echo "0")
+          FILES_MODIFIED=$(git diff --name-only --diff-filter=M "$BASE_SHA" "$HEAD_SHA" 2>/dev/null | wc -l || echo "0")
+          FILES_RENAMED=$(git diff --name-only --diff-filter=R "$BASE_SHA" "$HEAD_SHA" 2>/dev/null | wc -l || echo "0")
+          
+          # Get file type breakdown (top 5)
+          FILE_TYPES=$(echo "$CHANGED_FILES" | sed 's/.*\.//' | sort | uniq -c | sort -rn | head -5 | awk '{print $2 " (" $1 ")"}' | tr '\n' ', ' | sed 's/,$//' || echo "N/A")
+          
+          # Get file list for display (truncate if too long for Discord)
+          TOTAL_FILES=$(echo "$CHANGED_FILES" | grep -v '^$' | wc -l | tr -d ' ' || echo "0")
+          
+          # Show top files changed (Discord field limit: 1024 chars, so show ~8 files max)
+          if [ $TOTAL_FILES -gt 0 ]; then
+            # Show top 8 files (safe for Discord 1024 char limit)
+            TOP_FILES=$(echo "$CHANGED_FILES" | grep -v '^$' | head -8 | sed 's/^/  • /' | tr '\n' '\n' || echo "")
+            REMAINING_FILES=$((TOTAL_FILES - 8))
+            
+            if [ $REMAINING_FILES -gt 0 ]; then
+              FILE_LIST="${TOP_FILES}\n  ... and $REMAINING_FILES more file(s)"
+            else
+              FILE_LIST="${TOP_FILES}"
+            fi
+          else
+            FILE_LIST="  (No files changed)"
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          echo ""
+          echo "File Statistics:"
+          echo "  Added: $FILES_ADDED"
+          echo "  Removed: $FILES_REMOVED"
+          echo "  Modified: $FILES_MODIFIED"
+          echo "  Renamed: $FILES_RENAMED"
+          echo "  Total: $TOTAL_FILES"
+          echo "  File Types: $FILE_TYPES"
+
+          # Initialize service lists
+          CHANGED_SERVICES=""
+          SERVICE_COUNT=0
+
+          # Check Client-side (React frontend)
+          if echo "$CHANGED_FILES" | grep -q "^client-side/"; then
+            CHANGED_SERVICES="$CHANGED_SERVICES• **Client-side** (React Frontend)\n"
+            SERVICE_COUNT=$((SERVICE_COUNT + 1))
+          fi
+
+          # Check Server-side (Node.js/TypeScript backend)
+          if echo "$CHANGED_FILES" | grep -q "^server-side/"; then
+            CHANGED_SERVICES="$CHANGED_SERVICES• **Server-side** (Node.js/TypeScript Backend)\n"
+            SERVICE_COUNT=$((SERVICE_COUNT + 1))
+          fi
+
+          # Check workflows
+          if echo "$CHANGED_FILES" | grep -q "^\.github/workflows/"; then
+            CHANGED_SERVICES="$CHANGED_SERVICES• **CI/CD Workflows**\n"
+            SERVICE_COUNT=$((SERVICE_COUNT + 1))
+          fi
+
+          # Check documentation
+          if echo "$CHANGED_FILES" | grep -E "\.(md|txt)$" | grep -v "^server-side/" | grep -v "^client-side/"; then
+            CHANGED_SERVICES="$CHANGED_SERVICES• **Documentation**\n"
+            SERVICE_COUNT=$((SERVICE_COUNT + 1))
+          fi
+
+          # If no specific services detected, mark as general changes
+          if [ $SERVICE_COUNT -eq 0 ]; then
+            CHANGED_SERVICES="• **General project changes**\n"
+            SERVICE_COUNT=1
+          fi
+
+          # Save outputs (escape newlines for GitHub Actions)
+          # Use heredoc delimiter to safely write multiline content
+          {
+            echo "CHANGED_SERVICES<<EOF"
+            echo -e "$CHANGED_SERVICES"
+            echo "EOF"
+          } >> $GITHUB_ENV
+          echo "SERVICE_COUNT=$SERVICE_COUNT" >> $GITHUB_ENV
+          
+          # Save file statistics
+          echo "FILES_ADDED=$FILES_ADDED" >> $GITHUB_ENV
+          echo "FILES_REMOVED=$FILES_REMOVED" >> $GITHUB_ENV
+          echo "FILES_MODIFIED=$FILES_MODIFIED" >> $GITHUB_ENV
+          echo "FILES_RENAMED=$FILES_RENAMED" >> $GITHUB_ENV
+          echo "TOTAL_FILES=$TOTAL_FILES" >> $GITHUB_ENV
+          echo "FILE_TYPES=$FILE_TYPES" >> $GITHUB_ENV
+          
+          # Save file list (truncated for Discord)
+          {
+            echo "FILE_LIST<<EOF"
+            echo -e "$FILE_LIST"
+            echo "EOF"
+          } >> $GITHUB_ENV
+
+          echo "Detected $SERVICE_COUNT service(s) with changes"
+          echo "File changes: +$FILES_ADDED -$FILES_REMOVED ~$FILES_MODIFIED (Total: $TOTAL_FILES)"
+
+      - name: Determine event type and color
+        id: event-info
+        run: |
+          # Validate essential PR data exists before processing
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          
+          # Check if PR data is missing or empty (including empty strings)
+          if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" = "null" ] || \
+             [ -z "$PR_TITLE" ] || [ "$PR_TITLE" = "null" ] || \
+             [ -z "$PR_URL" ] || [ "$PR_URL" = "null" ] || \
+             [ -z "$PR_AUTHOR" ] || [ "$PR_AUTHOR" = "null" ]; then
+            echo "SKIP_NOTIFICATION=true" >> $GITHUB_ENV
+            echo "⚠️ Missing essential PR data. Skipping notification."
+            echo "PR_NUMBER: '$PR_NUMBER'"
+            echo "PR_TITLE: '$PR_TITLE'"
+            echo "PR_URL: '$PR_URL'"
+            echo "PR_AUTHOR: '$PR_AUTHOR'"
+            exit 0
+          fi
+          
+          EVENT_TYPE="${{ github.event.action }}"
+          PR_STATE="${{ github.event.pull_request.state }}"
+          MERGED="${{ github.event.pull_request.merged }}"
+          PR_USER="${{ github.event.pull_request.user.login }}"
+          SENDER="${{ github.event.sender.login }}"
+          MERGED_BY="${{ github.event.pull_request.merged_by.login }}"
+
+          # Set defaults for empty values
+          PR_USER="${PR_USER:-Unknown User}"
+          SENDER="${SENDER:-Unknown User}"
+          MERGED_BY="${MERGED_BY:-Unknown User}"
+
+          # Determine color and title based on event
+          if [ "$EVENT_TYPE" = "opened" ]; then
+            COLOR="3447003"  # Blue
+            TITLE="🆕 New Pull Request Opened"
+            DESCRIPTION="$PR_USER created a new pull request"
+          elif [ "$EVENT_TYPE" = "reopened" ]; then
+            COLOR="10181046"  # Purple
+            TITLE="🔄 Pull Request Reopened"
+            DESCRIPTION="$PR_USER reopened this pull request"
+          elif [ "$EVENT_TYPE" = "closed" ] && [ "$MERGED" = "true" ]; then
+            COLOR="5763719"  # Green
+            TITLE="✅ Pull Request Merged"
+            DESCRIPTION="$MERGED_BY merged this pull request"
+          elif [ "$EVENT_TYPE" = "closed" ] && [ "$MERGED" = "false" ]; then
+            COLOR="15158332"  # Red
+            TITLE="❌ Pull Request Closed"
+            DESCRIPTION="$PR_USER closed this pull request without merging"
+          elif [ "$EVENT_TYPE" = "synchronize" ]; then
+            COLOR="16776960"  # Yellow
+            TITLE="📝 Pull Request Updated"
+            DESCRIPTION="$SENDER pushed new commits"
+          elif [ "$EVENT_TYPE" = "ready_for_review" ]; then
+            COLOR="3066993"  # Teal
+            TITLE="👀 Pull Request Ready for Review"
+            DESCRIPTION="$PR_USER marked this PR as ready for review"
+          elif [ "$EVENT_TYPE" = "review_requested" ]; then
+            COLOR="15844367"  # Orange
+            TITLE="🔍 Review Requested"
+            DESCRIPTION="$SENDER requested a review"
+          else
+            # Skip notification for unknown event types to prevent empty notifications
+            echo "SKIP_NOTIFICATION=true" >> $GITHUB_ENV
+            echo "⚠️ Unknown event type: $EVENT_TYPE. Skipping notification."
+            exit 0
+          fi
+
+          echo "SKIP_NOTIFICATION=false" >> $GITHUB_ENV
+          echo "COLOR=$COLOR" >> $GITHUB_ENV
+          echo "TITLE=$TITLE" >> $GITHUB_ENV
+          echo "DESCRIPTION=$DESCRIPTION" >> $GITHUB_ENV
+
+      - name: Send Discord notification
+        if: env.SKIP_NOTIFICATION != 'true' && github.event.pull_request.number != '' && github.event.pull_request.title != ''
+        run: |
+          # Double-check if we should skip notification (from previous step)
+          if [ "${SKIP_NOTIFICATION:-false}" = "true" ]; then
+            echo "Skipping notification as requested (SKIP_NOTIFICATION=true)"
+            exit 0
+          fi
+
+          # Prepare PR information
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          PR_AUTHOR_AVATAR="${{ github.event.pull_request.user.avatar_url }}"
+          BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+          HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
+          ADDITIONS="${{ github.event.pull_request.additions }}"
+          DELETIONS="${{ github.event.pull_request.deletions }}"
+          CHANGED_FILES="${{ github.event.pull_request.changed_files }}"
+          COMMITS="${{ github.event.pull_request.commits }}"
+
+          # Final validation - check if PR data is missing or empty (including null strings)
+          if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" = "null" ] || \
+             [ -z "$PR_TITLE" ] || [ "$PR_TITLE" = "null" ] || \
+             [ -z "$PR_URL" ] || [ "$PR_URL" = "null" ] || \
+             [ -z "$PR_AUTHOR" ] || [ "$PR_AUTHOR" = "null" ]; then
+            echo "⚠️ Missing required PR data. Skipping notification."
+            echo "PR_NUMBER: '$PR_NUMBER'"
+            echo "PR_TITLE: '$PR_TITLE'"
+            echo "PR_URL: '$PR_URL'"
+            echo "PR_AUTHOR: '$PR_AUTHOR'"
+            exit 0
+          fi
+
+          # Check if Discord webhook URL is available (for fork PRs, secrets are not available)
+          if [ -z "$DISCORD_WEBHOOK_URL" ] || [ "$DISCORD_WEBHOOK_URL" = "" ]; then
+            echo "ℹ️ Discord webhook URL not available (likely a fork PR). Skipping Discord notification."
+            echo "PR will still be processed, but Discord notification will be skipped."
+            exit 0
+          fi
+
+          # Set defaults for optional fields
+          PR_NUMBER="${PR_NUMBER:-0}"
+          PR_TITLE="${PR_TITLE:-Untitled}"
+          PR_URL="${PR_URL:-}"
+          PR_AUTHOR="${PR_AUTHOR:-Unknown}"
+          PR_AUTHOR_AVATAR="${PR_AUTHOR_AVATAR:-https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png}"
+          BASE_BRANCH="${BASE_BRANCH:-unknown}"
+          HEAD_BRANCH="${HEAD_BRANCH:-unknown}"
+          ADDITIONS="${ADDITIONS:-0}"
+          DELETIONS="${DELETIONS:-0}"
+          CHANGED_FILES="${CHANGED_FILES:-0}"
+          COMMITS="${COMMITS:-0}"
+
+          # Get current timestamp
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          # Escape special characters for JSON (handle newlines and quotes)
+          PR_TITLE_ESCAPED=$(echo "$PR_TITLE" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          DESCRIPTION_ESCAPED=$(echo "$DESCRIPTION" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          CHANGED_SERVICES_ESCAPED=$(echo "$CHANGED_SERVICES" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          
+          # Escape file list for Discord (truncate if too long - Discord field limit is 1024 chars)
+          FILE_LIST_ESCAPED=$(echo -e "$FILE_LIST" | sed 's/"/\\"/g' | sed 's/\\/\\\\/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          
+          # Ensure FILE_LIST_ESCAPED doesn't exceed Discord's 1024 char limit per field
+          FILE_LIST_LENGTH=$(echo -n "$FILE_LIST_ESCAPED" | wc -c)
+          if [ $FILE_LIST_LENGTH -gt 1000 ]; then
+            # Truncate to ~950 chars and add "... (truncated)"
+            FILE_LIST_ESCAPED=$(echo -n "$FILE_LIST_ESCAPED" | head -c 950)
+            FILE_LIST_ESCAPED="${FILE_LIST_ESCAPED}... (truncated - see PR for full list)"
+          fi
+
+          # Build Discord webhook payload
+          cat > discord_payload.json <<EOF
+          {
+            "username": "PSITS CI/CD",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            "embeds": [
+              {
+                "title": "$TITLE",
+                "description": "$DESCRIPTION_ESCAPED",
+                "url": "$PR_URL",
+                "color": $COLOR,
+                "fields": [
+                  {
+                    "name": "📋 Pull Request",
+                    "value": "[#$PR_NUMBER - $PR_TITLE_ESCAPED]($PR_URL)",
+                    "inline": false
+                  },
+                  {
+                    "name": "👤 Author",
+                    "value": "[$PR_AUTHOR](https://github.com/$PR_AUTHOR)",
+                    "inline": true
+                  },
+                  {
+                    "name": "🌿 Branch",
+                    "value": "\`$HEAD_BRANCH\` → \`$BASE_BRANCH\`",
+                    "inline": true
+                  },
+                  {
+                    "name": "📊 Changes",
+                    "value": "**$CHANGED_FILES** files • **$COMMITS** commits\n✅ **+$ADDITIONS** lines • ❌ **-$DELETIONS** lines\n\n📁 **Files:** +${{ env.FILES_ADDED }} added, -${{ env.FILES_REMOVED }} removed, ~${{ env.FILES_MODIFIED }} modified\n📦 **Types:** ${{ env.FILE_TYPES }}",
+                    "inline": false
+                  },
+                  {
+                    "name": "📝 Changed Files (${{ env.TOTAL_FILES }})",
+                    "value": "$FILE_LIST_ESCAPED",
+                    "inline": false
+                  },
+                  {
+                    "name": "🔧 Affected Services ($SERVICE_COUNT)",
+                    "value": "$CHANGED_SERVICES_ESCAPED",
+                    "inline": false
+                  }
+                ],
+                "thumbnail": {
+                  "url": "$PR_AUTHOR_AVATAR"
+                },
+                "footer": {
+                  "text": "PSITS • GitHub Actions",
+                  "icon_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                },
+                "timestamp": "$TIMESTAMP"
+              }
+            ]
+          }
+          EOF
+
+          # Send to Discord
+          echo "Sending notification to Discord..."
+
+          RESPONSE=$(curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d @discord_payload.json \
+            -w "\n%{http_code}" \
+            -s)
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+
+          if [ "$HTTP_CODE" = "204" ] || [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Successfully sent Discord notification (HTTP $HTTP_CODE)"
+          else
+            echo "⚠️ Discord webhook returned HTTP $HTTP_CODE"
+            echo "Response: $RESPONSE"
+            # Don't fail the workflow if Discord notification fails
+          fi
+
+      - name: Add PR comment (for opened/reopened)
+        if: github.event.action == 'opened' || github.event.action == 'reopened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const serviceCount = parseInt(process.env.SERVICE_COUNT || '0');
+            const changedServices = process.env.CHANGED_SERVICES || '• **General project changes**\n';
+
+            // Safely escape user input to prevent script injection
+            const escapeMarkdown = (str) => {
+              if (!str) return '';
+              return String(str).replace(/[\\`*_{}[\]()#+\-.!]/g, '\\$&');
+            };
+
+            // Get PR data safely
+            const prAuthor = escapeMarkdown(context.payload.pull_request.user.login);
+            const headBranch = escapeMarkdown(context.payload.pull_request.head.ref);
+            const baseBranch = escapeMarkdown(context.payload.pull_request.base.ref);
+            const changedFiles = context.payload.pull_request.changed_files || 0;
+            const commits = context.payload.pull_request.commits || 0;
+            const additions = context.payload.pull_request.additions || 0;
+            const deletions = context.payload.pull_request.deletions || 0;
+
+            let comment = '## 🤖 CI/CD Automation\n\n';
+            comment += '### 📋 PR Information\n';
+            comment += `- **Author**: @${prAuthor}\n`;
+            comment += `- **Branch**: \`${headBranch}\` → \`${baseBranch}\`\n`;
+            comment += `- **Changed Files**: ${changedFiles}\n`;
+            comment += `- **Commits**: ${commits}\n`;
+            comment += `- **Lines**: ✅ +${additions} • ❌ -${deletions}\n\n`;
+            
+            comment += '### 📁 File Changes\n';
+            comment += `- **Added**: ${process.env.FILES_ADDED || '0'} files\n`;
+            comment += `- **Removed**: ${process.env.FILES_REMOVED || '0'} files\n`;
+            comment += `- **Modified**: ${process.env.FILES_MODIFIED || '0'} files\n`;
+            comment += `- **Renamed**: ${process.env.FILES_RENAMED || '0'} files\n`;
+            comment += `- **File Types**: ${escapeMarkdown(process.env.FILE_TYPES || 'N/A')}\n\n`;
+
+            comment += `### 🔧 Affected Services (${serviceCount})\n`;
+            comment += changedServices + '\n';
+
+            comment += '### ⚙️ What happens next?\n';
+            comment += '1. ✅ **Validation workflows** will run automatically\n';
+            comment += '2. 🔍 **Only changed services** will be validated (client-side or server-side)\n';
+            comment += '3. 🚀 **After merge to production**, only affected services will be deployed\n';
+            comment += '4. 📢 **Discord notifications** will be sent for all PR events\n\n';
+
+            comment += '---\n';
+            comment += '*💡 Tip: Push additional commits to update this PR. The CI/CD will automatically detect and validate only the changed services.*';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  notify-pr-review:
+    name: Send PR Review Notification
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request_review'
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Get review details
+        id: review-details
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const review = context.payload.review;
+            const pr = context.payload.pull_request;
+            
+            // Skip bot reviews (like CodeRabbit) to avoid errors
+            if (review.user.type === 'Bot' || review.user.login.includes('[bot]')) {
+              core.setOutput('skip_notification', 'true');
+              core.info(`Skipping notification for bot review by ${review.user.login}`);
+              return { skip: true };
+            }
+            
+            // Validate required fields
+            if (!review || !pr || !pr.number) {
+              core.setOutput('skip_notification', 'true');
+              core.warning('Missing required review or PR data');
+              return { skip: true };
+            }
+            
+            // Get review comments with error handling
+            let reviewComments = { data: [] };
+            try {
+              reviewComments = await github.rest.pulls.listReviewComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                review_id: review.id
+              });
+            } catch (error) {
+              core.warning(`Failed to fetch review comments: ${error.message}`);
+              // Continue with empty comments
+              reviewComments = { data: [] };
+            }
+            
+            // Get review state emoji and color
+            let reviewEmoji = '';
+            let reviewColor = 9807270; // Gray default
+            let reviewStatus = review.state;
+            
+            if (review.state === 'approved') {
+              reviewEmoji = '✅';
+              reviewColor = 5763719; // Green
+              reviewStatus = 'Approved';
+            } else if (review.state === 'changes_requested') {
+              reviewEmoji = '❌';
+              reviewColor = 15158332; // Red
+              reviewStatus = 'Changes Requested';
+            } else if (review.state === 'commented') {
+              reviewEmoji = '💬';
+              reviewColor = 3447003; // Blue
+              reviewStatus = 'Commented';
+            } else if (review.state === 'dismissed') {
+              reviewEmoji = '🚫';
+              reviewColor = 9807270; // Gray
+              reviewStatus = 'Dismissed';
+            }
+            
+            // Format review body (truncate if too long)
+            let reviewBody = review.body || 'No comment provided';
+            if (reviewBody.length > 500) {
+              reviewBody = reviewBody.substring(0, 500) + '...';
+            }
+            
+            // Format comments
+            let commentsText = '';
+            if (reviewComments.data && reviewComments.data.length > 0) {
+              commentsText = reviewComments.data.slice(0, 5).map(comment => {
+                const file = comment.path;
+                const line = comment.line || comment.original_line || 'N/A';
+                const body = comment.body.length > 200 ? comment.body.substring(0, 200) + '...' : comment.body;
+                return `**${file}:${line}**\n${body}`;
+              }).join('\n\n---\n\n');
+              
+              if (reviewComments.data.length > 5) {
+                commentsText += `\n\n*...and ${reviewComments.data.length - 5} more comment(s)*`;
+              }
+            } else {
+              commentsText = 'No inline comments';
+            }
+            
+            // Write problematic outputs (with special characters) to files to avoid shell interpretation issues
+            const fs = require('fs');
+            const path = require('path');
+            const outputDir = process.env.GITHUB_WORKSPACE || '/tmp';
+            fs.writeFileSync(path.join(outputDir, 'review_body.txt'), reviewBody, 'utf8');
+            fs.writeFileSync(path.join(outputDir, 'review_comments.txt'), commentsText, 'utf8');
+            
+            // Set outputs (safe ones that don't contain code snippets or markdown)
+            core.setOutput('skip_notification', 'false');
+            core.setOutput('reviewer', review.user.login);
+            core.setOutput('reviewer_avatar', review.user.avatar_url || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png');
+            core.setOutput('review_state', review.state);
+            core.setOutput('review_status', reviewStatus);
+            core.setOutput('review_emoji', reviewEmoji);
+            core.setOutput('review_color', reviewColor.toString());
+            core.setOutput('comment_count', reviewComments.data ? reviewComments.data.length.toString() : '0');
+            
+            return {
+              reviewer: review.user.login,
+              reviewState: review.state,
+              commentCount: reviewComments.data ? reviewComments.data.length : 0
+            };
+
+      - name: Send Discord notification for review
+        if: steps.review-details.outputs.skip_notification != 'true'
+        run: |
+          # Check if we should skip (bot review or missing data)
+          if [ "${{ steps.review-details.outputs.skip_notification }}" = "true" ]; then
+            echo "Skipping notification (bot review or missing data)"
+            exit 0
+          fi
+          
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+          HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
+          
+          # Validate required fields
+          if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" = "null" ] || \
+             [ -z "$PR_TITLE" ] || [ "$PR_TITLE" = "null" ] || \
+             [ -z "$PR_URL" ] || [ "$PR_URL" = "null" ]; then
+            echo "⚠️ Missing required PR data. Skipping notification."
+            exit 0
+          fi
+
+          # Check if Discord webhook URL is available (for fork PRs, secrets are not available)
+          if [ -z "$DISCORD_WEBHOOK_URL" ] || [ "$DISCORD_WEBHOOK_URL" = "" ]; then
+            echo "ℹ️ Discord webhook URL not available (likely a fork PR). Skipping Discord notification."
+            echo "PR review will still be processed, but Discord notification will be skipped."
+            exit 0
+          fi
+          
+          REVIEWER="${{ steps.review-details.outputs.reviewer }}"
+          REVIEWER_AVATAR="${{ steps.review-details.outputs.reviewer_avatar }}"
+          REVIEW_STATE="${{ steps.review-details.outputs.review_state }}"
+          REVIEW_STATUS="${{ steps.review-details.outputs.review_status }}"
+          REVIEW_EMOJI="${{ steps.review-details.outputs.review_emoji }}"
+          REVIEW_COLOR="${{ steps.review-details.outputs.review_color }}"
+          COMMENT_COUNT="${{ steps.review-details.outputs.comment_count }}"
+          
+          # Read review body and comments from files to avoid shell interpretation issues
+          # These files were written by the GitHub script step to handle special characters
+          if [ -f "$GITHUB_WORKSPACE/review_body.txt" ]; then
+            REVIEW_BODY=$(cat "$GITHUB_WORKSPACE/review_body.txt")
+          else
+            REVIEW_BODY="No comment provided"
+          fi
+          
+          if [ -f "$GITHUB_WORKSPACE/review_comments.txt" ]; then
+            COMMENTS=$(cat "$GITHUB_WORKSPACE/review_comments.txt")
+          else
+            COMMENTS="No inline comments"
+          fi
+          
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Set defaults for empty values
+          REVIEW_BODY="${REVIEW_BODY:-No comment provided}"
+          COMMENTS="${COMMENTS:-No inline comments}"
+          PR_TITLE="${PR_TITLE:-Untitled PR}"
+          
+          # Use jq to properly escape JSON strings (handles all special characters, code snippets, markdown, etc.)
+          # -R: read as raw string, -s: read entire input as single string
+          # This returns JSON-escaped strings with quotes, which we'll use with --argjson
+          REVIEW_BODY_ESCAPED=$(echo -n "$REVIEW_BODY" | jq -Rs .)
+          COMMENTS_ESCAPED=$(echo -n "$COMMENTS" | jq -Rs .)
+          
+          # Build JSON payload using jq to ensure proper escaping
+          # Use --argjson for pre-escaped JSON strings, --arg for raw strings that jq will escape
+          jq -n \
+            --arg username "PSITS CI/CD" \
+            --arg avatar_url "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" \
+            --arg title "$REVIEW_EMOJI PR Review: $REVIEW_STATUS" \
+            --arg description "[$REVIEWER](https://github.com/$REVIEWER) reviewed pull request #$PR_NUMBER" \
+            --arg url "$PR_URL" \
+            --argjson color "$REVIEW_COLOR" \
+            --arg pr_number "$PR_NUMBER" \
+            --arg pr_title "$PR_TITLE" \
+            --arg pr_url "$PR_URL" \
+            --arg reviewer "$REVIEWER" \
+            --arg review_status "$REVIEW_STATUS" \
+            --arg head_branch "$HEAD_BRANCH" \
+            --arg base_branch "$BASE_BRANCH" \
+            --argjson review_body_escaped "$REVIEW_BODY_ESCAPED" \
+            --argjson comments_escaped "$COMMENTS_ESCAPED" \
+            --arg comment_count "$COMMENT_COUNT" \
+            --arg reviewer_avatar "$REVIEWER_AVATAR" \
+            --arg timestamp "$TIMESTAMP" \
+            '{
+              username: $username,
+              avatar_url: $avatar_url,
+              embeds: [{
+                title: $title,
+                description: $description,
+                url: $url,
+                color: $color,
+                fields: [
+                  {
+                    name: "📋 Pull Request",
+                    value: "[#\($pr_number) - \($pr_title)]($pr_url)",
+                    inline: false
+                  },
+                  {
+                    name: "👤 Reviewer",
+                    value: "[\($reviewer)](https://github.com/\($reviewer))",
+                    inline: true
+                  },
+                  {
+                    name: "📊 Review Status",
+                    value: "**\($review_status)**",
+                    inline: true
+                  },
+                  {
+                    name: "🌿 Branch",
+                    value: "`\($head_branch)` → `\($base_branch)`",
+                    inline: true
+                  },
+                  {
+                    name: "💬 Review Comment",
+                    value: $review_body_escaped,
+                    inline: false
+                  },
+                  {
+                    name: "📝 Inline Comments (\($comment_count))",
+                    value: $comments_escaped,
+                    inline: false
+                  }
+                ],
+                thumbnail: {
+                  url: $reviewer_avatar
+                },
+                footer: {
+                  text: "PSITS • PR Review Notification",
+                  icon_url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                },
+                timestamp: $timestamp
+              }]
+            }' > discord_payload.json
+          
+          RESPONSE=$(curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d @discord_payload.json \
+            -w "\n%{http_code}" \
+            -s)
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          
+          if [ "$HTTP_CODE" = "204" ] || [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Successfully sent Discord notification (HTTP $HTTP_CODE)"
+          else
+            echo "⚠️ Discord webhook returned HTTP $HTTP_CODE"
+            echo "Response: $RESPONSE"
+            # Don't fail the workflow if Discord notification fails
+          fi
+

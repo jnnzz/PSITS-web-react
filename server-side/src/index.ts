@@ -15,6 +15,7 @@ import privateRoutes from "./routes/private.route";
 import logRoutes from "./routes/logs.route";
 import merchRoutes from "./routes/merchandise.route";
 import eventRoutes from "./routes/events.route";
+import documentationRoutes from "./routes/documentation.route";
 
 //Declaration
 const app: Express = express();
@@ -56,6 +57,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api", privateRoutes);
+app.use("/api/docs", documentationRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server started, listening at port ${PORT}`);
