@@ -1,6 +1,7 @@
 import type { CCSData } from "@/data/sections-data";
 import imageLogo from "@/assets/ccsidentity.png";
 import announcement from "@/assets/announcement.png"
+import aiLab from "@/assets/aiLab.jpg";
 import { InsitutionalIdentityContent } from "./InsitutionalIdentityContent";
 import { Card } from "@/components/ui/card";
 import { OptimizedImage } from "../../common/OptimizedImage";
@@ -86,8 +87,8 @@ export const CCSIdentity = ({ data }: Props) => {
               >
                 {/* Background Image */}
                 <OptimizedImage
-                  src={announcement}
-                  alt=""
+                  src={aiLab}
+                  alt="AI Lab"
                   containerClassName="w-full h-full"
                   className="w-full h-full object-cover"
                 />
@@ -104,7 +105,7 @@ export const CCSIdentity = ({ data }: Props) => {
               {/* Inner Image */}
               <OptimizedImage
                 src={announcement}
-                alt=""
+                alt="AI Lab"
                 containerClassName="w-full h-full"
                 className="relative z-40 w-full h-full object-cover"
               />
