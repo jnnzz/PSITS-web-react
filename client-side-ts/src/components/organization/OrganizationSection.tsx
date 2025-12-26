@@ -1,6 +1,6 @@
 import { CardTitle } from "../ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
-import { Carousel, CarouselContent, CarouselItem } from "../ui/carousel"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel"
 import { organizationSectionData, type Member } from "@/data/sections-data"
 import { OptimizedImage } from "@/components/common/OptimizedImage"
 
@@ -85,31 +85,42 @@ const MemberCarousel = ({ members, title }: { members: Member[]; title: string }
                 <h3 className="text-xl md:text-2xl font-bold uppercase tracking-wider text-foreground/80">{title}</h3>
                 <div className="h-px flex-1 bg-border/50" />
             </div>
-            <Carousel
-                opts={{
-                    align: "start",
-                    loop: members.length > 4,
-                }}
-                className="w-full"
-            >
-                <CarouselContent className="-ml-2 md:-ml-4">
-                    {members.map((member, index) => (
-                        <CarouselItem key={index} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
-                            <div className="group relative aspect-[4/5] rounded-3xl overflow-hidden border border-border/50 bg-muted">
-                                <OptimizedImage
-                                    src={member.image}
-                                    alt={member.name}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
-                                    <p className="text-white font-bold text-lg leading-tight">{member.name}</p>
-                                    <p className="text-white/80 text-sm font-medium uppercase tracking-wider">{member.role}</p>
+            <div className="relative">
+                {/* Left fade gradient */}
+                <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+                {/* Right fade gradient */}
+                <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+                
+                <Carousel
+                    opts={{
+                        align: "center",
+                        loop: true,
+                    }}
+                    className="w-full"
+                >
+                    <CarouselContent className="-ml-2 md:-ml-4">
+                        {members.map((member, index) => (
+                            <CarouselItem key={index} className="pl-2 md:pl-4 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[35%] xl:basis-[28%]">
+                                <div className="group relative aspect-[4/5] rounded-3xl overflow-hidden border border-border/50 bg-muted">
+                                    <img
+                                        src={member.image}
+                                        alt={member.name}
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
+                                        <p className="text-white font-bold text-lg leading-tight">{member.name}</p>
+                                        <p className="text-white/80 text-sm font-medium uppercase tracking-wider">{member.role}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-            </Carousel>
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    
+                    {/* Navigation arrows */}
+                    <CarouselPrevious className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 z-20 h-10 w-10 md:h-12 md:w-12 bg-background/80 backdrop-blur-sm border border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 shadow-lg" />
+                    <CarouselNext className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-20 h-10 w-10 md:h-12 md:w-12 bg-background/80 backdrop-blur-sm border border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-300 shadow-lg" />
+                </Carousel>
+            </div>
         </div>
     );
 };
