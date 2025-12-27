@@ -8,6 +8,7 @@ interface GetInvolvedCardProps {
   title: string;
   description: string;
   icon: LucideIcon;
+  image?: string;
   className?: string;
 }
 
@@ -15,6 +16,7 @@ export const GetInvolvedCard = ({
   title,
   description,
   icon: Icon,
+  image,
   className,
 }: GetInvolvedCardProps) => (
   <Card
