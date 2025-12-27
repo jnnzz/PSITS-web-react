@@ -1,4 +1,4 @@
-import { BackgroundText } from "@/components/common/BackgroundText"
+import { BackgroundText } from '@/components/common/BackgroundText';
 
 export const EventsBanner = () => {
   return (
@@ -35,5 +35,5 @@ export const EventsBanner = () => {
         <div className="h-2 w-24 bg-primary mt-4 rounded-full" />
       </div>
     </section>
-  )
-}
+  );
+};

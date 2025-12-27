@@ -24,7 +24,9 @@ export interface ForgotPasswordFormProps {
   onSubmit?: (values: ForgotPasswordCredentials) => void;
 }
 
-export default function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps) {
+export default function ForgotPasswordForm({
+  onSubmit,
+}: ForgotPasswordFormProps) {
   const form = useForm({
     defaultValues: {
       id: '',
@@ -40,7 +42,9 @@ export default function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps
   return (
     <Card className="w-full sm:max-w-md border-none shadow-none">
       <CardHeader>
-        <CardTitle className="text-4xl font-semibold">Forgot Password</CardTitle>
+        <CardTitle className="text-4xl font-semibold">
+          Forgot Password
+        </CardTitle>
         <CardDescription>
           Enter your student ID number to reset your password.
         </CardDescription>
@@ -88,9 +92,7 @@ export default function ForgotPasswordForm({ onSubmit }: ForgotPasswordFormProps
                   field.state.meta.isTouched && !field.state.meta.isValid;
                 return (
                   <Field data-invalid={isInvalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Email Address
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Email Address</FieldLabel>
                     <Input
                       id={field.name}
                       name={field.name}

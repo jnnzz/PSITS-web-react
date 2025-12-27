@@ -1,10 +1,9 @@
-import type { CCSData } from "@/data/sections-data";
-import imageLogo from "@/assets/ccsidentity.png";
-import announcement from "@/assets/announcement.png"
-import { InsitutionalIdentityContent } from "./InsitutionalIdentityContent";
-import { Card } from "@/components/ui/card";
-import { OptimizedImage } from "../../common/OptimizedImage";
-
+import type { CCSData } from '@/data/sections-data';
+import imageLogo from '@/assets/ccsidentity.png';
+import announcement from '@/assets/announcement.png';
+import { InsitutionalIdentityContent } from './InsitutionalIdentityContent';
+import { Card } from '@/components/ui/card';
+import { OptimizedImage } from '../../common/OptimizedImage';
 
 interface Props {
   data: CCSData;
@@ -38,7 +37,6 @@ export const CCSIdentity = ({ data }: Props) => {
 
           {/* Right Column: Content */}
           <div className="relative w-full lg:w-2/5 h-[400px] sm:h-[500px] lg:h-auto lg:self-stretch">
-
             {/* Clipped Background Area */}
             <div className="absolute inset-0 rounded-[2rem] overflow-hidden z-10 w-full h-full lg:translate-x-0">
               <div
@@ -99,8 +97,8 @@ export const CCSIdentity = ({ data }: Props) => {
               className="absolute left-[-20px] sm:left-[-40px] lg:left-[-100px] top-1/2 h-[60%] w-[70%] lg:w-[60%]
                   -translate-y-1/2 rounded-[2rem]
                   border outline outline-background outline-[0.5rem]
-                  z-20 shadow-xl overflow-hidden transition-all duration-300">
-
+                  z-20 shadow-xl overflow-hidden transition-all duration-300"
+            >
               {/* Inner Image */}
               <OptimizedImage
                 src={announcement}

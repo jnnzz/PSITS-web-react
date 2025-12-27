@@ -79,9 +79,7 @@ export default function SetNewPasswordForm({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        New Password
-                      </FieldLabel>
+                      <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
                       <Input
                         id={field.name}
                         name={field.name}
@@ -140,11 +138,7 @@ export default function SetNewPasswordForm({
                 onClick={onBack}
                 asChild={!onBack}
               >
-                {onBack ? (
-                  'Back'
-                ) : (
-                  <Link to="/auth/login">Back</Link>
-                )}
+                {onBack ? 'Back' : <Link to="/auth/login">Back</Link>}
               </Button>
             </Field>
           </FieldGroup>

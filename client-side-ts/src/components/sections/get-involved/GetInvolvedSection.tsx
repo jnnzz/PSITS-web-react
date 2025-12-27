@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils';
 // import { Bell, Code2, Users2 } from "lucide-react" // Icons are now in data file
-import { getInvolvedData } from "@/data/sections-data"
-import { GetInvolvedCard } from "./GetInvolvedCard"
+import { getInvolvedData } from '@/data/sections-data';
+import { GetInvolvedCard } from './GetInvolvedCard';
 
 export const GetInvolvedSection = () => {
   return (
@@ -17,17 +17,23 @@ export const GetInvolvedSection = () => {
           {/* Header Area */}
           <div className="lg:col-span-5 space-y-8 sticky lg:top-32">
             <div className="space-y-4">
-              <h2 className={cn(
-                "text-primary font-bold uppercase tracking-[0.2em] text-sm md:text-base"
-              )}>
+              <h2
+                className={cn(
+                  'text-primary font-bold uppercase tracking-[0.2em] text-sm md:text-base'
+                )}
+              >
                 {getInvolvedData.header.subtitle}
               </h2>
-              <h1 className={cn(
-                "text-3xl md:text-4xl lg:text-5xl",
-                "font-black uppercase tracking-tighter leading-[0.9]",
-                "bg-gradient-to-br from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent"
-              )}>
-                {getInvolvedData.header.titlePrefix} <br className="hidden md:block" /> {getInvolvedData.header.titleSuffix}
+              <h1
+                className={cn(
+                  'text-3xl md:text-4xl lg:text-5xl',
+                  'font-black uppercase tracking-tighter leading-[0.9]',
+                  'bg-gradient-to-br from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent'
+                )}
+              >
+                {getInvolvedData.header.titlePrefix}{' '}
+                <br className="hidden md:block" />{' '}
+                {getInvolvedData.header.titleSuffix}
               </h1>
             </div>
 
@@ -45,7 +51,10 @@ export const GetInvolvedSection = () => {
                 ))}
               </div>
               <p className="flex items-center text-sm font-medium text-muted-foreground">
-                <span className="text-foreground font-bold mr-1">{getInvolvedData.header.memberCount}</span> IT Students already joined
+                <span className="text-foreground font-bold mr-1">
+                  {getInvolvedData.header.memberCount}
+                </span>{' '}
+                IT Students already joined
               </p>
             </div>
           </div>
