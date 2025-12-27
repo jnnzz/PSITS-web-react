@@ -2,7 +2,6 @@ import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import announcement from '@/assets/announcement.png';
 
 interface GetInvolvedCardProps {
   title: string;
@@ -27,13 +26,21 @@ export const GetInvolvedCard = ({
   >
     {/* Background Image with Overlay */}
     <div className="absolute inset-0 z-0">
-      <img
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        src={announcement}
-        alt=""
-      />
-      <div className="absolute inset-0 bg-black/80 group-hover:bg-black/70 transition-colors duration-500" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+      {image && (
+        <>
+          <img
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            src={image}
+            alt=""
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-black/80 group-hover:bg-black/70 transition-colors duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+        </>
+      )}
+      {!image && (
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
+      )}
     </div>
 
     <div className="relative z-10 flex flex-col h-full p-8">
@@ -50,7 +57,10 @@ export const GetInvolvedCard = ({
       </div>
 
       <div className="pt-6">
-        <button className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white transition-all hover:gap-3 group-hover:text-primary">
+        <button 
+          className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-white transition-all hover:gap-3 group-hover:text-primary"
+          type="button"
+        >
           Learn More
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
         </button>

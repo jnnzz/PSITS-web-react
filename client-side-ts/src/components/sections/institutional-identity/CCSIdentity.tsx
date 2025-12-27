@@ -1,5 +1,6 @@
 import type { CCSData } from '@/data/sections-data';
 import imageLogo from '@/assets/ccsidentity.png';
+import aiLab from "@/assets/aiLab.jpg";
 import announcement from '@/assets/announcement.png';
 import { InsitutionalIdentityContent } from './InsitutionalIdentityContent';
 import { Card } from '@/components/ui/card';
@@ -11,7 +12,7 @@ interface Props {
 
 export const CCSIdentity = ({ data }: Props) => {
   return (
-    <section className="relative min-h-[60vh] md:min-h-[700px] bg-background z-20 flex items-center">
+    <section className="relative min-h-[60vh] md:min-h-175 bg-background z-20 flex items-center">
       {/* Background Image - Subtle & Faded */}
       <div className="absolute inset-1 pointer-events-none flex items-center justify-center scale-115 select-none">
         <OptimizedImage
@@ -36,9 +37,9 @@ export const CCSIdentity = ({ data }: Props) => {
           </Card>
 
           {/* Right Column: Content */}
-          <div className="relative w-full lg:w-2/5 h-[400px] sm:h-[500px] lg:h-auto lg:self-stretch">
+          <div className="relative w-full lg:w-2/5 h-100 sm:h-125 lg:h-auto lg:self-stretch">
             {/* Clipped Background Area */}
-            <div className="absolute inset-0 rounded-[2rem] overflow-hidden z-10 w-full h-full lg:translate-x-0">
+            <div className="absolute inset-0 rounded-4xl overflow-hidden z-10 w-full h-full lg:translate-x-0">
               <div
                 className="w-full h-full relative"
                 style={{
@@ -94,9 +95,9 @@ export const CCSIdentity = ({ data }: Props) => {
 
             {/* Floating Card */}
             <div
-              className="absolute left-[-20px] sm:left-[-40px] lg:left-[-100px] top-1/2 h-[60%] w-[70%] lg:w-[60%]
-                  -translate-y-1/2 rounded-[2rem]
-                  border outline outline-background outline-[0.5rem]
+              className="absolute -left-5 sm:-left-10 lg:-left-25 top-1/2 h-[60%] w-[70%] lg:w-[60%]
+                  -translate-y-1/2 rounded-4xl
+                  border outline outline-background
                   z-20 shadow-xl overflow-hidden transition-all duration-300"
             >
               {/* Inner Image */}
