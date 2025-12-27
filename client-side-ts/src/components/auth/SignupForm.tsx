@@ -182,9 +182,7 @@ export default function SignupForm({
                     field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        First Name
-                      </FieldLabel>
+                      <FieldLabel htmlFor={field.name}>First Name</FieldLabel>
                       <Input
                         id={field.name}
                         name={field.name}
@@ -243,7 +241,7 @@ export default function SignupForm({
                         <Select
                           name={field.name}
                           value={field.state.value}
-                          onValueChange={(value) => field.handleChange(value)}
+                          onValueChange={value => field.handleChange(value)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Choose course" />
@@ -275,7 +273,7 @@ export default function SignupForm({
                         <Select
                           name={field.name}
                           value={field.state.value}
-                          onValueChange={(value) => field.handleChange(value)}
+                          onValueChange={value => field.handleChange(value)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Choose year" />

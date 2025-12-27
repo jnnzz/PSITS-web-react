@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils"
-import { useRef, useEffect, useState, useCallback } from "react"
-import { getInvolvedData } from "@/data/sections-data"
-import { GetInvolvedCard } from "./GetInvolvedCard"
+import { cn } from '@/lib/utils';
+// import { Bell, Code2, Users2 } from "lucide-react" // Icons are now in data file
+import { getInvolvedData } from '@/data/sections-data';
+import { GetInvolvedCard } from './GetInvolvedCard';
 
 export const GetInvolvedSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
@@ -73,12 +73,28 @@ export const GetInvolvedSection = () => {
           <div className="absolute -bottom-[10%] -right-[5%] w-[30%] h-[30%] bg-primary/10 blur-[100px] rounded-full" />
         </div>
 
-        <div className={cn("container px-4 md:px-6 mx-auto", isLg && "h-full")}>
-          <div className={cn("flex flex-col justify-between lg:flex-row gap-8 md:gap-12 lg:gap-16", isLg && "h-full py-20")}>
-            <div className="lg:w-5/12 flex flex-col justify-center space-y-4 md:space-y-6">
-              <h2 className="text-primary font-bold uppercase tracking-[0.2em] text-xs md:text-sm">{getInvolvedData.header.subtitle}</h2>
-              <h1 className={cn("text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.9]", "bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent")}>
-                {getInvolvedData.header.titlePrefix} <br className="hidden sm:block" /> {getInvolvedData.header.titleSuffix}
+      <div className="container px-4 md:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          {/* Header Area */}
+          <div className="lg:col-span-5 space-y-8 sticky lg:top-32">
+            <div className="space-y-4">
+              <h2
+                className={cn(
+                  'text-primary font-bold uppercase tracking-[0.2em] text-sm md:text-base'
+                )}
+              >
+                {getInvolvedData.header.subtitle}
+              </h2>
+              <h1
+                className={cn(
+                  'text-3xl md:text-4xl lg:text-5xl',
+                  'font-black uppercase tracking-tighter leading-[0.9]',
+                  'bg-gradient-to-br from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent'
+                )}
+              >
+                {getInvolvedData.header.titlePrefix}{' '}
+                <br className="hidden md:block" />{' '}
+                {getInvolvedData.header.titleSuffix}
               </h1>
               <p className="text-base md:text-lg text-muted-foreground max-w-md">{getInvolvedData.header.description}</p>
               <div className="flex items-center gap-3 md:gap-4 pt-2">
@@ -95,6 +111,12 @@ export const GetInvolvedSection = () => {
               <div ref={cardsRef} className="flex flex-col gap-4 md:gap-6" style={isLg ? { transform: `translateY(-${scrollY}px)` } : undefined}>
                 {getInvolvedData.cards.map((card, i) => <GetInvolvedCard key={i} {...card} />)}
               </div>
+              <p className="flex items-center text-sm font-medium text-muted-foreground">
+                <span className="text-foreground font-bold mr-1">
+                  {getInvolvedData.header.memberCount}
+                </span>{' '}
+                IT Students already joined
+              </p>
             </div>
           </div>
         </div>

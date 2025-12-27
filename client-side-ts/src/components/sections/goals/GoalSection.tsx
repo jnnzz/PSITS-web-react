@@ -1,95 +1,78 @@
-
-import { goalSectionData } from "@/data/sections-data"
-import { motion } from "framer-motion"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import { goalSectionData } from '@/data/sections-data';
 
 export const GoalSection = () => {
-    return (
-        <section className="py-20 xl:py-28 relative overflow-hidden bg-background">
-            {/* Background Elements */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-20 pointer-events-none">
-                <div className="absolute top-[20%] left-[10%] w-96 h-96 bg-primary/30 rounded-full blur-[100px]" />
-            </div>
+  return (
+    <section className="py-20 xl:py-28 relative overflow-hidden bg-background">
+      {/* Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-20 pointer-events-none">
+        <div className="absolute top-[20%] left-[10%] w-96 h-96 bg-primary/30 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[20%] right-[10%] w-96 h-96 bg-purple-500/30 rounded-full blur-[100px]" />
+      </div>
 
-            <div className="container mx-auto px-4 md:px-6">
-                {/* Header */}
-                <motion.div 
-                    className="text-center space-y-2 mb-16"
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.6 }}
+      <Card className="container mx-auto px-4 md:px-6 border-none shadow-none bg-transparent">
+        <CardHeader className="text-center space-y-4 mb-12">
+          <CardTitle className="text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.9] text-foreground">
+            {goalSectionData.title}
+          </CardTitle>
+          <CardDescription className="text-primary font-bold uppercase tracking-[0.2em] text-sm md:text-base max-w-2xl mx-auto">
+            {goalSectionData.subtitle}
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          {/* Full Width Roadmap Line */}
+          <div className="w-full relative h-[150px] md:h-[300px] flex items-center justify-center">
+            {/* SVG Curve Path */}
+            <svg
+              className="w-full h-full pointer-events-none"
+              viewBox="0 0 1440 300"
+              preserveAspectRatio="none"
+            >
+              {/* Defs for Gradient */}
+              <defs>
+                <linearGradient
+                  id="roadmapGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="0%"
                 >
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-foreground">
-                        {goalSectionData.title}
-                    </h2>
-                    <p className="text-muted-foreground text-base md:text-lg">
-                        {goalSectionData.subtitle}
-                    </p>
-                </motion.div>
+                  <stop offset="0%" stopColor="var(--color-primary-300)" />
+                  <stop offset="50%" stopColor="var(--color-primary-500)" />
+                  <stop offset="100%" stopColor="#a855f7" />
+                </linearGradient>
+              </defs>
 
-                {/* Timeline */}
-                <div className="max-w-4xl mx-auto">
-                    {goalSectionData.goals.map((goal, index) => (
-                        <motion.div 
-                            key={index} 
-                            className="flex items-start gap-4 md:gap-17"
-                            initial={{ opacity: 0, y: 40 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-50px" }}
-                            transition={{ duration: 0.5, delay: index * 0.15 }}
-                        >
-                            {/* Left side - Title */}
-                            <motion.div 
-                                className="flex-1 text-right "
-                                initial={{ opacity: 0, x: -30 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: index * 0.15 + 0.2 }}
-                            >
-                                <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-foreground">
-                                    {goal.title}
-                                </h3>
-                            </motion.div>
+              {/* The Wave Path - Adjusted for 1440 width */}
+              <path
+                d="M 0,150 C 200,50 400,50 550,150 C 700,250 850,250 1000,150 C 1150,50 1300,50 1440,150"
+                fill="none"
+                stroke="url(#roadmapGradient)"
+                strokeWidth="4"
+                strokeDasharray="10 5"
+                className="opacity-60"
+              />
+              {/* Solid path overlay */}
+              <path
+                d="M 0,150 C 200,50 400,50 550,150 C 700,250 850,250 1000,150 C 1150,50 1300,50 1440,150"
+                fill="none"
+                stroke="url(#roadmapGradient)"
+                strokeWidth="2"
+                className="drop-shadow-[0_0_8px_rgba(124,58,237,0.5)]"
+              />
+            </svg>
 
-                            {/* Center - Timeline */}
-                            <div className="flex flex-col items-center">
-                                {/* Dot */}
-                                <motion.div 
-                                    className={`w-4 h-4 rounded-full shrink-0   ${index === 0 ? 'bg-primary ' : 'bg-muted-foreground/40'}`}
-                                    initial={{ scale: 0 }}
-                                    whileInView={{ scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.3, delay: index * 0.15 + 0.1, type: "spring", stiffness: 300 }}
-                                />
-                                {/* Line */}
-                                {index < goalSectionData.goals.length - 1 && (
-                                    <motion.div 
-                                        className="w-0.5 bg-primary/30 origin-top"
-                                        initial={{ scaleY: 0, height: 96 }}
-                                        whileInView={{ scaleY: 1 }}
-                                        viewport={{ once: true }}
-                                        transition={{ duration: 0.4, delay: index * 0.15 + 0.3 }}
-                                        style={{ height: 112 }}
-                                    />
-                                )}
-                            </div>
-
-                            {/* Right side - Description */}
-                            <motion.div 
-                                className="flex-1 "
-                                initial={{ opacity: 0, x: 30 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: index * 0.15 + 0.2 }}
-                            >
-                                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                                    {goal.description}
-                                </p>
-                            </motion.div>
-                        </motion.div>
-                    ))}
-                </div>
-            </div>
-        </section>
-    )
-}
+            {/* Optional central glowing node merely for effect? User said ONLY THE LINE. I'll omit nodes to be safe. */}
+          </div>
+        </CardContent>
+      </Card>
+    </section>
+  );
+};

@@ -42,7 +42,9 @@ export const InsitutionalIdentityContent = ({
       {/* Mission */}
       {mission && (
         <div className="space-y-3">
-          <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Mission</h3>
+          <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+            Mission
+          </h3>
           <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
             {mission}
           </p>
@@ -52,7 +54,9 @@ export const InsitutionalIdentityContent = ({
       {/* Vision */}
       {vision && (
         <div className="space-y-3">
-          <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Vision</h3>
+          <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+            Vision
+          </h3>
           <div className="space-y-3">
             {typeof vision === 'string' ? (
               <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
@@ -65,7 +69,10 @@ export const InsitutionalIdentityContent = ({
                 </p>
                 <ul className="space-y-2">
                   {vision.points.map((point, i) => (
-                    <li key={i} className="text-muted-foreground leading-relaxed flex items-start gap-3 text-sm md:text-base">
+                    <li
+                      key={i}
+                      className="text-muted-foreground leading-relaxed flex items-start gap-3 text-sm md:text-base"
+                    >
                       <Check className="w-4 h-4 md:w-5 md:h-5 text-primary mt-1 shrink-0" />
                       <span className="flex-1">{point}</span>
                     </li>
