@@ -1,61 +1,95 @@
-import { goalSectionData } from '@/data/sections-data';
 
-export default function GoalsSection() {
-  return (
-    <section className="w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 py-20 px-4 overflow-hidden relative">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-20">
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-4 tracking-tight">
-            {goalSectionData.title}
-          </h2>
-          <p className="text-gray-400 text-sm md:text-base font-light tracking-wide">
-            {goalSectionData.subtitle}
-          </p>
-        </div>
+import { goalSectionData } from "@/data/sections-data"
+import { motion } from "framer-motion"
 
-        {/* Goals Timeline */}
-        <div className="relative max-w-4xl mx-auto">
-          {/* Vertical connecting line */}
-          <div className="absolute left-1/3 top-8 bottom-8 w-0.5 bg-gradient-to-b from-gray-200 via-gray-300 to-gray-200 hidden md:block" />
-          
-          {/* Goals list */}
-          <div className="space-y-8 md:space-y-12">
-            {goalSectionData.goals.map((goal, index) => (
-              <div key={index} className="relative flex flex-col md:flex-row items-start md:items-center gap-6">
-                {/* Left side - Title */}
-                <div className="w-full md:w-1/3 text-left md:text-right">
-                  <h3 className="text-xl md:text-2xl font-bold text-gray-900 pr-0 md:pr-8">
-                    {goal.title}
-                  </h3>
+export default function GoalSection() {
+    return (
+        <section className="py-20 xl:py-28 relative overflow-hidden bg-background">
+            {/* Background Elements */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 opacity-20 pointer-events-none">
+                <div className="absolute top-[20%] left-[10%] w-96 h-96 bg-primary/30 rounded-full blur-[100px]" />
+            </div>
+
+            <div className="container mx-auto px-4 md:px-6">
+                {/* Header */}
+                <motion.div 
+                    className="text-center space-y-2 mb-16"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-foreground">
+                        {goalSectionData.title}
+                    </h2>
+                    <p className="text-muted-foreground text-base md:text-lg">
+                        {goalSectionData.subtitle}
+                    </p>
+                </motion.div>
+
+                {/* Timeline */}
+                <div className="max-w-4xl mx-auto">
+                    {goalSectionData.goals.map((goal, index) => (
+                        <motion.div 
+                            key={index} 
+                            className="flex items-start gap-4 md:gap-17"
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.5, delay: index * 0.15 }}
+                        >
+                            {/* Left side - Title */}
+                            <motion.div 
+                                className="flex-1 text-right "
+                                initial={{ opacity: 0, x: -30 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: index * 0.15 + 0.2 }}
+                            >
+                                <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-foreground">
+                                    {goal.title}
+                                </h3>
+                            </motion.div>
+
+                            {/* Center - Timeline */}
+                            <div className="flex flex-col items-center">
+                                {/* Dot */}
+                                <motion.div 
+                                    className={`w-4 h-4 rounded-full shrink-0   ${index === 0 ? 'bg-primary ' : 'bg-muted-foreground/40'}`}
+                                    initial={{ scale: 0 }}
+                                    whileInView={{ scale: 1 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.3, delay: index * 0.15 + 0.1, type: "spring", stiffness: 300 }}
+                                />
+                                {/* Line */}
+                                {index < goalSectionData.goals.length - 1 && (
+                                    <motion.div 
+                                        className="w-0.5 bg-primary/30 origin-top"
+                                        initial={{ scaleY: 0, height: 96 }}
+                                        whileInView={{ scaleY: 1 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.4, delay: index * 0.15 + 0.3 }}
+                                        style={{ height: 112 }}
+                                    />
+                                )}
+                            </div>
+
+                            {/* Right side - Description */}
+                            <motion.div 
+                                className="flex-1 "
+                                initial={{ opacity: 0, x: 30 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: index * 0.15 + 0.2 }}
+                            >
+                                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                                    {goal.description}
+                                </p>
+                            </motion.div>
+                        </motion.div>
+                    ))}
                 </div>
-
-                {/* Center dot */}
-                <div className="absolute left-0 md:left-1/3 top-0 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-10 hidden md:block">
-                  <div 
-                    className={`w-4 h-4 rounded-full border-4 transition-all duration-300 ${
-                      index === 0
-                        ? 'bg-blue-500 border-blue-200 shadow-lg shadow-blue-500/50' 
-                        : 'bg-white border-gray-300'
-                    }`}
-                  />
-                </div>
-
-                {/* Right side - Description */}
-                <div className="w-full md:w-2/3 pl-0 md:pl-8">
-                  <p className="text-gray-500 text-sm md:text-base leading-relaxed">
-                    {goal.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Decorative background elements */}
-      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-100/40 rounded-full blur-3xl -z-10 pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
-    </section>
-  );
-};
+            </div>
+        </section>
+    )
+}
