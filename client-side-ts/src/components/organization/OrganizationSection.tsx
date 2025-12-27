@@ -1,6 +1,6 @@
 import { CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Carousel, CarouselContent, CarouselItem } from '../ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '../ui/carousel';
 import { organizationSectionData, type Member } from '@/data/sections-data';
 import { OptimizedImage } from '@/components/common/OptimizedImage';
 
@@ -104,38 +104,52 @@ const MemberCarousel = ({
         </h3>
         <div className="h-px flex-1 bg-border/50" />
       </div>
-      <Carousel
-        opts={{
-          align: 'start',
-          loop: members.length > 4,
-        }}
-        className="w-full"
-      >
-        <CarouselContent className="-ml-2 md:-ml-4">
-          {members.map((member, index) => (
-            <CarouselItem
-              key={index}
-              className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
-            >
-              <div className="group relative aspect-[4/5] rounded-3xl overflow-hidden border border-border/50 bg-muted">
-                <OptimizedImage
-                  src={member.image}
-                  alt={member.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
-                  <p className="text-white font-bold text-lg leading-tight">
-                    {member.name}
-                  </p>
-                  <p className="text-white/80 text-sm font-medium uppercase tracking-wider">
-                    {member.role}
-                  </p>
+      <div className="relative">
+        {/* Left fade effect */}
+        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+        
+        {/* Right fade effect */}
+        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+        
+        <Carousel
+          opts={{
+            align: 'start',
+            loop: members.length > 4,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {members.map((member, index) => (
+              <CarouselItem
+                key={index}
+                className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+              >
+                <div className="group relative aspect-[4/5] rounded-3xl overflow-hidden bg-muted">
+                  <div className="absolute inset-0 flex items-center justify-center scale-125">
+                    <OptimizedImage
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      loading="eager"
+                      priority={index < 4}
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 z-10">
+                    <p className="text-white font-bold text-lg leading-tight mb-1">
+                      {member.name}
+                    </p>
+                    <p className="text-white/90 text-sm font-medium uppercase tracking-wider">
+                      {member.role}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20" />
+          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20" />
+        </Carousel>
+      </div>
     </div>
   );
 };
