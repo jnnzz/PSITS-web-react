@@ -1,0 +1,34 @@
+# Dependency directories
+node_modules/
+**/node_modules/
+
+# Build and Output folders
+dist/
+build/
+.next/
+out/
+
+# Version Control
+.git/
+
+# Environment variables (Safety)
+.env
+.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Project-specific ignores
+LICENSE
+LICENSE.md
+CONTRIBUTING.md
+README.md
+CODE_OF_CONDUCT.md
+package-lock.json
+yarn.lock
+
+# Public assets (Images/Icons)
+public/
+**/assets/

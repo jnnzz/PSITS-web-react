@@ -9,6 +9,7 @@ import { IOrders } from "../models/orders.interface";
 import { IOrderReceipt } from "../mail_template/mail.interface";
 import { orderSearch } from "../utils/search.pending.orders";
 import { orderSort, ISort } from "../utils/sort.pending.orders";
+import { Promo } from "../models/promo.model";
 //Initialize
 import mongoose, { Types } from "mongoose";
 import dotenv from "dotenv";
@@ -100,18 +101,12 @@ export const studentAndAdminOrderController = async (
   session.startTransaction();
 
   try {
-    const { id_number, rfid, course, year, student_name, items, admin } =
-      req.body;
+    const { promo_name, promo_discount, items, admin } = req.body;
+    const both = req.both;
 
     const itemsArray = Array.isArray(items) ? items : [items];
 
-    const hasMissingFields =
-      !id_number ||
-      !rfid ||
-      !student_name ||
-      !course ||
-      !year ||
-      !itemsArray.length;
+    const hasMissingFields = !itemsArray.length;
 
     if (hasMissingFields) {
       await session.abortTransaction();
@@ -125,15 +120,15 @@ export const studentAndAdminOrderController = async (
         await new Log({
           admin: findAdmin.name,
           admin_id: findAdmin._id,
-          action: "Make manual Order for [" + student_name + "]",
-          target: "Manual Order [" + student_name + "]",
+          action: "Make manual Order for [" + both.name + "]",
+          target: "Manual Order [" + both.name + "]",
         }).save();
       }
     }
 
-    const student = await Student.findOne({ id_number: id_number }).session(
-      session
-    );
+    const student = await Student.findOne({
+      id_number: both.id_number,
+    }).session(session);
 
     if (!student) {
       await session.abortTransaction();
@@ -145,7 +140,7 @@ export const studentAndAdminOrderController = async (
     let orderTotal = 0;
 
     let finalMembershipDiscount = false;
-
+    let promo;
     for (let item of itemsArray) {
       const productId = new Types.ObjectId(item.product_id);
 
@@ -201,6 +196,7 @@ export const studentAndAdminOrderController = async (
         itemSubtotal = itemSubtotal - itemSubtotal * 0.05; // 5%
         finalMembershipDiscount = true;
       }
+      console.log(itemSubtotal);
 
       const processedItem = {
         product_id: item.product_id,
@@ -219,21 +215,53 @@ export const studentAndAdminOrderController = async (
 
       processedItems.push(processedItem);
       orderTotal += itemSubtotal;
+      if (promo_discount) {
+        promo = await Promo.findOne({ promo_name });
+        if (promo) {
+          if (promo.quantity <= 0 && promo.limit_type === "Limited") {
+            return res
+              .status(404)
+              .json({ message: `Promo Code out of Stocks` });
+          }
+          await Promo.updateOne(
+            {
+              promo_name,
+              "selected_merchandise._id": item.product_id,
+              "selected_merchandise.items.id_number": { $ne: both.id_number },
+            },
+            {
+              $push: {
+                "selected_merchandise.$.items": {
+                  id_number: both.id_number,
+                  promo_used: new Date(),
+                },
+              },
+              $inc: { quantity: -1 },
+            }
+          );
+          orderTotal = orderTotal - orderTotal * (promo.discount / 100);
+        }
+      }
     }
 
     const finalOrder = {
-      id_number,
-      rfid,
+      id_number: both.id_number,
+      rfid: both.rfid,
       imageUrl1: processedItems[0]?.imageUrl1,
       membership_discount: finalMembershipDiscount,
-      course,
-      year,
-      student_name,
+      promo: {
+        _id: promo?._id,
+        promo_name: promo?.promo_name,
+        promo_discount: promo_discount,
+      },
+      course: both.course,
+      year: both.year,
+      student_name: both.name,
       items: processedItems,
       total: orderTotal,
       order_date: new Date(),
       order_status: "Pending",
-      role: student.role,
+      role: both.role,
     };
 
     console.log("==========Final Order==========", finalOrder);
@@ -272,7 +300,7 @@ export const studentAndAdminOrderController = async (
 
       // Remove from student cart
       await Student.updateOne(
-        { id_number },
+        { id_number: both.id_number },
         { $pull: { cart: { product_id: productId } } }
       ).session(session);
 
@@ -298,6 +326,7 @@ export const studentAndAdminOrderController = async (
       .json({ message: "Internal Server Error: " + error.message });
   }
 };
+
 export const cancelOrderController = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -311,7 +340,7 @@ export const cancelOrderController = async (req: Request, res: Response) => {
 
   try {
     const order = await Orders.findById(productId).session(session);
-
+    console.log(order);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
@@ -327,8 +356,21 @@ export const cancelOrderController = async (req: Request, res: Response) => {
       }
 
       const newStocks = merch.stocks + item.quantity;
+      if (order.promo.promo_discount) {
+        await Promo.updateOne(
+          {
+            promo_name: order.promo.promo_name,
+            "selected_merchandise._id": item.product_id,
+          },
+          {
+            $pull: {
+              "selected_merchandise.$.items": { id_number: order.id_number },
+            },
+            $inc: { quantity: 1 },
+          }
+        );
+      }
 
-      // ✅ Make sure this uses the session
       await Merch.updateOne(
         { _id: merchId },
         { $set: { stocks: newStocks } },
@@ -491,6 +533,7 @@ export const approveOrderController = async (req: Request, res: Response) => {
               event.totalRevenueAll += item.sub_total;
               await event.save({ session });
 
+              // Update merch (if isEvent) and create instance of it as event attendee
               if (merchToGet) {
                 await Event.findOneAndUpdate(
                   {

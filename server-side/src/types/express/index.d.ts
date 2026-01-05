@@ -14,6 +14,10 @@ declare global {
       both: IAdminModelData | IUserModelData;
       admin: IAdminModelData | IAdminModelDataDocument | any;
       student: IUserModelData;
+      user?: {
+        role: 'Student' | 'Admin';
+        [key: string]: any;
+      };
       files?: any;
     }
   }

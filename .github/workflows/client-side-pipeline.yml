@@ -5,6 +5,9 @@ on:
     branches:
       - master
       - production
+    paths:
+      - 'client-side/**'
+      - '.github/workflows/client-side-pipeline.yml'
 
 jobs:
   build:

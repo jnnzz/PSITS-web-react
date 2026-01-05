@@ -2,6 +2,7 @@ import {
   admin_authenticate,
   student_authenticate,
 } from "../middlewares/custom_authenticate_token";
+import loginLimiter from "../util/limiter.util";
 
 import { Router, Request, Response } from "express";
 const router = Router();
@@ -9,6 +10,7 @@ const router = Router();
 //protected route for admin
 router.get(
   "/protected-route-admin",
+  loginLimiter,
   admin_authenticate,
   async (req: Request, res: Response) => {
     try {
@@ -29,10 +31,10 @@ router.get(
   student_authenticate,
   async (req, res) => {
     try {
-      if (req.student.role === "Student") {
+      if (req.student.position === "Student") {
         return res.status(200).json({
           user: req.student,
-          role: req.student.role,
+          position: req.student.position,
         });
       } else return res.status(400).json({ message: "Access Denied" });
     } catch (error) {

@@ -271,6 +271,38 @@ const AddOrderModal = ({ handleClose = () => {}, onCreateOrder }) => {
           readOnly
         />
 
+        <TextInput
+          label="Discount (%)"
+          type="number"
+          value={discount}
+          placeholder="Enter discount %"
+          onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+        />
+
+        <TextInput
+          label="Final Price (After Discount)"
+          type="number"
+          value={finalPrice}
+          placeholder="Final Price"
+          readOnly
+        />
+
+        <TextInput
+          label="Discount (%)"
+          type="number"
+          value={discount}
+          placeholder="Enter discount %"
+          onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+        />
+
+        <TextInput
+          label="Final Price (After Discount)"
+          type="number"
+          value={finalPrice}
+          placeholder="Final Price"
+          readOnly
+        />
+
         {item &&
         (item.type === "Uniform" ||
           item.type === "Tshirt" ||
