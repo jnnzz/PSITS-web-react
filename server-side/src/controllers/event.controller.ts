@@ -168,6 +168,7 @@ export const getAllEventsController = async (req: Request, res: Response) => {
   }
 };
 
+// GET an event and all of its attendees
 export const getAllEventsAndAttendeesController = async (
   req: Request,
   res: Response

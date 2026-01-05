@@ -24,6 +24,7 @@ import AllOfficers from "./pages/admin/officers/AllOfficers";
 import Request from "./pages/admin/officers/Request";
 
 import Raffle from "./pages/admin/events/EventRaffle";
+import RaffleTwo from './pages/admin/events/EventRaffleTwo'
 import AddAttendeeForm from "./pages/admin/Attendance/AddAttendeeForm";
 import AdminEvents from "./pages/admin/events/Events";
 
@@ -73,6 +74,9 @@ import StudentPendingOrder from "./pages/students/orders/PendingOrders";
 import Resouces from "./pages/students/Resouces";
 import MarkAsPresent from "./pages/admin/MarkAsPresent";
 import { QRCodeScanner } from "./pages/admin/QRCodeScanner";
+
+//Promo Code
+import PromoDashboard from "./pages/admin/PromoCode/PromoDashboard";
 
 const App = () => {
   return (
@@ -144,7 +148,7 @@ const App = () => {
           />
           <Route
             path="raffle/:eventId"
-            element={<PrivateRouteAdmin element={Raffle} />}
+            element={<PrivateRouteAdmin element={RaffleTwo} />}
           />
 
           <Route
@@ -228,6 +232,10 @@ const App = () => {
           ></Route>
 
           <Route path="logs" element={<PrivateRouteAdmin element={Logs} />} />
+          <Route
+            path="promo-dashboard"
+            element={<PrivateRouteAdmin element={PromoDashboard} />}
+          />
         </Route>
 
         <Route

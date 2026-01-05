@@ -10,6 +10,7 @@ import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { S3Client } from "@aws-sdk/client-s3";
+import { expiryStatus } from "../custom_function/conditional_dates";
 dotenv.config();
 const s3Client = new S3Client({
   region: process.env.AWS_REGION || "ap-southeast-1",
@@ -167,6 +168,29 @@ export const retrieveActiveMerchandiseController = async (
   }
 };
 
+export const retrieveActiveAndPublishMerchandiseController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const now = new Date();
+
+    const merches: IMerch[] = await Merch.find({
+      is_active: true,
+      end_date: { $gt: now },
+    }).select("_id name");
+
+    if (!merches || merches.length === 0) {
+      return res.status(400).json({ message: "No Available Merchandise" });
+    }
+
+    res.status(200).json(merches);
+  } catch (error) {
+    console.error("Error retrieving merchandise:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 export const retrieveSpecificMerchandiseController = async (
   req: Request,
   res: Response
@@ -288,8 +312,8 @@ export const updateMerchandiseController = async (
     const imagesToRemove = Array.isArray(removeImage)
       ? removeImage
       : removeImage
-      ? [removeImage]
-      : [];
+        ? [removeImage]
+        : [];
 
     const imageKeys = imagesToRemove.length
       ? imagesToRemove.map((url) => url.replace(process.env.bucketUrl, ""))

@@ -1,8 +1,20 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 import { CartItem, cartItemSchema } from "./cart.model";
-import { IOrders } from "./orders.interface";
+import { IOrders, IPromoOrder } from "./orders.interface";
 
 export interface IOrdersDocument extends IOrders, Document {}
+
+const promoSchema = new Schema<IPromoOrder>({
+  _id: {
+    type: Types.ObjectId,
+  },
+  promo_name: {
+    type: String,
+  },
+  promo_discount: {
+    type: Boolean,
+  },
+});
 
 const orderSchema = new Schema<IOrdersDocument>({
   id_number: {
@@ -15,6 +27,9 @@ const orderSchema = new Schema<IOrdersDocument>({
   },
   membership_discount: {
     type: Boolean,
+  },
+  promo: {
+    type: promoSchema,
   },
   student_name: {
     type: String,

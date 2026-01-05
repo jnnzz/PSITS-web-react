@@ -31,10 +31,10 @@ router.get(
   student_authenticate,
   async (req, res) => {
     try {
-      if (req.student.role === "Student") {
+      if (req.student.position === "Student") {
         return res.status(200).json({
           user: req.student,
-          role: req.student.role,
+          position: req.student.position,
         });
       } else return res.status(400).json({ message: "Access Denied" });
     } catch (error) {
