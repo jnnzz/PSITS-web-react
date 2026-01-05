@@ -1,11 +1,6 @@
 import { Types } from "mongoose";
 import { IAttendee } from "./attendee.interface";
 
-export interface IRequirement {
-  key: string;
-  label: string;
-}
-
 export interface IEvent {
   eventId: Types.ObjectId;
   eventName: string;
@@ -21,7 +16,6 @@ export interface IEvent {
   sales_data: ISalesData[];
   totalUnitsSold: number;
   totalRevenueAll: number;
-  requirements: IRequirement[];
 }
 
 export interface ISalesData {

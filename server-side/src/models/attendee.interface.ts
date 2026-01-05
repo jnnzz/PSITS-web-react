@@ -22,7 +22,4 @@ export interface IAttendee {
   raffleIsWinner: boolean;
   transactBy: string;
   transactDate: Date | null;
-  requirements_status: {
-    [key: string]: boolean;
-  };
 }

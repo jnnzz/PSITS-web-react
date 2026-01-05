@@ -4,16 +4,13 @@ import {
   ISessionConfigType,
   IEvent,
   ISessionConfig,
-  IRequirement,
 } from "./event.interface";
 import { attendeeSchema } from "./attendee.model";
 
 export interface ISalesDataDocument extends ISalesData, Document {}
 export interface ISessionConfigDocument extends ISessionConfig, Document {}
 export interface ISessionConfigTypeDocument
-  extends ISessionConfigType,
-    Document {}
-export interface IRequirementDocument extends IRequirement, Document {}
+  extends ISessionConfigType, Document {}
 export interface IEventDocument extends IEvent, Document {}
 
 const salesDataSchema = new Schema<ISalesDataDocument>({
@@ -30,15 +27,6 @@ const sessionConfigTypeSchema = new Schema<ISessionConfigTypeDocument>(
   {
     enabled: { type: Boolean },
     timeRange: { type: String },
-  },
-  { _id: false }
-);
-
-/** New sub-schema for event-level requirements */
-const requirementSchema = new Schema<IRequirementDocument>(
-  {
-    key: { type: String, required: true },
-    label: { type: String, required: true },
   },
   { _id: false }
 );
@@ -76,10 +64,6 @@ const eventSchema = new Schema<IEventDocument>({
   createdBy: { type: String, required: true },
   attendees: { type: [attendeeSchema], default: [] },
   status: { type: String, required: true },
-  requirements: {
-    type: [requirementSchema],
-    default: [],
-  },
 
   limit: {
     type: [

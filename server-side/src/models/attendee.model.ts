@@ -6,11 +6,9 @@ import {
 } from "./attendee.interface";
 
 export interface IAttendanceSessionTypeDocument
-  extends IAttendanceSessionType,
-    Document {}
+  extends IAttendanceSessionType, Document {}
 export interface IAttendanceSessionDocument
-  extends IAttendanceSession,
-    Document {}
+  extends IAttendanceSession, Document {}
 export interface IAttendeeDocument extends IAttendee, Document {}
 
 const attendanceSessionSchema = new Schema<IAttendanceSessionTypeDocument>(
@@ -47,9 +45,4 @@ export const attendeeSchema = new Schema<IAttendeeDocument>({
   raffleIsWinner: { type: Boolean, default: false },
   transactBy: { type: String },
   transactDate: { type: Date },
-  requirements_status: {
-    type: Map,
-    of: Boolean,
-    default: {},
-  },
 });

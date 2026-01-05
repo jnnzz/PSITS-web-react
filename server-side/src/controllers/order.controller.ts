@@ -548,13 +548,6 @@ export const approveOrderController = async (req: Request, res: Response) => {
                         course: successfulOrder.course,
                         year: successfulOrder.year,
                         campus: student.campus,
-                        requirements: {
-                          // false nalng ni uis HAHAHA
-                          // set to false on order approval (e.g. if order is related to acquiantance/ict congress)
-                          insurance: false,
-                          prelim_payment: false,
-                          midterm_payment: false,
-                        },
                         attendance: {
                           morning: { attended: false, timestamp: "" },
                           afternoon: { attended: false, timestamp: "" },
