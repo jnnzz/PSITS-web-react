@@ -74,8 +74,6 @@ import StudentPendingOrder from "./pages/students/orders/PendingOrders";
 import Resouces from "./pages/students/Resouces";
 import MarkAsPresent from "./pages/admin/MarkAsPresent";
 import { QRCodeScanner } from "./pages/admin/QRCodeScanner";
-import DefacedOverlay from "./components/DefacedOverlay";
-
 
 //Promo Code
 import PromoDashboard from "./pages/admin/PromoCode/PromoDashboard";
