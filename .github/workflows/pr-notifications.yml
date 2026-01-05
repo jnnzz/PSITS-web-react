@@ -1,0 +1,304 @@
+name: PSITS CI/CD PR Reviewer
+
+on:
+  pull_request_target:
+    branches: ['**']  # Match all branches - scalable for any branch
+    types: [opened, closed, reopened, synchronize]
+
+env:
+  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+jobs:
+  notify-discord:
+    name: Send Discord Notification
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      # SECURITY: Only checkout base branch, never PR code from fork
+      - name: Checkout base branch (SECURITY)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+
+      - name: Get changed files via GitHub API (SECURITY)
+        id: detect-changes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const prNumber = pr.number;
+            
+            // Get changed files using GitHub API (safe - only reading metadata)
+            let changedFiles = [];
+            let serviceCount = 0;
+            let changedServices = '';
+            
+            try {
+              const files = await github.rest.pulls.listFiles({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                per_page: 100
+              });
+              
+              changedFiles = files.data.map(file => file.filename);
+              
+              // Calculate file statistics
+              const filesAdded = files.data.filter(f => f.status === 'added').length;
+              const filesRemoved = files.data.filter(f => f.status === 'removed').length;
+              const filesModified = files.data.filter(f => f.status === 'modified').length;
+              const filesRenamed = files.data.filter(f => f.status === 'renamed').length;
+              
+              // Get file type breakdown (top 5)
+              const fileTypes = {};
+              changedFiles.forEach(file => {
+                const ext = file.split('.').pop() || 'no-ext';
+                fileTypes[ext] = (fileTypes[ext] || 0) + 1;
+              });
+              const topTypes = Object.entries(fileTypes)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([ext, count]) => `${ext} (${count})`)
+                .join(', ') || 'N/A';
+              
+              // Detect changed services
+              const hasClientSide = changedFiles.some(f => f.startsWith('client-side/'));
+              const hasServerSide = changedFiles.some(f => f.startsWith('server-side/'));
+              const hasWorkflows = changedFiles.some(f => f.startsWith('.github/workflows/'));
+              const hasDocs = changedFiles.some(f => /\.(md|txt)$/.test(f) && !f.startsWith('server-side/') && !f.startsWith('client-side/'));
+              
+              if (hasClientSide) {
+                changedServices += '• **Client-side** (React Frontend)\n';
+                serviceCount++;
+              }
+              if (hasServerSide) {
+                changedServices += '• **Server-side** (Node.js/TypeScript Backend)\n';
+                serviceCount++;
+              }
+              if (hasWorkflows) {
+                changedServices += '• **CI/CD Workflows**\n';
+                serviceCount++;
+              }
+              if (hasDocs) {
+                changedServices += '• **Documentation**\n';
+                serviceCount++;
+              }
+              
+              if (serviceCount === 0) {
+                changedServices = '• **General project changes**\n';
+                serviceCount = 1;
+              }
+              
+              // Prepare file list (top 8 for Discord)
+              const topFiles = changedFiles.slice(0, 8).map(f => `  • ${f}`).join('\n');
+              const remainingFiles = changedFiles.length - 8;
+              const fileList = changedFiles.length > 0 
+                ? (remainingFiles > 0 ? `${topFiles}\n  ... and ${remainingFiles} more file(s)` : topFiles)
+                : '  (No files changed)';
+              
+              // Set outputs
+              core.setOutput('files_added', filesAdded.toString());
+              core.setOutput('files_removed', filesRemoved.toString());
+              core.setOutput('files_modified', filesModified.toString());
+              core.setOutput('files_renamed', filesRenamed.toString());
+              core.setOutput('total_files', changedFiles.length.toString());
+              core.setOutput('file_types', topTypes);
+              core.setOutput('file_list', fileList);
+              core.setOutput('service_count', serviceCount.toString());
+              core.setOutput('changed_services', changedServices);
+              
+            } catch (error) {
+              core.warning(`Failed to get changed files: ${error.message}`);
+              // Set defaults on error
+              core.setOutput('files_added', '0');
+              core.setOutput('files_removed', '0');
+              core.setOutput('files_modified', '0');
+              core.setOutput('files_renamed', '0');
+              core.setOutput('total_files', '0');
+              core.setOutput('file_types', 'N/A');
+              core.setOutput('file_list', '  (Unable to detect files)');
+              core.setOutput('service_count', '0');
+              core.setOutput('changed_services', '• **General project changes**\n');
+            }
+
+      - name: Load file list and services
+        id: load-files
+        run: |
+          {
+            echo "FILE_LIST<<EOF"
+            echo "${{ steps.detect-changes.outputs.file_list }}"
+            echo "EOF"
+          } >> $GITHUB_ENV
+          
+          {
+            echo "CHANGED_SERVICES<<EOF"
+            echo "${{ steps.detect-changes.outputs.changed_services }}"
+            echo "EOF"
+          } >> $GITHUB_ENV
+          
+          echo "FILES_ADDED=${{ steps.detect-changes.outputs.files_added }}" >> $GITHUB_ENV
+          echo "FILES_REMOVED=${{ steps.detect-changes.outputs.files_removed }}" >> $GITHUB_ENV
+          echo "FILES_MODIFIED=${{ steps.detect-changes.outputs.files_modified }}" >> $GITHUB_ENV
+          echo "FILES_RENAMED=${{ steps.detect-changes.outputs.files_renamed }}" >> $GITHUB_ENV
+          echo "TOTAL_FILES=${{ steps.detect-changes.outputs.total_files }}" >> $GITHUB_ENV
+          echo "FILE_TYPES=${{ steps.detect-changes.outputs.file_types }}" >> $GITHUB_ENV
+          echo "SERVICE_COUNT=${{ steps.detect-changes.outputs.service_count }}" >> $GITHUB_ENV
+
+      - name: Send Discord notification
+        if: env.DISCORD_WEBHOOK_URL != ''
+        run: |
+          # Prepare PR information
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          PR_AUTHOR_AVATAR="${{ github.event.pull_request.user.avatar_url }}"
+          BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
+          HEAD_BRANCH="${{ github.event.pull_request.head.ref }}"
+          HEAD_REPO="${{ github.event.pull_request.head.repo.full_name }}"
+          BASE_REPO="${{ github.event.pull_request.base.repo.full_name }}"
+          ADDITIONS="${{ github.event.pull_request.additions }}"
+          DELETIONS="${{ github.event.pull_request.deletions }}"
+          CHANGED_FILES="${{ github.event.pull_request.changed_files }}"
+          COMMITS="${{ github.event.pull_request.commits }}"
+          
+          # Detect if PR is from a fork
+          IS_FORK="false"
+          if [ "$HEAD_REPO" != "$BASE_REPO" ]; then
+            IS_FORK="true"
+            BRANCH_DISPLAY="🔀 FORK \`$HEAD_BRANCH\` → \`$BASE_BRANCH\`"
+          else
+            BRANCH_DISPLAY="\`$HEAD_BRANCH\` → \`$BASE_BRANCH\`"
+          fi
+          
+          # Set defaults for optional fields
+          PR_AUTHOR_AVATAR="${PR_AUTHOR_AVATAR:-https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png}"
+          COMMITS="${COMMITS:-0}"
+          
+          # Determine event type and color
+          EVENT_TYPE="${{ github.event.action }}"
+          MERGED="${{ github.event.pull_request.merged }}"
+          MERGED_BY="${{ github.event.pull_request.merged_by.login }}"
+          
+          if [ "$EVENT_TYPE" = "opened" ]; then
+            COLOR="3447003"  # Blue
+            TITLE="🆕 New Pull Request Opened"
+            DESCRIPTION="$PR_AUTHOR created a new pull request"
+          elif [ "$EVENT_TYPE" = "reopened" ]; then
+            COLOR="10181046"  # Purple
+            TITLE="🔄 Pull Request Reopened"
+            DESCRIPTION="$PR_AUTHOR reopened this pull request"
+          elif [ "$EVENT_TYPE" = "closed" ] && [ "$MERGED" = "true" ]; then
+            COLOR="5763719"  # Green
+            TITLE="✅ Pull Request Merged"
+            DESCRIPTION="${MERGED_BY:-$PR_AUTHOR} merged this pull request"
+          elif [ "$EVENT_TYPE" = "closed" ] && [ "$MERGED" = "false" ]; then
+            COLOR="15158332"  # Red
+            TITLE="❌ Pull Request Closed"
+            DESCRIPTION="$PR_AUTHOR closed this pull request without merging"
+          elif [ "$EVENT_TYPE" = "synchronize" ]; then
+            COLOR="16776960"  # Yellow
+            TITLE="📝 Pull Request Updated"
+            DESCRIPTION="$PR_AUTHOR pushed new commits"
+          else
+            COLOR="9807270"  # Gray
+            TITLE="📋 Pull Request Event"
+            DESCRIPTION="Pull request event: $EVENT_TYPE"
+          fi
+          
+          # Get timestamp
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Escape special characters for JSON
+          PR_TITLE_ESCAPED=$(echo "$PR_TITLE" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          DESCRIPTION_ESCAPED=$(echo "$DESCRIPTION" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          CHANGED_SERVICES_ESCAPED=$(echo -e "$CHANGED_SERVICES" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          
+          # Escape file list for Discord (truncate if too long - Discord field limit is 1024 chars)
+          FILE_LIST_ESCAPED=$(echo -e "$FILE_LIST" | sed 's/"/\\"/g' | sed 's/\\/\\\\/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          
+          # Ensure FILE_LIST_ESCAPED doesn't exceed Discord's 1024 char limit per field
+          FILE_LIST_LENGTH=$(echo -n "$FILE_LIST_ESCAPED" | wc -c)
+          if [ $FILE_LIST_LENGTH -gt 1000 ]; then
+            # Truncate to ~950 chars and add "... (truncated)"
+            FILE_LIST_ESCAPED=$(echo -n "$FILE_LIST_ESCAPED" | head -c 950)
+            FILE_LIST_ESCAPED="${FILE_LIST_ESCAPED}... (truncated - see PR for full list)"
+          fi
+          
+          # Build Discord webhook payload
+          cat > discord_payload.json <<EOF
+          {
+            "username": "PSITS CI/CD PR Reviewer",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            "embeds": [
+              {
+                "title": "$TITLE",
+                "description": "$DESCRIPTION_ESCAPED",
+                "url": "$PR_URL",
+                "color": $COLOR,
+                "fields": [
+                  {
+                    "name": "📋 Pull Request",
+                    "value": "[#$PR_NUMBER - $PR_TITLE_ESCAPED]($PR_URL)",
+                    "inline": false
+                  },
+                  {
+                    "name": "👤 Author",
+                    "value": "[$PR_AUTHOR](https://github.com/$PR_AUTHOR)",
+                    "inline": true
+                  },
+                  {
+                    "name": "🌿 Branch",
+                    "value": "$BRANCH_DISPLAY",
+                    "inline": true
+                  },
+                  {
+                    "name": "📊 Changes",
+                    "value": "**$CHANGED_FILES** files • **$COMMITS** commits\n✅ **+$ADDITIONS** lines • ❌ **-$DELETIONS** lines\n\n📁 **Files:** +$FILES_ADDED added, -$FILES_REMOVED removed, ~$FILES_MODIFIED modified\n📦 **Types:** $FILE_TYPES",
+                    "inline": false
+                  },
+                  {
+                    "name": "📝 Changed Files ($TOTAL_FILES)",
+                    "value": "$FILE_LIST_ESCAPED",
+                    "inline": false
+                  },
+                  {
+                    "name": "🔧 Affected Services ($SERVICE_COUNT)",
+                    "value": "$CHANGED_SERVICES_ESCAPED",
+                    "inline": false
+                  }
+                ],
+                "thumbnail": {
+                  "url": "$PR_AUTHOR_AVATAR"
+                },
+                "footer": {
+                  "text": "PSITS • GitHub Actions",
+                  "icon_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                },
+                "timestamp": "$TIMESTAMP"
+              }
+            ]
+          }
+          EOF
+          
+          # Send to Discord
+          echo "Sending notification to Discord..."
+          
+          RESPONSE=$(curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d @discord_payload.json \
+            -w "\n%{http_code}" \
+            -s)
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          
+          if [ "$HTTP_CODE" = "204" ] || [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Successfully sent Discord notification (HTTP $HTTP_CODE)"
+          else
+            echo "⚠️ Discord webhook returned HTTP $HTTP_CODE"
+            echo "Response: $RESPONSE"
+            # Don't fail the workflow if Discord notification fails
+          fi

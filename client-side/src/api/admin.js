@@ -288,6 +288,30 @@ export const merchandise = async () => {
   }
 };
 
+export const activePublishMerchandise = async () => {
+  try {
+    const response = await axios.get(
+      `${backendConnection()}/api/merch/retrieve-publish-merchandise`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.data) {
+      showToast("error", error.response.data.message || "An error occurred");
+    } else {
+      showToast("error", "An error occurred");
+    }
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 export const merchandiseAdmin = async () => {
   try {
     const response = await axios.get(
@@ -617,7 +641,7 @@ export const roleRemove = async (id_number) => {
         },
       }
     );
-    // console.log(response.data.message);
+
     return response.status;
   } catch (error) {
     if (error.response && error.response.data) {
@@ -786,7 +810,7 @@ export const fetchAdminLogs = async () => {
 export const fetchStudentName = async (id_number) => {
   try {
     const response = await axios.get(
-      `${backendConnection()}/api/admin/search_student/${id_number}`,
+      `${backendConnection()}/api/admin/student_search/${id_number}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -1108,5 +1132,97 @@ export const getStudentMembershipHistory = async (studentId) => {
     } else {
       console.log("error", "An error occurred");
     }
+  }
+};
+
+export const membershipPrice = async () => {
+  try {
+    const response = await axios.get(
+      `${backendConnection()}/api/admin/get-membership-price`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      return response.data.data.membership_price;
+    }
+  } catch (error) {
+    if (error.response && error.response.data) {
+      return false;
+    } else {
+      console.log("error", "An error occurred");
+      return false;
+    }
+  }
+};
+
+export const changeMembershipPrice = async (price) => {
+  const newPriceFormData = new FormData();
+  newPriceFormData.set("price", price);
+
+  try {
+    const response = await axios.put(
+      `${backendConnection()}/api/admin/change-membership-price`,
+      newPriceFormData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      showToast("success", response.data.message);
+    }
+  } catch (error) {
+    if (error.response && error.response.data) {
+      return false;
+    } else {
+      console.log("error", "An error occurred");
+      return false;
+    }
+  }
+};
+
+export const updateStudent = async (
+  id_number,
+  rfid,
+  first_name,
+  middle_name,
+  last_name,
+  email,
+  course,
+  year
+) => {
+  try {
+    const response = await axios.post(
+      `${backendConnection()}/api/students/edited-student`,
+      {
+        id_number,
+        rfid,
+        first_name,
+        middle_name,
+        last_name,
+        email,
+        course,
+        year,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Error updating student:", error);
+    throw error;
   }
 };

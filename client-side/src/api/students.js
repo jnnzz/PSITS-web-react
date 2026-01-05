@@ -7,7 +7,7 @@ const token = sessionStorage.getItem("Token");
 
 export const requestMembership = async (id_number) => {
   try {
-    // console.log("Sending request for ID:", id_number);
+   
     const response = await axios.put(
       `${backendConnection()}/api/students/request`,
       { id_number },

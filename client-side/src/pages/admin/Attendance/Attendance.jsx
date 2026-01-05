@@ -133,13 +133,14 @@ const Attendance = (props) => {
     const currentDate = new Date();
     const eventDateObj = new Date(eventDate);
 
-    const isAllDayEvent = enabledSessions.length > 0 &&
-      enabledSessions.every(s => !sessionConfig[s]?.timeRange);
+    const isAllDayEvent =
+      enabledSessions.length > 0 &&
+      enabledSessions.every((s) => !sessionConfig[s]?.timeRange);
 
     if (isAllDayEvent) {
-      const attended = row.isAttended || enabledSessions.some(
-        s => attendance[s]?.attended === true
-      );
+      const attended =
+        row.isAttended ||
+        enabledSessions.some((s) => attendance[s]?.attended === true);
 
       if (eventDateObj < currentDate) return attended ? "Attended" : "Absent";
       return attended ? "Attended" : "Ongoing";
@@ -152,10 +153,10 @@ const Attendance = (props) => {
     }
 
     const hasAttendedAny = enabledSessions.some(
-      session => attendance[session]?.attended === true
+      (session) => attendance[session]?.attended === true
     );
     const attendedAll = enabledSessions.every(
-      session => attendance[session]?.attended === true
+      (session) => attendance[session]?.attended === true
     );
 
     if (attendedAll) row.isAttended = true;
@@ -168,9 +169,6 @@ const Attendance = (props) => {
     if (!hasAttendedAny) return "Absent";
     return "Incomplete";
   };
-
-
-
 
   const columns = [
     {
@@ -243,13 +241,13 @@ const Attendance = (props) => {
           Absent: "bg-red-600 text-white",
           Incomplete: "bg-orange-200 text-orange-800",
           Ongoing: "bg-yellow-200 text-yellow-800",
-          Upcoming: "bg-gray-600 text-white"
+          Upcoming: "bg-gray-600 text-white",
         };
 
         return (
           <div className="text-left">
             <span
-              className={`px-2 py-1 rounded text-xs ${statusClasses[status]}`}
+              className={`rounded px-2 py-1 text-xs ${statusClasses[status]}`}
             >
               {status}
             </span>
@@ -285,8 +283,9 @@ const Attendance = (props) => {
 
         const isPastEvent = eventDate < currentDate && !isSameDate;
         const attendanceStatus = computeAttendanceStatus(row);
-        const hasMultipleSessions = eventData.sessionConfig && 
-                              Object.keys(eventData.sessionConfig).length > 1;  
+        const hasMultipleSessions =
+          eventData.sessionConfig &&
+          Object.keys(eventData.sessionConfig).length > 1;
 
         return (
           <ButtonsComponent>
@@ -409,8 +408,8 @@ const Attendance = (props) => {
   const isPastEvent = eventDate < currentDate && !isSameDate;
   const isSoonEvent = eventDate > currentDate && !isSameDate;
   return (
-    <div className="container mx-auto p-4 ">
-      <div className="flex flex-col gap-5 p-2 md:flex-col sm:flex-col">
+    <div className="container mx-auto p-4">
+      <div className="flex flex-col gap-5 p-2 sm:flex-col md:flex-col">
         <div className="flex justify-start">
           <button
             onClick={handleNavigate("/admin/events")}
@@ -421,9 +420,9 @@ const Attendance = (props) => {
           </button>
         </div>
 
-        <div className=" shadow-sm rounded-sm border bg-white p-2 space-y-4">
+        <div className="space-y-4 rounded-sm border bg-white p-2 shadow-sm">
           <motion.div
-            className="flex flex-col sm:flex-row justify-between items-center product-detail p-3 sm:p-2 mx-auto"
+            className="product-detail mx-auto flex flex-col items-center justify-between p-3 sm:flex-row sm:p-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
@@ -433,14 +432,14 @@ const Attendance = (props) => {
               {user.campus !== "UC-Main" && <p>Limit: {displayLimit}</p>}
             </div>
 
-            <div className="w-full sm:w-auto flex justify-center sm:justify-end mt-4 sm:mt-0 whitespace-nowrap">
+            <div className="mt-4 flex w-full justify-center whitespace-nowrap sm:mt-0 sm:w-auto sm:justify-end">
               {isPastEvent ? (
                 <ButtonsComponent>
                   <div className="py-2">
                     <motion.button
                       type="button"
                       text=" Ended"
-                      className="bg-red-500 text-white hover:bg-red-600 active:bg-red-700 rounded-md px-4 py-2 text-sm transition duration-150 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-400 flex items-center justify-center gap-2"
+                      className="flex items-center justify-center gap-2 rounded-md bg-red-500 px-4 py-2 text-sm text-white shadow-sm transition duration-150 hover:bg-red-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-400 active:bg-red-700"
                       textClass="sm:block hidden text-white"
                       whileHover={{ scale: 1.01, opacity: 0.95 }}
                       whileTap={{ scale: 0.98, opacity: 0.9 }}
@@ -455,7 +454,7 @@ const Attendance = (props) => {
                     <motion.button
                       type="button"
                       text="Coming soon..."
-                      className="bg-gray-500 text-white hover:bg-gray-600 active:bg-gray-700 rounded-md px-4 py-2 text-sm transition duration-150 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400 flex items-center justify-center gap-2"
+                      className="flex items-center justify-center gap-2 rounded-md bg-gray-500 px-4 py-2 text-sm text-white shadow-sm transition duration-150 hover:bg-gray-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400 active:bg-gray-700"
                       textClass="sm:block hidden text-white"
                       whileHover={{ scale: 1.01, opacity: 0.95 }}
                       whileTap={{ scale: 0.98, opacity: 0.9 }}
@@ -471,7 +470,7 @@ const Attendance = (props) => {
                     <motion.button
                       type="button"
                       text="Limit Reached"
-                      className="bg-red-500 text-white hover:bg-red-600 active:bg-red-700 rounded-md px-4 py-2 text-sm transition duration-150 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-400 flex items-center justify-center gap-2"
+                      className="flex items-center justify-center gap-2 rounded-md bg-red-500 px-4 py-2 text-sm text-white shadow-sm transition duration-150 hover:bg-red-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-400 active:bg-red-700"
                       textClass="sm:block hidden text-white"
                       whileHover={{ scale: 1.01, opacity: 0.95 }}
                       whileTap={{ scale: 0.98, opacity: 0.9 }}
@@ -487,7 +486,7 @@ const Attendance = (props) => {
                       <motion.button
                         type="button"
                         text="Add Attendee"
-                        className="bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 rounded-md px-4 py-2 text-sm transition duration-150 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center justify-center gap-2"
+                        className="flex items-center justify-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-sm text-white shadow-sm transition duration-150 hover:bg-blue-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 active:bg-blue-700"
                         textClass="sm:block hidden text-white"
                         whileHover={{ scale: 1.01, opacity: 0.95 }}
                         whileTap={{ scale: 0.98, opacity: 0.9 }}
@@ -503,7 +502,7 @@ const Attendance = (props) => {
         </div>
 
         <div>
-          <div className="w-full sm:w-auto flex justify-center sm:justify-end mt-4 sm:mt-0 whitespace-nowrap">
+          <div className="mt-4 flex w-full justify-center whitespace-nowrap sm:mt-0 sm:w-auto sm:justify-end">
             {user.campus === "UC-Main" && (
               <ButtonsComponent>
                 <div className="py-2">
@@ -511,7 +510,7 @@ const Attendance = (props) => {
                     type="button"
                     text="Settings"
                     onClick={() => handleSettingsView()}
-                    className="bg-gray-500 text-white hover:bg-gray-600 active:bg-gray-700 rounded-md px-4 py-2 text-sm transition duration-150 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400 flex items-center justify-center gap-2"
+                    className="flex items-center justify-center gap-2 rounded-md bg-gray-500 px-4 py-2 text-sm text-white shadow-sm transition duration-150 hover:bg-gray-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-gray-400 active:bg-gray-700"
                     textClass="sm:block hidden text-white"
                     whileHover={{ scale: 1.01, opacity: 0.95 }}
                     whileTap={{ scale: 0.98, opacity: 0.9 }}
@@ -523,7 +522,7 @@ const Attendance = (props) => {
             )}
           </div>
         </div>
-        <div className="md:overflow-x-auto shadow-sm rounded-sm space-y-4">
+        <div className="space-y-4 rounded-sm shadow-sm md:overflow-x-auto">
           <AttendanceTab
             columns={columns}
             filteredData={filteredData}
@@ -555,7 +554,7 @@ const Attendance = (props) => {
           eventId={eventId}
           eventName={eventData.eventName}
           eventSessionConfig={eventData.sessionConfig}
-          eventDate = {eventDate}
+          eventDate={eventDate}
         />
       )}
       {removeModal && (

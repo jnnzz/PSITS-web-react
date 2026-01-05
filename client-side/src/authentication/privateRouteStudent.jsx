@@ -20,9 +20,9 @@ const PrivateRouteStudent = ({ element: Component }) => {
         }
       );
 
-      setInformationData(response.data.user, response.data.user.role);
+      setInformationData(response.data.user, response.data.user.position);
 
-      if (response.data.user.role === "Student") {
+      if (response.data.user.position === "Student") {
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
