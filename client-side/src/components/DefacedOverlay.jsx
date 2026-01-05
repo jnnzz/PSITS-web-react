@@ -24,7 +24,7 @@ const DefacedOverlay = ({ initiallyOpen = true }) => {
   useEffect(() => {
     const glitchInterval = setInterval(() => {
       setGlitchText(
-        glitchVariants[Math.floor(Math.random() * glitchVariants.length)],
+        glitchVariants[Math.floor(Math.random() * glitchVariants.length)]
       );
     }, 800);
 
