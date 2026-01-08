@@ -41,7 +41,7 @@ import Nihonggo from "../assets/nihonggo/1.jpg";
 import EmbeddedSystems from "../assets/embedded/1.jpg";
 import UCCCSCares from "../assets/embedded/1.jpg";
 import UCIntramurals from "../assets/intramurals/1.jpg";
-import CCSAcquaintance from "../assets/akwe/CCS 4 (28).jpg";
+import CCSAcquaintance from "../assets/acquaintance-party/CCS 4 (28).jpg";
 
 // --- Home Banner Data ---
 export const homeBannerData = {
