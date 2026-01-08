@@ -1,0 +1,99 @@
+import { goalSectionData } from "@/data/sections-data";
+import { motion } from "framer-motion";
+
+export default function GoalsSection() {
+  return (
+    <section className="bg-background relative overflow-hidden py-20 xl:py-28">
+      {/* Background Elements */}
+      <div className="pointer-events-none absolute top-0 left-0 -z-10 h-full w-full overflow-hidden opacity-20">
+        <div className="bg-primary/30 absolute top-[20%] left-[10%] h-96 w-96 rounded-full blur-[100px]" />
+      </div>
+
+      <div className="container mx-auto px-4 md:px-6">
+        {/* Header */}
+        <motion.div
+          className="mb-16 space-y-2 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-foreground text-3xl font-black tracking-tight md:text-4xl lg:text-5xl">
+            {goalSectionData.title}
+          </h2>
+          <p className="text-muted-foreground text-base md:text-lg">
+            {goalSectionData.subtitle}
+          </p>
+        </motion.div>
+
+        {/* Timeline */}
+        <div className="mx-auto max-w-4xl">
+          {goalSectionData.goals.map((goal, index) => (
+            <motion.div
+              key={index}
+              className="flex items-start gap-4 md:gap-17"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+            >
+              {/* Left side - Title */}
+              <motion.div
+                className="flex-1 text-right"
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.15 + 0.2 }}
+              >
+                <h3 className="text-foreground text-lg font-semibold md:text-xl lg:text-2xl">
+                  {goal.title}
+                </h3>
+              </motion.div>
+
+              {/* Center - Timeline */}
+              <div className="flex flex-col items-center">
+                {/* Dot */}
+                <motion.div
+                  className={`h-4 w-4 shrink-0 rounded-full ${index === 0 ? "bg-primary" : "bg-muted-foreground/40"}`}
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.3,
+                    delay: index * 0.15 + 0.1,
+                    type: "spring",
+                    stiffness: 300,
+                  }}
+                />
+                {/* Line */}
+                {index < goalSectionData.goals.length - 1 && (
+                  <motion.div
+                    className="bg-primary/30 w-0.5 origin-top"
+                    initial={{ scaleY: 0, height: 96 }}
+                    whileInView={{ scaleY: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.15 + 0.3 }}
+                    style={{ height: 112 }}
+                  />
+                )}
+              </div>
+
+              {/* Right side - Description */}
+              <motion.div
+                className="flex-1"
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.15 + 0.2 }}
+              >
+                <p className="text-muted-foreground text-sm leading-relaxed md:text-base">
+                  {goal.description}
+                </p>
+              </motion.div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
