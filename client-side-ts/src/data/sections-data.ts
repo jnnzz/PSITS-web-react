@@ -35,7 +35,7 @@ import Albeos from "../assets/Development Team 2025/23.png";
 
 import Orientation from "../assets/orientation2025/1.jpg";
 import ICT from "../assets/ict-congress/1.jpg";
-import Blockchain from "../assets/cbc/1.jpg";
+import Blockchain from "../assets/cebu-blockchain-conference/1.jpg";
 import CCSDays from "../assets/awarding/1.jpg";
 import Nihonggo from "../assets/nihonggo/1.jpg";
 import EmbeddedSystems from "../assets/embedded/1.jpg";
