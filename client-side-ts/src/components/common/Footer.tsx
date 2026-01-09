@@ -165,7 +165,6 @@ export const Footer = () => {
         parentStyle="absolute -bottom-16 sm:-bottom-24 md:-bottom-32 lg:-bottom-44 xl:-bottom-56 left-1/2 -translate-x-1/2 w-full text-center -z-10"
         childStyle="text-transparent bg-clip-text bg-gradient-to-br from-primary to-primary/80"
       />
-      <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-background to-transparent pointer-events-none" />
     </footer>
   );
 };

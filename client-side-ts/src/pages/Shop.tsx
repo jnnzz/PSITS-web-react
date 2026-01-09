@@ -1,5 +1,5 @@
 import React from 'react';
-import OurShop from '@/components/sections/shop/OurShop';
+import OurShop from '@/components/sections/OurShop';
 export const Shop = () => {
   return (
     <div>

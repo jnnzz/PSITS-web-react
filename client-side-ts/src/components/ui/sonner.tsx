@@ -8,13 +8,13 @@ import {
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
-const Toaster = ({ ...props }: ToasterProps) => {
+const Toaster = ({ position = 'top-right', ...props }: ToasterProps & { position?: ToasterProps['position'] }) => {
   const { theme = "system" } = useTheme();
 
   return (
     <Sonner
+      position={position}
       theme={theme as ToasterProps['theme']}
-      position="top-right"
       className="toaster group"
       icons={{
         success: <CircleCheckIcon className="size-4" />,
@@ -29,7 +29,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
           '--normal-text': 'var(--popover-foreground)',
           '--normal-border': 'var(--border)',
           '--border-radius': 'var(--radius)',
-          // success variant will be overridden per-toast for blue theme when desired
+          // Use theme primary color for success toasts
+          '--success-bg': 'var(--primary, #1c9dde)',
+          '--success-text': 'white',
         } as React.CSSProperties
       }
       {...props}

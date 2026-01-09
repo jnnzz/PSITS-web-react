@@ -1,5 +1,5 @@
 import React from 'react'
-import Carts from '../components/sections/cart/CartArea';
+import Carts from '../components/sections/CartArea';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useCart } from '@/lib/cart';
