@@ -7,9 +7,10 @@ import { Card } from '@/components/ui/card';
 import { Minus, Plus, Trash } from 'lucide-react';
 import { useCart } from '@/lib/cart';
 import { useTransactions } from '@/lib/transactions';
+import { toast } from 'sonner';
 
 export const Cart: React.FC = () => {
-  const { items, removeItem, updateQty, total } = useCart();
+  const { items, removeItem, updateQty } = useCart();
   const { addTransaction } = useTransactions();
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
@@ -154,7 +155,7 @@ export const Cart: React.FC = () => {
                 selected.forEach((s) => removeItem(s.uid));
                 setSelectedIds(new Set());
 
-                window.alert(`Order placed for ${selected.length} item(s). Transaction saved.`);
+                toast.success(`Order placed for ${selected.length} item(s). Transaction saved.`);
               }}
             >
               Order

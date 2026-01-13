@@ -1,26 +1,73 @@
-import "../App.css";
 import { showToast } from "../utils/alertHelper";
 import backendConnection from "./backendApi";
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
+import type { AxiosResponse } from "axios";
 
-// Helper to read the token at call time (keeps behavior consistent if sessionStorage changes)
+interface ApiErrorResponse {
+  message?: string;
+}
+
+interface ApiSuccessResponse {
+  message: string;
+}
+
+interface CartItem {
+  product_id?: string;
+  product_name?: string;
+  price?: number;
+  quantity?: number;
+  sub_total?: number;
+  variation?: string[];
+  sizes?: string[];
+  [key: string]: any;
+}
+
+// interface Student {
+//   id_number: string;
+//   rfid?: string;
+//   first_name?: string;
+//   middle_name?: string;
+//   last_name?: string;
+//   email?: string;
+//   course?: string;
+//   year?: number;
+//   isYearUpdated?: boolean;
+//   status?: string;
+//   membershipStatus?: string;
+//   campus?: string;
+//   role?: string;
+//   cart?: CartItem[];
+//   [key: string]: any;
+// }
+
 const getToken = (): string | null => sessionStorage.getItem("Token");
 
-const getAuthHeaders = (hasJsonContent = true) => {
-  const token = getToken();
-  const headers: Record<string, string> = {};
-  if (hasJsonContent) headers["Content-Type"] = "application/json";
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  return headers;
+const handleApiError = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError<ApiErrorResponse>;
+    const errorMessage = axiosError.response?.data?.message ?? "An error occurred";
+    console.error("Error:", errorMessage);
+    showToast("error", errorMessage);
+    return errorMessage;
+  } else {
+    const errorMessage = "An error occurred";
+    console.error("Error:", error);
+    showToast("error", errorMessage);
+    return errorMessage;
+  }
 };
 
 export const requestMembership = async (id_number: string): Promise<void> => {
   try {
+    const token = getToken();
     const response: AxiosResponse = await axios.put(
       `${backendConnection()}/api/students/request`,
       { id_number },
       {
-        headers: getAuthHeaders(true),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       }
     );
 
@@ -30,21 +77,20 @@ export const requestMembership = async (id_number: string): Promise<void> => {
       showToast("error", response.data.message);
     }
   } catch (error: any) {
-    if (error?.response?.data) {
-      showToast("error", error.response.data.message || "An error occurred");
-    } else {
-      showToast("error", "An error occurred");
-    }
-    console.error("Error:", error);
+    handleApiError(error);
   }
 };
 
 export const getMembershipStatusStudents = async (id_number: string): Promise<any | undefined> => {
   try {
+    const token = getToken();
     const response: AxiosResponse = await axios.get(
       `${backendConnection()}/api/students/get-membership-status/${id_number}`,
       {
-        headers: getAuthHeaders(true),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       }
     );
 
@@ -52,22 +98,22 @@ export const getMembershipStatusStudents = async (id_number: string): Promise<an
       return response.data;
     }
   } catch (error: any) {
-    if (error?.response?.data) {
-      console.log(error.response.data.message);
-    } else {
-      console.log(error?.response?.data?.message ?? "An error occurred");
-    }
-    console.error("Error:", error);
+    handleApiError(error);
+    return undefined;
   }
 };
 
 export const addToCartApi = async (formData: any): Promise<boolean | void> => {
   try {
+    const token = getToken();
     const response: AxiosResponse = await axios.post(
       `${backendConnection()}/api/cart/add-cart`,
       formData,
       {
-        headers: getAuthHeaders(true),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       }
     );
 
@@ -76,63 +122,72 @@ export const addToCartApi = async (formData: any): Promise<boolean | void> => {
     }
     return false;
   } catch (error: any) {
-    if (error?.response?.data) {
-      showToast("error", error.response.data.message || "An error occurred");
-    } else {
-      showToast("error", "An error occurred");
-    }
-    console.error("Error:", error);
+    handleApiError(error);
+    return false;
   }
 };
 
-export const viewCart = async (id_number: string): Promise<any | null | void> => {
+export const viewCart = async (id_number: string): Promise<CartItem[]> => {
   try {
+    const token = getToken();
     const response: AxiosResponse = await axios.get(`${backendConnection()}/api/cart/view-cart`, {
       params: { id_number },
-      headers: getAuthHeaders(true),
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
     });
 
     if (response.status === 200) {
-      return response.data;
+      return response.data as CartItem[];
     }
-    return null;
-  } catch (error: any) {
-    console.error("Error:", error);
+
+    const message = response.data?.message ?? "Failed to fetch cart";
+    showToast("error", message);
+    throw new Error(message);
+  } catch (error: unknown) {
+    const message = handleApiError(error);
+    throw new Error(message);
   }
 };
 
-export const deleteItem = async (data: any): Promise<void> => {
+export const deleteItem = async (data: any): Promise<boolean> => {
   try {
+    const token = getToken();
     const response: AxiosResponse = await axios.put(
       `${backendConnection()}/api/cart/delete-item-cart`,
       data,
       {
-        headers: getAuthHeaders(true),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       }
     );
 
     if (response.status === 200) {
       showToast("success", response.data.message);
-      window.location.reload();
+      return true; // let caller handle UI updates (reload/navigation)
     } else {
       showToast("error", response.data.message);
+      return false;
     }
   } catch (error: any) {
-    if (error?.response?.data) {
-      console.error("Error:", error);
-    } else {
-      console.error("Error:", error);
-    }
-    console.error("Error:", error);
+    handleApiError(error);
+    return false;
   }
 };
 
 export const fetchSpecificStudent = async (id_number: string): Promise<any | null | void> => {
   try {
+    const token = getToken();
     const response: AxiosResponse = await axios.get(
       `${backendConnection()}/api/fetch-specific-student/${id_number}`,
       {
-        headers: getAuthHeaders(true),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       }
     );
 
@@ -141,25 +196,26 @@ export const fetchSpecificStudent = async (id_number: string): Promise<any | nul
     }
     return null;
   } catch (error: any) {
-    if (error?.response?.data) {
-      console.error("Error:", error);
-    } else {
-      console.error("Error:", error);
-    }
-    console.error("Error:", error);
+    handleApiError(error);
+    return null;
   }
 };
 
 export const searchStudentById = async (id_number: string): Promise<any> => {
   try {
+    const token = getToken();
     const response: AxiosResponse = await axios.get(
       `${backendConnection()}/api/admin/student_search/${id_number}`,
       {
-        headers: getAuthHeaders(true),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       }
     );
     return response.data.data;
   } catch (error: any) {
+    handleApiError(error);
     throw error?.response?.data?.message || "An error occurred while searching.";
   }
 };
@@ -169,32 +225,40 @@ export const updateStudentYearLevelForCurrentYear = async (
   yearToUpdate: string
 ): Promise<any> => {
   try {
+    const token = getToken();
     const response: AxiosResponse = await axios.put(
       `${backendConnection()}/api/students/edit-year-level/${id_number}`,
       { year: yearToUpdate },
       {
-        headers: getAuthHeaders(true),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       }
     );
     return response.data; // Contains message and updatedStudent data
   } catch (error: any) {
-    console.error("Student year level update error: ", error);
+    handleApiError(error);
     throw error;
   }
 };
 
 export const isStudentYearUpdated = async (id_number: string): Promise<boolean> => {
   try {
+    const token = getToken();
     const response: AxiosResponse = await axios.get(
       `${backendConnection()}/api/students/is-year-updated/${id_number}`,
       {
-        headers: getAuthHeaders(true),
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
       }
     );
 
     return response.data.isYearUpdated;
   } catch (error: any) {
-    console.error("Fetching isStudentYearUpdate error: ", error);
+    handleApiError(error);
     throw error;
   }
 };

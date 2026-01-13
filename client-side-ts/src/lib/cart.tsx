@@ -2,8 +2,8 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 
 
 export interface CartItem {
-  uid: string; // stable unique id for this cart line
-  id: number; // product id from backend
+  uid: string; 
+  id: number; 
   name: string;
   price: number; 
   image: string;
@@ -24,14 +24,17 @@ interface CartContextValue {
 
 const STORAGE_KEY = 'psits_cart_v1';
 const MAX_QTY = 999;
+const MAX_NAME_LEN = 512;
+const MAX_IMAGE_LEN = 1024;
+const MAX_ATTR_LEN = 64; // color, size, course
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 
 function generateUid(): string {
   try {
-    if (typeof crypto !== 'undefined' && typeof (crypto as any).randomUUID === 'function') {
-      return (crypto as any).randomUUID();
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
     }
   } catch (e) {
 
@@ -56,12 +59,12 @@ function sanitizeStoredItem(obj: any): CartItem | null {
   return {
     uid,
     id,
-    name: name.slice(0, 512),
+    name: name.slice(0, MAX_NAME_LEN),
     price,
-    image,
-    color: typeof obj.color === 'string' ? obj.color : undefined,
-    size: typeof obj.size === 'string' ? obj.size : undefined,
-    course: typeof obj.course === 'string' ? obj.course : undefined,
+    image: typeof obj.image === 'string' ? obj.image.slice(0, MAX_IMAGE_LEN) : '',
+    color: typeof obj.color === 'string' ? obj.color.slice(0, MAX_ATTR_LEN) : undefined,
+    size: typeof obj.size === 'string' ? obj.size.slice(0, MAX_ATTR_LEN) : undefined,
+    course: typeof obj.course === 'string' ? obj.course.slice(0, MAX_ATTR_LEN) : undefined,
     qty,
   };
 }
@@ -91,33 +94,69 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [items]);
 
+  const indexMapRef = React.useRef<Map<string, number>>(new Map());
+
+  const makeKey = (it: { id: number; size?: string; color?: string; course?: string }) =>
+    `${it.id}|${it.size ?? ''}|${it.color ?? ''}|${it.course ?? ''}`;
+
+  const rebuildIndexMap = (arr: CartItem[]) => {
+    const m = new Map<string, number>();
+    for (let i = 0; i < arr.length; i++) {
+      m.set(makeKey(arr[i]), i);
+    }
+    indexMapRef.current = m;
+  };
+
+  useEffect(() => {
+    rebuildIndexMap(items);
+  }, []);
+
   const addItem = (item: Omit<CartItem, 'uid'>) => {
     const safeItem = sanitizeStoredItem({ ...item, uid: generateUid() });
     if (!safeItem) return;
 
     setItems((current) => {
-      const idx = current.findIndex(
-        (x) => x.id === safeItem.id && x.size === safeItem.size && x.color === safeItem.color && x.course === safeItem.course
-      );
-      if (idx > -1) {
+      const key = makeKey(safeItem);
+      const idx = indexMapRef.current.get(key) ?? -1;
+      if (idx > -1 && idx < current.length) {
         const copy = [...current];
         const existing = copy[idx];
         const newQty = Math.min(MAX_QTY, existing.qty + safeItem.qty);
         copy[idx] = { ...existing, qty: newQty };
+        indexMapRef.current.set(key, idx);
         return copy;
       }
-      return [...current, safeItem];
+      const newArr = [...current, safeItem];
+      indexMapRef.current.set(key, newArr.length - 1);
+      return newArr;
     });
   };
 
-  const removeItem = (uid: string) => setItems((s) => s.filter((i) => i.uid !== uid));
+  const removeItem = (uid: string) => {
+    setItems((s) => {
+      const idx = s.findIndex((i) => i.uid === uid);
+      if (idx === -1) return s;
+      const newArr = [...s.slice(0, idx), ...s.slice(idx + 1)];
+      rebuildIndexMap(newArr);
+      return newArr;
+    });
+  };
 
   const updateQty = (uid: string, qty: number) => {
     const safeQty = Math.max(1, Math.min(MAX_QTY, Math.floor(Number(qty) || 0)));
-    setItems((s) => s.map((i) => (i.uid === uid ? { ...i, qty: safeQty } : i)));
+    setItems((s) => {
+      const idx = s.findIndex((i) => i.uid === uid);
+      if (idx === -1) return s;
+      const copy = [...s];
+      copy[idx] = { ...copy[idx], qty: safeQty };
+      return copy;
+    });
   };
 
-  const clear = () => setItems([]);
+  const clear = () => {
+    setItems([]);
+    indexMapRef.current.clear();
+  };
 
   const total = useMemo(() => items.reduce((sum, it) => sum + it.price * it.qty, 0), [items]);
 
