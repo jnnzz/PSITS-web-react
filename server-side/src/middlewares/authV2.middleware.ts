@@ -1,3 +1,42 @@
+/**
+ * Authentication & Authorization Middleware for V2 Auth Routes
+ *
+ * ARCHITECTURE OVERVIEW:
+ * This module provides a layered middleware system for protecting routes:
+ *
+ * Layer 1: Token Verification (Choose ONE per route)
+ * - requireAccessTokenV2: Fast, stateless verification. Use for READ-ONLY operations
+ *   (fetching data, non-sensitive reads). Only validates access token signature & expiry.
+ * - requireAccessTokenWithDBCheck: Slower, stateful verification. Use for DANGEROUS operations
+ *   (payments, sensitive edits, deletions). Validates token AND real-time DB status.
+ *   Prevents damage if account deactivated while token still valid.
+ *
+ * Layer 2: Role-Based Access (REQUIRED after Layer 1)
+ * - roleAuthenticateV2(roles): Specify which roles ("Admin" | "Student") can access.
+ *   Always use this to define your route's role requirements.
+ *
+ * Layer 3: Admin-Level Access (OPTIONAL, only for admin routes)
+ * - adminAccessAuthenticateV2(accessLevels): Restrict to specific admin types
+ *   (e.g., ["president", "secretary"]). Only needed if you want granular admin permissions.
+ *   Skip if route allows ALL admins with any access level.
+ *
+ * USAGE PATTERNS:
+ *
+ * Example 1: Simple read (fetch student profile)
+ * router.get("/profile", requireAccessTokenV2, roleAuthenticateV2(["Student"]), controller)
+ *
+ * Example 2: Sensitive edit (update grades)
+ * router.put("/grades", requireAccessTokenWithDBCheck, roleAuthenticateV2(["Admin"]), controller)
+ *
+ * Example 3: Admin-only action (delete student)
+ * router.delete("/student/:id", requireAccessTokenWithDBCheck, roleAuthenticateV2(["Admin"]),
+ *   adminAccessAuthenticateV2(["registrar", "admin"]), controller)
+ *
+ * Example 4: Allow all admins without access level restriction
+ * router.post("/announcement", requireAccessTokenV2, roleAuthenticateV2(["Admin"]), controller)
+ * As you can see, no adminAccessAuthenticateV2 needed - all admins can post
+ */
+
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken, AccessTokenClaims } from "../util/jwt.util";
 import { Student } from "../models/student.model";
