@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-import { Student, IStudentDocument } from "../models/student.model";
-import { Admin } from "../models/admin.model";
+import { Student } from "../models/student.model";
+import { IStudentDocument } from "../models/student.interface";
 import { Orders } from "../models/orders.model";
 import { Log } from "../models/log.model";
 import { MembershipHistory } from "../models/history.model";
@@ -9,8 +9,6 @@ import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { IStudent } from "../models/student.interface";
 import { IHistory } from "../models/history.interface";
-import { IOrders } from "../models/orders.interface";
-import { IAdmin, IAdminDocument } from "../models/admin.interface";
 
 export const getAllActiveStudentsController = async (
   req: Request,
