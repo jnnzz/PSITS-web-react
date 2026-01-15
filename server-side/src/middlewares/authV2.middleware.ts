@@ -35,6 +35,17 @@
  * Example 4: Allow all admins without access level restriction
  * router.post("/announcement", requireAccessTokenV2, roleAuthenticateV2(["Admin"]), controller)
  * As you can see, no adminAccessAuthenticateV2 needed - all admins can post
+ *
+ * ERROR SHAPE STANDARDS:
+ * All endpoints return JSON errors in this format: { error: 'CODE', message: 'Description' }
+ *
+ * Error codes:
+ * - INVALID_TOKEN (401): Token missing, invalid, malformed, or expired
+ * - INSUFFICIENT_PERMISSIONS (403): User lacks required role
+ * - ACCOUNT_INACTIVE (403): User account deactivated/suspended
+ * - CREDENTIALS_MISMATCH (403): Token claims don't match current DB state
+ * - ADMIN_ACCESS_REQUIRED (403): Route restricted to admin role
+ * - INSUFFICIENT_ADMIN_PERMISSIONS (403): Admin lacks required access level
  */
 
 import { Request, Response, NextFunction } from "express";
@@ -86,7 +97,9 @@ export const requireAccessTokenV2 = (
   }
 
   if (!token) {
-    return res.status(401).json({ message: "Access token required" });
+    return res
+      .status(401)
+      .json({ error: "INVALID_TOKEN", message: "Access token required" });
   }
 
   try {
@@ -96,7 +109,7 @@ export const requireAccessTokenV2 = (
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Invalid access token";
-    return res.status(401).json({ message });
+    return res.status(401).json({ error: "INVALID_TOKEN", message });
   }
 };
 
@@ -142,7 +155,9 @@ export const requireAccessTokenWithDBCheck = async (
   }
 
   if (!token) {
-    return res.status(401).json({ message: "Access token required" });
+    return res
+      .status(401)
+      .json({ error: "INVALID_TOKEN", message: "Access token required" });
   }
 
   try {
@@ -152,23 +167,31 @@ export const requireAccessTokenWithDBCheck = async (
     if (claims.role === "Admin") {
       const admin = await Admin.findById(claims.sub);
       if (!admin || admin.status !== "Active") {
-        return res.status(403).json({ message: "Account no longer active" });
+        return res.status(403).json({
+          error: "ACCOUNT_INACTIVE",
+          message: "Account no longer active",
+        });
       }
       // Verify role hasn't changed
       if (admin.id_number !== claims.idNumber) {
-        return res
-          .status(403)
-          .json({ message: "Account credentials mismatch" });
+        return res.status(403).json({
+          error: "CREDENTIALS_MISMATCH",
+          message: "Account credentials mismatch",
+        });
       }
     } else {
       const student = await Student.findById(claims.sub);
       if (!student || student.status !== "True") {
-        return res.status(403).json({ message: "Account no longer active" });
+        return res.status(403).json({
+          error: "ACCOUNT_INACTIVE",
+          message: "Account no longer active",
+        });
       }
       if (student.id_number !== claims.idNumber) {
-        return res
-          .status(403)
-          .json({ message: "Account credentials mismatch" });
+        return res.status(403).json({
+          error: "CREDENTIALS_MISMATCH",
+          message: "Account credentials mismatch",
+        });
       }
     }
 
@@ -177,7 +200,7 @@ export const requireAccessTokenWithDBCheck = async (
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Invalid access token";
-    return res.status(401).json({ message });
+    return res.status(401).json({ error: "INVALID_TOKEN", message });
   }
 };
 
