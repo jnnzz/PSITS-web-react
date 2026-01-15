@@ -22,23 +22,30 @@ interface CartItem {
   [key: string]: any;
 }
 
-// interface Student {
-//   id_number: string;
-//   rfid?: string;
-//   first_name?: string;
-//   middle_name?: string;
-//   last_name?: string;
-//   email?: string;
-//   course?: string;
-//   year?: number;
-//   isYearUpdated?: boolean;
-//   status?: string;
-//   membershipStatus?: string;
-//   campus?: string;
-//   role?: string;
-//   cart?: CartItem[];
-//   [key: string]: any;
-// }
+interface Student {
+  id_number: string;
+  [key: string]: unknown;
+}
+
+interface MembershipStatusResponse {
+  status: string;
+  isFirstApplication: boolean;
+}
+
+interface DeleteItemRequest {
+  id_number: string;
+  [key: string]: unknown;
+}
+
+interface CartItemFormData {
+  product_id?: string;
+  product_name?: string;
+  price?: number;
+  quantity?: number;
+  variation?: string[] | string;
+  sizes?: string[] | string;
+  [key: string]: unknown;
+}
 
 const getToken = (): string | null => sessionStorage.getItem("Token");
 
@@ -81,10 +88,12 @@ export const requestMembership = async (id_number: string): Promise<void> => {
   }
 };
 
-export const getMembershipStatusStudents = async (id_number: string): Promise<any | undefined> => {
+export const getMembershipStatusStudents = async (
+  id_number: string
+): Promise<MembershipStatusResponse | undefined> => {
   try {
     const token = getToken();
-    const response: AxiosResponse = await axios.get(
+    const response: AxiosResponse<MembershipStatusResponse> = await axios.get(
       `${backendConnection()}/api/students/get-membership-status/${id_number}`,
       {
         headers: {
@@ -97,13 +106,14 @@ export const getMembershipStatusStudents = async (id_number: string): Promise<an
     if (response.status === 200) {
       return response.data;
     }
-  } catch (error: any) {
+    return undefined;
+  } catch (error: unknown) {
     handleApiError(error);
     return undefined;
   }
 };
 
-export const addToCartApi = async (formData: any): Promise<boolean | void> => {
+export const addToCartApi = async (formData: CartItemFormData): Promise<boolean> => {
   try {
     const token = getToken();
     const response: AxiosResponse = await axios.post(
@@ -151,7 +161,7 @@ export const viewCart = async (id_number: string): Promise<CartItem[]> => {
   }
 };
 
-export const deleteItem = async (data: any): Promise<boolean> => {
+export const deleteItem = async (data: DeleteItemRequest): Promise<boolean> => {
   try {
     const token = getToken();
     const response: AxiosResponse = await axios.put(
@@ -167,7 +177,7 @@ export const deleteItem = async (data: any): Promise<boolean> => {
 
     if (response.status === 200) {
       showToast("success", response.data.message);
-      return true; // let caller handle UI updates (reload/navigation)
+      return true;
     } else {
       showToast("error", response.data.message);
       return false;
@@ -178,10 +188,10 @@ export const deleteItem = async (data: any): Promise<boolean> => {
   }
 };
 
-export const fetchSpecificStudent = async (id_number: string): Promise<any | null | void> => {
+export const fetchSpecificStudent = async (id_number: string): Promise<Student | null> => {
   try {
     const token = getToken();
-    const response: AxiosResponse = await axios.get(
+    const response: AxiosResponse<{ data: Student }> = await axios.get(
       `${backendConnection()}/api/fetch-specific-student/${id_number}`,
       {
         headers: {
@@ -195,7 +205,7 @@ export const fetchSpecificStudent = async (id_number: string): Promise<any | nul
       return response.data.data;
     }
     return null;
-  } catch (error: any) {
+  } catch (error: unknown) {
     handleApiError(error);
     return null;
   }
