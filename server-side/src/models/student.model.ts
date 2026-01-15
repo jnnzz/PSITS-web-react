@@ -2,7 +2,9 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 import { IStudent } from "./student.interface";
 import { CartItem, cartItemSchema } from "./cart.model";
 
-export interface IStudentDocument extends IStudent, Document {}
+export interface IStudentDocument extends IStudent, Document {
+  _id: mongoose.Types.ObjectId;
+}
 
 const studentSchema = new Schema<IStudentDocument>({
   id_number: {

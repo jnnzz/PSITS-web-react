@@ -1,7 +1,9 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { IAdmin } from "./admin.interface";
 
-export interface IAdminDocument extends IAdmin, Document {}
+export interface IAdminDocument extends IAdmin, Document {
+  _id: mongoose.Types.ObjectId;
+}
 
 const adminSchema = new Schema<IAdminDocument>({
   id_number: { type: String, unique: true },
