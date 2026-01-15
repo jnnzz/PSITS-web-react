@@ -47,7 +47,7 @@ export const setRefreshCookie = (res: Response, token: string): void => {
     httpOnly: true, // Prevent JavaScript access; only sent with HTTP requests
     secure: IS_PROD, // HTTPS only in production; allow HTTP in dev
     sameSite: "lax", // Prevent CSRF while allowing top-level navigations
-    path: "/v2/auth", // Only send with requests to /v2/auth routes
+    path: "/api/v2/auth", // Only send with requests to /api/v2/auth routes
     maxAge, // Browser removes cookie after this duration (ms)
   });
 };
@@ -61,7 +61,7 @@ export const clearRefreshCookie = (res: Response): void => {
     httpOnly: true,
     secure: IS_PROD,
     sameSite: "lax",
-    path: "/v2/auth",
+    path: "/api/v2/auth",
   });
 };
 
