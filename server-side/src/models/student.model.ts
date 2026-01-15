@@ -1,10 +1,6 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
-import { IStudent } from "./student.interface";
+import mongoose, { Schema, Types } from "mongoose";
+import { IStudentDocument } from "./student.interface";
 import { CartItem, cartItemSchema } from "./cart.model";
-
-export interface IStudentDocument extends IStudent, Document {
-  _id: mongoose.Types.ObjectId;
-}
 
 const studentSchema = new Schema<IStudentDocument>({
   id_number: {
@@ -81,6 +77,11 @@ const studentSchema = new Schema<IStudentDocument>({
   },
 
   cart: [cartItemSchema],
+
+  currentRefreshToken: {
+    type: String,
+    default: null,
+  },
 });
 
 export const Student = mongoose.model<IStudentDocument>(

@@ -1,5 +1,7 @@
 import { ICart } from "./cart.interface";
 import { ICartDocument } from "./cart.model";
+import { Document } from "mongoose";
+import mongoose from "mongoose";
 
 export interface IStudent {
   id_number: string;
@@ -23,4 +25,9 @@ export interface IStudent {
   isRequest: boolean;
   adminRequest: string;
   cart: ICartDocument[];
+  currentRefreshToken?: string | null;
+}
+
+export interface IStudentDocument extends IStudent, Document {
+  _id: mongoose.Types.ObjectId;
 }
