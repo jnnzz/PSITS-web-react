@@ -28,7 +28,7 @@ router.post("/refresh", refreshV2Controller);
  */
 router.post("/logout", logoutV2Controller);
 
-// TODO: Remove this, only for testing purposes
+// TODO (auth): Remove this, only for testing purposes
 /**
  * GET /v2/auth/me
  * Get current user profile (requires valid access token)
