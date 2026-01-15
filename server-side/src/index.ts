@@ -32,7 +32,6 @@ app.use(
   })
 );
 
-console.log(process.env.CORS);
 app.use(
   cors({
     origin: process.env.CORS,
