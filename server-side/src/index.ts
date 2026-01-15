@@ -63,7 +63,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/promo", promoRoutes);
 app.use("/api", privateRoutes);
 app.use("/api/docs", documentationRoutes);
-app.use("/v2/auth", authV2Routes);
+app.use("/api/v2/auth", authV2Routes);
 
 app.listen(PORT, () => {
   console.log(`Server started, listening at port ${PORT}`);
