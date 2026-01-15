@@ -1,0 +1,38 @@
+import { Router } from "express";
+import loginLimiter from "../util/limiter.util";
+import {
+  loginV2Controller,
+  refreshV2Controller,
+  logoutV2Controller,
+  meV2Controller,
+} from "../controllers/authV2.controller";
+import { requireAccessTokenV2 } from "../middlewares/authV2.middleware";
+
+const router: Router = Router();
+
+/**
+ * POST /v2/auth/login
+ * Authenticate user with id_number + password, issue tokens, set refresh cookie
+ */
+router.post("/login", loginLimiter, loginV2Controller);
+
+/**
+ * POST /v2/auth/refresh
+ * Read refresh token from cookie, validate, issue new tokens
+ */
+router.post("/refresh", refreshV2Controller);
+
+/**
+ * POST /v2/auth/logout
+ * Clear refresh token cookie (stateless; token remains valid until expiry)
+ */
+router.post("/logout", logoutV2Controller);
+
+// TODO: Remove this, only for testing purposes
+/**
+ * GET /v2/auth/me
+ * Get current user profile (requires valid access token)
+ */
+router.get("/me", requireAccessTokenV2, meV2Controller);
+
+export default router;

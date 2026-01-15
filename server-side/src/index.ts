@@ -17,6 +17,7 @@ import logRoutes from "./routes/logs.route";
 import merchRoutes from "./routes/merchandise.route";
 import eventRoutes from "./routes/events.route";
 import promoRoutes from "./routes/promo.route";
+import authV2Routes from "./routes/authV2.route";
 import { checkPromos } from "./custom_function/check_promo";
 import documentationRoutes from "./routes/documentation.route";
 
@@ -35,8 +36,9 @@ console.log(process.env.CORS);
 app.use(
   cors({
     origin: process.env.CORS,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 app.set("trust proxy", 1);
@@ -62,6 +64,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/promo", promoRoutes);
 app.use("/api", privateRoutes);
 app.use("/api/docs", documentationRoutes);
+app.use("/v2/auth", authV2Routes);
 
 app.listen(PORT, () => {
   console.log(`Server started, listening at port ${PORT}`);
