@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-
 export interface CartItem {
   uid: string; 
   id: number; 
@@ -15,7 +14,7 @@ export interface CartItem {
 
 interface CartContextValue {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'uid'>) => void;
+  addItem: (item: Omit<CartItem, 'uid'>) => string | undefined;
   removeItem: (uid: string) => void;
   updateQty: (uid: string, qty: number) => void;
   clear: () => void;
@@ -26,7 +25,7 @@ const STORAGE_KEY = 'psits_cart_v1';
 const MAX_QTY = 999;
 const MAX_NAME_LEN = 512;
 const MAX_IMAGE_LEN = 1024;
-const MAX_ATTR_LEN = 64; // color, size, course
+const MAX_ATTR_LEN = 64; 
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
@@ -111,9 +110,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     rebuildIndexMap(items);
   }, []);
 
-  const addItem = (item: Omit<CartItem, 'uid'>) => {
+  const addItem = (item: Omit<CartItem, 'uid'>): string | undefined => {
     const safeItem = sanitizeStoredItem({ ...item, uid: generateUid() });
-    if (!safeItem) return;
+    if (!safeItem) return undefined;
 
     setItems((current) => {
       const key = makeKey(safeItem);
@@ -130,6 +129,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       indexMapRef.current.set(key, newArr.length - 1);
       return newArr;
     });
+    return safeItem.uid;
   };
 
   const removeItem = (uid: string) => {
