@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, memo, type ChangeEvent } from 'react';
 import { Link } from 'react-router';
-import image from '../../assets/awarding/1.jpg';
-import image1 from '../../assets/awarding/2.jpg';
-import image2 from '../../assets/awarding/3.jpg';
-import image3 from '../../assets/awarding/4.jpg';
-import image4 from '../../assets/awarding/5.jpg';
-import image5 from '../../assets/awarding/6.jpg';
-import image6 from '../../assets/awarding/7.jpg';
-import image7 from '../../assets/awarding/8.jpg';
+import image from '../../../assets/awarding/1.jpg';
+import image1 from '../../../assets/awarding/2.jpg';
+import image2 from '../../../assets/awarding/3.jpg';
+import image3 from '../../../assets/awarding/4.jpg';
+import image4 from '../../../assets/awarding/5.jpg';
+import image5 from '../../../assets/awarding/6.jpg';
+import image6 from '../../../assets/awarding/7.jpg';
+import image7 from '../../../assets/awarding/8.jpg';
 import {
   InputGroup,
   InputGroupAddon,

@@ -1,5 +1,5 @@
 import React from 'react'
-import ResourcesSection from '@/components/sections/ResourcesSection'
+import ResourcesSection from '@/pages/resources/sections/ResourcesSection'
 export const Resources = () => {
   return (
     <div>
