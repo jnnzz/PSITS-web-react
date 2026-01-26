@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const navItems = [
   { name: "Event", path: "/event", iconClass: "fas fa-calendar" },
   { name: "Community", path: "/community", iconClass: "fas fa-users" },
+  { name: "Docs", path: "/docs", iconClass: "fas fa-book" },
   {
     name: "Login",
     path: "/login",

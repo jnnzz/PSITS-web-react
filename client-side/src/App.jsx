@@ -1,5 +1,8 @@
 import React from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { DarkModeProvider } from "./contexts/DarkModeContext";
 
 import AdminLayout from "./components/layout/AdminLayout";
 import LandingLayout from "./components/layout/LandingLayout";
@@ -42,7 +45,9 @@ import Register from "./pages/authentication/Register";
 import PrivateRouteAdmin from "./authentication/privateRouteAdmin";
 import NotFound from "./components/common/NotFound";
 import Profile from "./pages/admin/Profile";
-
+import DocsHome from "./pages/docs/DocsHome";
+import ApiEndpoints from "./pages/docs/ApiEndpoints";
+import Features from "./pages/docs/Features";
 import PrivateRouteStudent from "./authentication/privateRouteStudent";
 import StudentLayout from "./components/layout/StudentLayout";
 import AllMembers from "./pages/admin/membership/AllMembers";
@@ -62,6 +67,7 @@ import StudentOrders from "./pages/students/StudentOrders";
 import Logs from "./pages/admin/Logs";
 import Community from "./pages/Community";
 import Events from "./pages/Events";
+import DocumentationManagement from "./pages/admin/documentation/DocumentationManagement";
 
 import StudentPaidOrders from "./pages/students/orders/PaidOrders";
 import StudentPendingOrder from "./pages/students/orders/PendingOrders";
@@ -69,10 +75,14 @@ import Resouces from "./pages/students/Resouces";
 import MarkAsPresent from "./pages/admin/MarkAsPresent";
 import { QRCodeScanner } from "./pages/admin/QRCodeScanner";
 
+//Promo Code
+import PromoDashboard from "./pages/admin/PromoCode/PromoDashboard";
+
 const App = () => {
   return (
-    <Router>
-      <Routes>
+    <DarkModeProvider>
+      <Router>
+        <Routes>
         <Route path="/" element={<LandingLayout />}>
           <Route index element={<Home />} />
           <Route path="/explore" element={<Explore />} />
@@ -80,6 +90,11 @@ const App = () => {
           <Route path="/community" element={<Community />} />
           <Route path="/admin-register" element={<AdminRegister />} />
         </Route>
+        
+        {/* Protected docs routes - requires admin authentication with login modal */}
+        <Route path="/docs" element={<PrivateRouteAdmin element={DocsHome} />} />
+        <Route path="/docs/api" element={<PrivateRouteAdmin element={ApiEndpoints} />} />
+        <Route path="/docs/features" element={<PrivateRouteAdmin element={Features} />} />
         <Route
           path="/admin/"
           element={<PrivateRouteAdmin element={AdminLayout} />}
@@ -200,6 +215,10 @@ const App = () => {
             element={<PrivateRouteAdmin element={Reports} />}
           />
           <Route
+            path="documentation"
+            element={<PrivateRouteAdmin element={DocumentationManagement} />}
+          />
+          <Route
             path="resources"
             element={<PrivateRouteAdmin element={Resources} />}
           />
@@ -213,6 +232,10 @@ const App = () => {
           ></Route>
 
           <Route path="logs" element={<PrivateRouteAdmin element={Logs} />} />
+          <Route
+            path="promo-dashboard"
+            element={<PrivateRouteAdmin element={PromoDashboard} />}
+          />
         </Route>
 
         <Route
@@ -295,6 +318,19 @@ const App = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
+    <ToastContainer
+      position="top-right"
+      autoClose={2000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="colored"
+    />
+    </DarkModeProvider>
   );
 };
 

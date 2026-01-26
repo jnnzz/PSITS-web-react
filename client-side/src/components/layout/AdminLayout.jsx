@@ -61,6 +61,7 @@ const AdminLayout = () => {
           { text: "Merchandise", icon: "fas fa-boxes", path: "merchandise" },
           { text: "Orders", icon: "fas fa-shopping-cart", path: "orders" },
           { text: "Reports", icon: "fas fa-chart-line", path: "reports" },
+          { text: "Documentation", icon: "fas fa-book-open", path: "documentation" },
           logsAccess() && {
             text: "Logs",
             icon: "fa-solid fa-book",

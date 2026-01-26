@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   admin_authenticate,
   role_authenticate,
+  both_authenticate,
 } from "../middlewares/custom_authenticate_token";
 import {
   getSearchStudentByIdController,
@@ -32,6 +33,8 @@ import {
   approveAdminAccountController,
   declineAdminAccountController,
   setNewAdminAccessController,
+  getMembershipPrice,
+  changeMembershipPrice,
 } from "../controllers/admin.controller";
 
 const router = Router();
@@ -96,6 +99,7 @@ router.get("/get-daily-sales", admin_authenticate, getDailySalesController);
 router.get(
   "/get-all-officers",
   admin_authenticate,
+  role_authenticate(["admin", "finance", "executive"]),
   getAllAdminAccountsController
 );
 //Get All Members
@@ -199,6 +203,13 @@ router.put(
   "/update-admin-access",
   admin_authenticate,
   setNewAdminAccessController
+);
+router.get("/get-membership-price", both_authenticate, getMembershipPrice);
+router.put(
+  "/change-membership-price",
+  admin_authenticate,
+  role_authenticate(["finance", "admin"]),
+  changeMembershipPrice
 );
 
 export default router;

@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { getAllOfficers, editAdminAccess } from "../../api/admin";
+import {
+  getAllOfficers,
+  editAdminAccess,
+  membershipPrice,
+  changeMembershipPrice,
+} from "../../api/admin";
 import { getInformationData } from "../../authentication/Authentication";
 import {
   financeConditionalAccess,
@@ -21,6 +26,10 @@ const Settings = () => {
     admin: "Admin Access",
   };
   const [renewStudentStatus, setRenewStudentStatus] = useState(false);
+  const [priceStatus, setPriceStatus] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
+
+  const [priceChange, setPriceChange] = useState(membershipPrice);
 
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [users, setUsers] = useState([]);
@@ -29,7 +38,8 @@ const Settings = () => {
   const fetchUsers = async () => {
     try {
       const response = await getAllOfficers();
-
+      const price = await membershipPrice();
+      setPriceChange(price ? price : 0);
       setUsers(response ? response : []);
       setSelectedUsers([]);
     } catch (error) {
@@ -52,10 +62,32 @@ const Settings = () => {
   const handleShowModalRenewStudent = async () => {
     setRenewStudentStatus(true);
   };
+  const handleShowPriceStatus = () => {
+    setPriceStatus(true);
+  };
+  const handleShowEditable = () => {
+    setIsEditable(true);
+  };
+  const handleCancel = () => {
+    setIsEditable(false);
+    fetchUsers();
+  };
+
   const handleRenewStudent = async () => {
     if (await revokeAllStudent()) {
       setRenewStudentStatus(false);
       fetchUsers();
+    }
+  };
+
+  const handlePriceChange = async (event) => {
+    setPriceChange(event.target.value);
+  };
+
+  const handleChangeFee = async () => {
+    if (changeMembershipPrice(priceChange)) {
+      setPriceStatus(false);
+      setIsEditable(false);
     }
   };
 
@@ -92,6 +124,13 @@ const Settings = () => {
             confirmType={ConfirmActionType.RESET}
             onConfirm={() => handleRenewStudent()}
             onCancel={() => setRenewStudentStatus(false)}
+          />
+        )}
+        {priceStatus && (
+          <ConfirmationModal
+            confirmType={ConfirmActionType.CHANGE}
+            onConfirm={() => handleChangeFee()}
+            onCancel={() => setPriceStatus(false)}
           />
         )}
         {/* Bulk Access Control */}
@@ -188,23 +227,42 @@ const Settings = () => {
       {/* Membership Renewal Section */}
       <section className="bg-white rounded-2xl shadow p-6 space-y-4">
         <h2 className="text-xl font-medium border-b pb-2">Membership</h2>
-        <div className=" pt-2 flex flex-row items-center justify-between space-x-3">
-          <FormInput label="Change Membership Fee" type="number" />
-          <FormInput label="Change Renewal Fee" type="number" />
-        </div>
-        <div>
+        <div className=" pt-2  flex flex-row  items-center justify-between space-x-3">
+          <label>Membership Fee</label>
+          <FormInput
+            type="number"
+            onChange={handlePriceChange}
+            value={priceChange}
+            disabled={!isEditable}
+          />
+          {isEditable && (
+            <button
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md font-medium "
+              onClick={() => handleCancel()}
+            >
+              Cancel
+            </button>
+          )}
+
           <button
-            onClick={() => handleShowModalRenewStudent()}
+            onClick={
+              !isEditable
+                ? () => handleShowEditable()
+                : () => handleShowPriceStatus()
+            }
             className={
-              adminConditionalAccess()
+              adminConditionalAccess() && !isEditable
                 ? "px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md font-medium"
-                : "px-4 py-2 bg-gray-300 text-gray-500 rounded-md font-medium cursor-not-allowed"
+                : isEditable
+                ? "px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md font-medium"
+                : "px-4 py-2 bg-red-300 text-white rounded-md font-medium cursor-not-allowed"
             }
             disabled={!adminConditionalAccess()}
           >
-            Change Fee
+            {!isEditable ? "Edit" : "Save"}
           </button>
         </div>
+        <div></div>
         <div className="space-y-2">
           <p>Reset all active membership.</p>
           <button
