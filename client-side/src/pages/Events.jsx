@@ -129,7 +129,132 @@ const cbcImageArray = [
   "/cbc/27.jpg",
   "/cbc/28.jpg",
 ];
+const ictImageArray = [
+  "/ict-congress/1.jpg",
+  "/ict-congress/2.jpg",
+  "/ict-congress/3.jpg",
+  "/ict-congress/4.jpg",
+  "/ict-congress/5.jpg",
+  "/ict-congress/7.jpg",
+  "/ict-congress/8.jpg",
+  "/ict-congress/9.jpg",
+  "/ict-congress/10.jpg",
+  "/ict-congress/11.jpg",
+  "/ict-congress/12.jpg",
+  "/ict-congress/13.jpg",
+  "/ict-congress/14.jpg",
+  "/ict-congress/15.jpg",
+  "/ict-congress/16.jpg",
+  "/ict-congress/17.jpg",
+  "/ict-congress/18.jpg",
+  "/ict-congress/19.jpg",
+  "/ict-congress/20.jpg",
+  "/ict-congress/21.jpg",
+  "/ict-congress/22.jpg",
+  "/ict-congress/23.jpg",
+  "/ict-congress/24.jpg",
+  "/ict-congress/25.jpg",
+  "/ict-congress/26.jpg",
+  "/ict-congress/27.jpg",
+]
+const awardingImageArray = [
+  // "/awarding/1.jpg",
+  // "/awarding/2.jpg",
+  // "/awarding/3.jpg",
+  // "/awarding/4.jpg",
+  // "/awarding/5.jpg",
+  // "/awarding/6.jpg",
+  // "/awarding/7.jpg",
+  // "/awarding/8.jpg",
+  // "/awarding/9.jpg",
+  // "/awarding/10.jpg",
+  // "/awarding/11.jpg",
+  // "/awarding/12.jpg",
+  // "/awarding/13.jpg",
+  "/awarding/14.jpg",
+  "/awarding/15.jpg",
+  "/awarding/16.jpg",
+  "/awarding/17.jpg",
+  // "/awarding/18.jpg",
+  "/awarding/19.jpg",
+  "/awarding/20.jpg",
+  "/awarding/21.jpg",
+  "/awarding/22.jpg",
+  "/awarding/23.jpg",
+  "/awarding/24.jpg",
+  "/awarding/25.jpg",
+  "/awarding/26.jpg",
+  "/awarding/27.jpg",
+  "/awarding/28.jpg",
+  "/awarding/29.jpg",
+];
+  const orientationImageArray = [
+  "/orientation2025/1.jpg",
+  "/orientation2025/2.jpg",
+  "/orientation2025/3.jpg",
+  "/orientation2025/4.jpg",
+  "/orientation2025/5.jpg",
+  "/orientation2025/6.jpg",
+  "/orientation2025/7.jpg",
+  "/orientation2025/8.jpg",
+  "/orientation2025/9.jpg",
+  "/orientation2025/10.jpg",
+  "/orientation2025/11.jpg",
+  "/orientation2025/12.jpg",
+  "/orientation2025/13.jpg",
+  "/orientation2025/14.jpg",
+  "/orientation2025/15.jpg",
+  "/orientation2025/16.jpg",
+  "/orientation2025/17.jpg",
+  "/orientation2025/18.jpg",
+  "/orientation2025/19.jpg",
+  "/orientation2025/20.jpg",
+  "/orientation2025/21.jpg",
+  "/orientation2025/22.jpg",
+  "/orientation2025/23.jpg",
+  "/orientation2025/24.jpg",
+  "/orientation2025/25.jpg",
+  "/orientation2025/26.jpg",
+  "/orientation2025/27.jpg",
+  "/orientation2025/28.jpg",
+  "/orientation2025/29.jpg",
+  "/orientation2025/30.jpg",
+  "/orientation2025/31.jpg",
+  "/orientation2025/32.jpg",
+  "/orientation2025/33.jpg",
+  ];
 
+  const embeddedImageArray = [
+  "/embedded/1.jpg",
+  "/embedded/2.jpg",
+  "/embedded/3.jpg",
+  "/embedded/4.jpg",
+  "/embedded/5.jpg",
+  "/embedded/6.jpg",
+  "/embedded/7.jpg",
+  "/embedded/8.jpg",
+  "/embedded/9.jpg",
+  "/embedded/10.jpg",
+  "/embedded/11.jpg",
+  "/embedded/12.jpg",
+  "/embedded/13.jpg",
+  "/embedded/14.jpg",
+  "/embedded/15.jpg",
+  "/embedded/16.jpg",
+  "/embedded/17.jpg",
+  "/embedded/18.jpg",
+  "/embedded/19.jpg",
+  "/embedded/20.jpg",
+  "/embedded/21.jpg",
+  "/embedded/22.jpg",
+  "/embedded/23.jpg",
+  "/embedded/24.jpg",
+  "/embedded/25.jpg",
+  "/embedded/26.jpg",
+  "/embedded/27.jpg",
+
+
+  ];
 export const Carousel = ({ imageArray }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const controls = useAnimation();
@@ -595,7 +720,7 @@ const EmbededMessage = () => {
           {showMore ? "See less" : "See more"}
         </button>
       </div>
-
+      <Carousel imageArray={embeddedImageArray} />
   
     </>
   );
@@ -786,7 +911,7 @@ const Awarding = () => {
           style={{ top: "60%", left: "80%" }}
         ></div>
         <h2 className="text-2xl md:text-3xl font-semibold mb-4 md:mb-6">
-          𝗥𝗲𝗹𝗶𝘃𝗲 𝘁𝗵𝗲 𝗲𝘅𝗰𝗶𝘁𝗲𝗺𝗲𝗻𝘁 𝗼𝗳 𝗖𝗖𝗦 𝗗𝗔𝗬𝗦 2025! 🎥
+          𝗥𝗲𝗹𝗶𝘃𝗲 𝘁𝗵𝗲 𝗲𝘅𝗰𝗶𝘁𝗲𝗺𝗲𝗻𝘁 𝗼𝗳 𝗖𝗖𝗦 𝗗𝗔𝗬𝗦 2025! 
         </h2>
         <p className="text-base md:text-lg mb-4">
           <p>
@@ -794,8 +919,7 @@ const Awarding = () => {
             From thrilling competitions to impressive showcases of knowledge and
             wits, new and experienced contenders—brought their skills to the
             test, embodying the theme "𝐂𝐨𝐝𝐞. 𝐈𝐧𝐧𝐨𝐯𝐚𝐭𝐞. 𝐄𝐥𝐞𝐯𝐚𝐭𝐞. - 𝐒𝐡𝐚𝐩𝐢𝐧𝐠 𝐭𝐡𝐞
-            𝐅𝐮𝐭𝐮𝐫𝐞 𝐰𝐢𝐭𝐡 𝐓𝐞𝐜𝐡𝐧𝐨𝐥𝐨𝐠𝐲". Watch these video highlights from Day 1 to
-            Day 3 of our event!
+            𝐅𝐮𝐭𝐮𝐫𝐞 𝐰𝐢𝐭𝐡 𝐓𝐞𝐜𝐡𝐧𝐨𝐥𝐨𝐠𝐲". <table>QA13DE4RF4</table>
           </p>
           <br />
         </p>
@@ -805,7 +929,7 @@ const Awarding = () => {
           <span>Captions | Christine Anne Alesna</span>
         </p>
       </div>
-
+    <Carousel imageArray={awardingImageArray} />
    
     </>
   );
@@ -887,25 +1011,72 @@ export const IctMessage = () => {
         </p>
       </div>
 
-   
+      <Carousel imageArray={ictImageArray} />
+
     </>
   );
 };
+
+export const OrientationMessage = () => {
+  return (
+    <>
+      <div className=" z-20 -mt-24 relative bg-gradient-to-br from-secondary to-primary  text-neutral-light p-4 md:p-6 shadow-md w-full">
+        <div
+          className="absolute w-16 h-16 md:w-20 md:h-20 bg-primary bg-opacity-30"
+          style={{ top: "5%", right: "5%" }}
+        ></div>
+        <div
+          className="absolute w-20 h-20 md:w-24 md:h-24 bg-secondary bg-opacity-30"
+          style={{ top: "30%", left: "50%", transform: "translateX(-50%)" }}
+        ></div>
+        <div
+          className="absolute w-16 h-16 md:w-20 md:h-20 bg-accent bg-opacity-30"
+          style={{ top: "60%", left: "80%" }}
+        ></div>
+        <h2 className="text-2xl md:text-3xl font-semibold mb-4 md:mb-6">
+          𝙃𝙚𝙡𝙡𝙤 𝙒𝙤𝙧𝙡𝙙, 𝘾𝘾𝙎 𝘽𝙖𝙩𝙘𝙝 2025! 🎉
+        </h2>
+        <p className="text-base md:text-lg mb-4">
+          <p>
+            {" "}
+        
+            From that very first hello at registration to the final round of applause, our Freshmen Orientation celebrated fresh starts and meaningful connections.
+            We met new faces, shared stories, learned from our mentors, and embraced what it truly means to be part of the CCS family.
+            Here’s to making the most of your journey—not just through learning, but by creating memories that will stay with you long after graduation.
+            Welcome to the CCS family! 💛💜
+            #CCSYellowAndPurple
+          </p>
+          <br />
+        </p>
+
+        <p className="pt-4 text-base md:text-lg flex flex-col ">
+          <span> Photos | Haydee Dionaldo, AJ Brian Pasilaban, Roshele Faye Labiaga</span>
+        </p>
+      </div>
+    <Carousel imageArray={orientationImageArray} />
+   
+    </>
+  );
+
+
+
+}
 
 const Events = () => {
   return (
     <>
       <Banner />
       <section className="px-4 min-h-screen container py-14 flex flex-col md:py-24 items-center justify-center space-y-5">
-        <AkweMessage />
-        <IntramsMessage />
-        <SeminarMessage />
-        <EmbededMessage />
-        <NihonggoMessage />
-        <YearEnd />
-        <CbcMessage />
-        <Awarding />
+        <OrientationMessage />
         <IctMessage />
+        <Awarding />
+        <CbcMessage />
+        <YearEnd />
+        <NihonggoMessage />
+        <EmbededMessage />
+        <SeminarMessage />
+        <IntramsMessage />
+        <AkweMessage />
       </section>
     </>
   );

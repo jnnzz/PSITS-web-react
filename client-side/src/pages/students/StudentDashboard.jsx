@@ -10,6 +10,7 @@ import { getEvents } from "../../api/event";
 import ads from "../../assets/images/ads.png";
 import {IctMessage} from '../Events.jsx';
 import { AkweMessage } from "../Events.jsx";
+import { OrientationMessage } from "../Events.jsx";
 import CircularGallery from '../../components/Image/CircularGallery';
 
 
@@ -210,7 +211,9 @@ const StudentDashboard = () => {
                 <span className="flex-shrink mx-4 text-center font-semibold text-[#074873]">Recent Activities</span>
               <div className="flex-shrink-0">― ― ― ―</div>
             </div>
-
+            <div>
+              <IctMessage/>
+            </div>
             <div>
             
               <IntramsMessage/>
