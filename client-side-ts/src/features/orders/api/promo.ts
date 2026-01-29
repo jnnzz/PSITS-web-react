@@ -1,6 +1,7 @@
-import { showToast } from "../utils/alertHelper";
+import { showToast } from "../../../utils/alertHelper";
 import backendConnection from "../../../api/backendApi";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
+import type { AxiosResponse } from "axios";
 
 interface MerchandiseItem {
   id: string | number;
