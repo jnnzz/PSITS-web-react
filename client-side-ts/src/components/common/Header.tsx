@@ -111,10 +111,10 @@ export const Header = () => {
         {/* Right Section: Cart and Sign In */}
         <div className="flex items-center gap-2 md:gap-4">
           {/* Cart */}
-          <button className="flex items-center gap-2 rounded-full px-3 py-2 text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900">
+          <Link to="/cart" className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 transition-colors rounded-full hover:bg-gray-50" aria-label="View cart">
             <ShoppingCart size={20} />
-            <span className="hidden text-sm font-semibold xl:inline">Cart</span>
-          </button>
+            <span className="text-sm font-semibold hidden xl:inline">Cart</span>
+          </Link>
 
           {/* Join Us Button */}
           <Button
