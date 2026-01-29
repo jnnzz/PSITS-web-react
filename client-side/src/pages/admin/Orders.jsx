@@ -521,13 +521,13 @@ const Orders = () => {
                                       Quantity: {item.quantity}
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                      Variation: {item.variation || "Null"}
+                                      Variation: {item.variation || "N/A"}
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                      Size: {item.sizes || "Null"}
+                                      Size: {item.sizes || item.size || "N/A"}
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                      Batch: {item.batch || "Null"}
+                                      Batch: {item.batch || "N/A"}
                                     </div>
                                     <div className="text-xs text-gray-500">
                                       Subtotal: ₱{item.sub_total || "Null"}
