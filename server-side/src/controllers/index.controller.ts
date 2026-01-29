@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { Student } from "../models/student.model";
-import { Admin, IAdminDocument } from "../models/admin.model";
+import { Admin } from "../models/admin.model";
+import { IAdminDocument } from "../models/admin.interface";
 import { Log } from "../models/log.model";
 import { forgotPasswordMail } from "../mail_template/mail.template";
 import { Request, Response } from "express";

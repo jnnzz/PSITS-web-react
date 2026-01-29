@@ -1,6 +1,6 @@
 import { CartItem } from "../models/cart.model";
-import { ICart } from "../models/cart.interface";
-import { Student, IStudentDocument } from "../models/student.model";
+import { Student } from "../models/student.model";
+import { IStudentDocument } from "../models/student.interface";
 import mongoose, { Types } from "mongoose";
 import { Request, Response } from "express";
 import { Merch } from "../models/merch.model";
@@ -225,9 +225,8 @@ export const deleteItemCartController = async (req: Request, res: Response) => {
 
     const cartId = new Types.ObjectId(cart_id);
 
-    const cartResult = await CartItem.findByIdAndDelete(cartId).session(
-      session
-    );
+    const cartResult =
+      await CartItem.findByIdAndDelete(cartId).session(session);
 
     if (!result && !cartResult) {
       await session.abortTransaction();
