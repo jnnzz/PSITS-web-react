@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback, memo, type ChangeEvent } from 'react';
+import { tutorials } from '@/data/sections-data';
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { Badge } from '@/components/ui/badge';
+import { OptimizedImage } from '@/components/common/OptimizedImage';
+import { Card, CardContent, CardFooter, CardTitle, CardDescription } from '@/components/ui/card';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -11,18 +14,84 @@ type Resource = {
   category: string;
   excerpt: string;
   image: string;
+  link?: string;
   year: 'First Year' | 'Second Year' | 'Third Year' | 'Fourth Year';
 };
 
-const DUMMY_RESOURCES: Resource[] = Array.from({ length: 12 }).map((_, i) => ({
-  id: i + 1,
-  title: `IT-NETWORK${30 + i} Computer Networks`,
-  category: ['Networking', 'Programming', 'Mathematics', 'Systems'][i % 4],
-  excerpt:
-    'Learn the fundamentals of computer networking, including network models, protocols, and basic configuration.',
-  image: `https://picsum.photos/seed/resource-${i}/640/480`,
-  year: (['First Year', 'Second Year', 'Third Year', 'Fourth Year'][(i % 4)] as Resource['year']),
-}));
+const buildResourcesFromTutorials = (): Resource[] => {
+  const resources: Resource[] = [];
+  let id = 1;
+
+  const pushList = (list: any[], year: Resource['year']) => {
+    list.forEach((t) => {
+      resources.push({
+        id: id++,
+        title: t.course,
+        category: 'Tutorial',
+        excerpt: t.excerpt ?? generateSummary(t.course),
+        link: t.link ?? '',
+        image: t.image ?? `https://picsum.photos/seed/tutorial-${id}/640/480`,
+        year,
+      });
+    });
+  };
+
+  pushList(tutorials.firstYear || [], 'First Year');
+  pushList(tutorials.secondYear || [], 'Second Year');
+  pushList(tutorials.thirdYear || [], 'Third Year');
+  pushList(tutorials.fourthYear || [], 'Fourth Year');
+
+  return resources;
+};
+
+const DUMMY_RESOURCES: Resource[] = buildResourcesFromTutorials();
+
+function generateSummary(course: string): string {
+  const c = course.toLowerCase();
+  if (c.includes('introduction to computing') || c.includes('intcom'))
+    return 'Fundamental computing concepts: hardware, software, algorithms, and basic problem solving.';
+  if (c.includes('computer programming 1'))
+    return 'Covers programming basics: variables, control flow, functions, and problem-solving using C-like syntax.';
+  if (c.includes('computer programming 2'))
+    return 'Builds on programming fundamentals with data structures, modular design, and intermediate language features.';
+  if (c.includes('web') || c.includes('webdev'))
+    return 'Introduction to web design and development: HTML, CSS, JavaScript, and responsive layouts.';
+  if (c.includes('discrete') || c.includes('discret'))
+    return 'Covers logic, set theory, combinatorics, and graph theory foundational to CS theory and algorithms.';
+  if (c.includes('digital logic') || c.includes('digilog'))
+    return 'Digital circuits and logic design: gates, flip-flops, combinational and sequential circuits.';
+  if (c.includes('object oriented') || c.includes('ooprog'))
+    return 'Object-oriented programming principles: classes, objects, inheritance, and polymorphism.';
+  if (c.includes('platform') || c.includes('op. sys') || c.includes('os'))
+    return 'Platform technologies and operating system concepts: processes, memory, and system services.';
+  if (c.includes('system analysis') || c.includes('sad'))
+    return 'System analysis and design methodologies: requirements, modeling, and design patterns.';
+  if (c.includes('applications') || c.includes('appsdev'))
+    return 'Application development techniques and emerging technologies for building modern software.';
+  if (c.includes('data structure') || c.includes('dastruc'))
+    return 'Core data structures and algorithms: arrays, lists, trees, sorting, and algorithmic complexity.';
+  if (c.includes('data communications') || c.includes('datacom'))
+    return 'Fundamentals of networking and data communication protocols, topologies, and transmission concepts.';
+  if (c.includes('information management') || c.includes('db sys') || c.includes('imdbsys'))
+    return 'Database fundamentals: relational design, SQL, normalization, and basic database operations.';
+  if (c.includes('network') || c.includes('network31'))
+    return 'Computer networking principles: OSI model, routing, switching, and network protocols.';
+  if (c.includes('security') || c.includes('infosec'))
+    return 'Information assurance and security basics: threats, defenses, cryptography, and best practices.';
+  if (c.includes('testing') || c.includes('quality'))
+    return 'Software testing and quality assurance: test planning, methods, and automation basics.';
+  if (c.includes('system integration') || c.includes('sysarch'))
+    return 'System integration and architecture concepts: component integration, middleware, and architectures.';
+  if (c.includes('human computer interaction') || c.includes('hci'))
+    return 'HCI principles: usability, user-centered design, and interaction techniques.';
+  if (c.includes('technopreneur') || c.includes('technopreneurship'))
+    return 'Technopreneurship topics: startup basics, product-market fit, and tech entrepreneurship.';
+  if (c.includes('integrative') || c.includes('intprog'))
+    return 'Integrative programming topics combining multiple technologies into cohesive projects.';
+  if (c.includes('hacker') || c.includes('hackerrank'))
+    return 'Practice coding problems and algorithm challenges to improve problem-solving and contest skills.';
+  return `Overview and learning materials for ${course}.`;
+}
 
 export const ResourcesSection: React.FC = () => {
   const years: Resource['year'][] = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
@@ -64,34 +133,12 @@ export const ResourcesSection: React.FC = () => {
           <h2 className="text-3xl md:text-5xl font-extrabold text-gray-800 tracking-tight">Resources</h2>
         </header>
 
-        <div className="flex justify-center md:justify-end mb-8">
-          <div className="relative w-full max-w-xs">
-            <InputGroup className="rounded-full">
-              <InputGroupInput
-                type="text"
-                placeholder="Search resources..."
-                aria-label="Search resources"
-                value={search}
-                onChange={handleSearch}
-                className="rounded-full pl-5 pr-10"
-              />
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton aria-label="Search" variant="ghost" size="xs" className="p-2">
-                  <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-                  </svg>
-                </InputGroupButton>
-              </InputGroupAddon>
-            </InputGroup>
-          </div>
-        </div>
-
         <nav className="flex items-center justify-center gap-6 mb-10" aria-label="Years">
           {years.map((y) => (
             <button
               key={y}
               onClick={() => { setActiveYear(y); setPage(1); }}
-              className={`text-sm md:text-base font-medium pb-2 ${
+              className={`text-sm md:text-base cursor-pointer mt-25 sm:mt-10  font-medium pb-2 ${
                 activeYear === y
                   ? 'text-[#1C9DDE] border-b-2 border-[#1C9DDE]'
                   : 'text-gray-400'
@@ -136,24 +183,36 @@ export const ResourcesSection: React.FC = () => {
 
 const ResourceCard: React.FC<{ res: Resource }> = ({ res }) => {
   return (
-    <article className={`group bg-white border border-gray-100 rounded-3xl pb-4 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-2`}>
-      <div className="relative aspect-video overflow-hidden mb-6 rounded-t-2xl">
-        <img src={res.image} alt={res.title} className="w-full h-full object-cover" />
+    <Card className="group h-full rounded-3xl transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-2 border border-gray-100">
+      <div className="relative aspect-video overflow-hidden rounded-t-2xl">
+        <OptimizedImage
+          src={res.image}
+          alt={res.title}
+          className="w-full h-full object-cover"
+          containerClassName="h-full w-full"
+        />
         <div className="absolute left-4 top-4">
           <Badge className="bg-white/90 text-[#1C9DDE] px-3 py-1 rounded-full font-semibold border-0">{res.category}</Badge>
         </div>
       </div>
 
-      <div className="space-y-2 px-5">
-        <p className="text-sm font-semibold text-gray-800 truncate">{res.title}</p>
-        <p className="text-sm text-gray-500 line-clamp-3">{res.excerpt}</p>
-      </div>
+      <CardContent className="flex flex-col gap-3 px-5 pt-4 pb-0">
+        <CardTitle className="text-sm font-semibold text-gray-800 truncate">{res.title}</CardTitle>
+        <CardDescription className="text-sm text-gray-500 line-clamp-3 flex-1">{res.excerpt}</CardDescription>
+      </CardContent>
 
-      <div className="flex items-center justify-between px-5 mt-4">
-        <button className="text-sm text-[#1C9DDE] font-medium py-2 px-4 rounded-full border border-[#E6F6FF] hover:bg-[#F2FBFF]">Learn more ↗</button>
+      <CardFooter className="mt-auto flex items-center justify-between px-5">
+        <button
+          onClick={() => {
+            if (res.link) window.open(res.link, '_blank', 'noopener');
+          }}
+          className="text-sm cursor-pointer text-[#1C9DDE] font-medium py-2 px-4 rounded-full border border-[#E6F6FF] hover:bg-[#F2FBFF]"
+        >
+          Learn more ↗
+        </button>
         <span className="text-xs text-gray-400">{res.year}</span>
-      </div>
-    </article>
+      </CardFooter>
+    </Card>
   );
 };
 

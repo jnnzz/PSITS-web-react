@@ -4,6 +4,7 @@ import { DeansMessageSection } from "./sections/DeansMessageSection";
 import { GetInvolvedSection } from "./sections/GetInvolvedSection";
 import GoalsSection from "./sections/GoalsSection";
 import { InstitutionalIdentitySection } from "./sections/InstitutionalIdentitySection";
+import { OurShop } from "@/features/orders/components/OurShop";
 
 export const Home = () => {
   return (

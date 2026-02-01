@@ -1,5 +1,10 @@
 import { cn } from "@/lib/utils";
 import { useRef, useEffect, useState, useCallback } from "react";
+import { OptimizedImage } from "@/components/common/OptimizedImage";
+import Avatar1 from "@/assets/Core Officers 2025/1.png";
+import Avatar2 from "@/assets/Core Officers 2025/2.png";
+import Avatar3 from "@/assets/Core Officers 2025/3.png";
+import Avatar4 from "@/assets/Core Officers 2025/5.png";
 import { getInvolvedData } from "@/data/sections-data";
 import { GetInvolvedCard } from "./GetInvolvedCard";
 
@@ -108,11 +113,24 @@ export const GetInvolvedSection = () => {
               </p>
               <div className="flex items-center gap-3 pt-2 md:gap-4">
                 <div className="flex -space-x-2 md:-space-x-3">
-                  {[1, 2, 3, 4].map((i) => (
+                  {[
+                    Avatar1,
+                    Avatar2,
+                    Avatar3,
+                    Avatar4,
+                  ].map((src, idx) => (
                     <div
-                      key={i}
-                      className="bg-muted border-background h-8 w-8 rounded-full border-2 md:h-10 md:w-10"
-                    />
+                      key={idx}
+                      className="h-8 w-8 md:h-10 md:w-10 rounded-full overflow-hidden border-2 border-background bg-muted"
+                    >
+                      <OptimizedImage
+                        src={src}
+                        alt={`member ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        containerClassName="h-full w-full"
+                        blur={false}
+                      />
+                    </div>
                   ))}
                 </div>
                 <p className="text-muted-foreground text-xs md:text-sm">
