@@ -4,15 +4,23 @@ import { AdminLayout } from "./layouts/AdminLayout";
 import { Home } from "./pages/home";
 import { Events } from "./pages/events";
 import { Organizations } from "./pages/organizations";
+import { Resources } from "./pages/home/sections/Resources";
+import { Shop } from "./pages/orders/components/Shop";
+import { ProductDetailsPage } from "./pages/orders/components/ProductDetails";
+import { Cart } from "./pages/orders/components/Cart";
 import OTPCode from "./pages/auth/OtpCode";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { TermsOfCondition } from "./pages/TermsOfCondition";
-import { Dashboard } from "./pages/admin/Dashboard";
+import { Dashboard } from "./features/admin/Dashboard";
 import { ErrorPage } from "./pages/ErrorPage";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/SignUp";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import SetNewPassword from "./pages/auth/SetNewPassword";
+import AccountSettings from "./features/student/components/AccountSettings";
+import EventAttendance from "./features/student/components/EventAttendance";
+import MyOrders from "./features/student/components/MyOrders";
+import StudentLayout from "./layouts/StudentLayout";
 
 export default createBrowserRouter([
   {
@@ -27,6 +35,21 @@ export default createBrowserRouter([
           { index: true, Component: Home },
           { path: "events", Component: Events },
           { path: "organizations", Component: Organizations },
+          { path: "resources", Component: Resources },
+          { path: "shop", Component: Shop },
+          { path: "shop/:id", Component: ProductDetailsPage },
+          { path: "cart", Component: Cart },
+          {
+            path: "student",
+            Component: StudentLayout,
+            children: [
+              { index: true, Component: AccountSettings },
+              { path: "event-attendance", Component: EventAttendance },
+              { path: "my-orders", Component: MyOrders },
+              { path: "account-settings", Component: AccountSettings },
+            ],
+          },
+
         ],
       },
       // Static Pages (No Header/Footer)
@@ -49,6 +72,7 @@ export default createBrowserRouter([
         Component: AdminLayout,
         children: [{ index: true, Component: Dashboard }],
       },
+      
       // Admin Routes
       {
         path: "admin",

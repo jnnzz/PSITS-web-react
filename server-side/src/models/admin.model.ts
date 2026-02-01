@@ -1,7 +1,5 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { IAdmin } from "./admin.interface";
-
-export interface IAdminDocument extends IAdmin, Document {}
+import mongoose, { Schema } from "mongoose";
+import { IAdminDocument } from "./admin.interface";
 
 const adminSchema = new Schema<IAdminDocument>({
   id_number: { type: String, unique: true },
@@ -14,6 +12,7 @@ const adminSchema = new Schema<IAdminDocument>({
   status: { type: String },
   campus: { type: String },
   access: { type: String, default: "admin" },
+  currentRefreshToken: { type: String, default: null },
 });
 
 export const Admin = mongoose.model<IAdminDocument>("Admin", adminSchema);

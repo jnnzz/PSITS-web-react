@@ -6,7 +6,7 @@ interface OptimizedImageProps extends Omit<
   HTMLMotionProps<"img">,
   "src" | "alt"
 > {
-  src: string;
+  src?: string | null;
   alt: string;
   containerClassName?: string;
   priority?: boolean;
@@ -34,7 +34,8 @@ export const OptimizedImage = ({
   const [error, setError] = useState(false);
 
   // Normalize Unsplash URLs for better performance
-  const getOptimizedUrl = (url: string) => {
+  const getOptimizedUrl = (url?: string | null) => {
+    if (!url) return undefined;
     if (url.includes("images.unsplash.com")) {
       // Remove existing sizing/format params to apply our own
       const baseUrl = url.split("?")[0];
@@ -57,7 +58,8 @@ export const OptimizedImage = ({
 
   const optimizedSrc = getOptimizedUrl(src);
 
-  const getSrcSet = (url: string) => {
+  const getSrcSet = (url?: string | null) => {
+    if (!url) return undefined;
     if (!url.includes("images.unsplash.com")) return undefined;
     const baseUrl = url.split("?")[0];
     return [400, 800, 1200, 1600, 2000]
@@ -86,9 +88,10 @@ export const OptimizedImage = ({
         )}
       </AnimatePresence>
 
-      <motion.img
-        src={optimizedSrc}
-        srcSet={srcSet}
+      {optimizedSrc ? (
+        <motion.img
+          src={optimizedSrc}
+          srcSet={srcSet}
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         alt={alt}
         initial={
@@ -116,8 +119,11 @@ export const OptimizedImage = ({
           isLoaded && "visible",
           className
         )}
-        {...props}
-      />
+          {...props}
+        />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center text-muted-foreground">No image</div>
+      )}
 
       {error && (
         <div className="bg-muted/10 text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-2">
