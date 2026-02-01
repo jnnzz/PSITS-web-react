@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/lib/cart';
 import { addToCartApi } from '../../student/api/student';
+import { getMerchandiseById, type MerchandiseItem } from '../api/orders';
+
+// Fallback image for products without images
+import fallbackImage from '../../../assets/awarding/1.jpg';
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   image: string;
   isSoldOut: boolean;
   category: string;
+  description?: string;
+  sizes?: string[];
+  colors?: string[];
+  stock?: number;
 }
 
 interface ProductDetailsProps {
@@ -20,23 +28,19 @@ interface ProductDetailsProps {
   onBack?: () => void;
 }
 
-const SAMPLE_NAMES = [
-  'CCS Uniform',
-  'Event Hoodie',
-  'Faculty Polo',
-  'Core Team Jacket',
-  'PSITS Tee',
-  'Limited Edition Jacket',
-];
-
-const MOCK_PRODUCTS: Product[] = Array.from({ length: 40 }, (_, i) => ({
-  id: i + 1,
-  name: `${SAMPLE_NAMES[i % SAMPLE_NAMES.length]} ${i + 1}`,
-  price: 400 + (i % 5) * 50,
-  image: '/assets/awarding/uniform.jpg',
-  isSoldOut: false,
-  category: 'uniform',
-}));
+// Transform API merchandise to display product
+const transformMerchandise = (item: MerchandiseItem): Product => ({
+  id: item._id,
+  name: item.name || item.product_name || 'Unknown Product',
+  price: item.price,
+  image: item.imageUrl?.[0] || item.imageUrl1 || fallbackImage,
+  isSoldOut: (item.stocks ?? item.stock ?? 0) <= 0,
+  category: item.category || 'Merchandise',
+  description: item.description,
+  sizes: item.sizes,
+  colors: item.colors || item.variation,
+  stock: item.stocks ?? item.stock,
+});
 
 const ADD_TO_CART_TOAST_STYLE = {
   background: '#1DA1F2',
@@ -194,15 +198,92 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 export const ProductDetails: React.FC<ProductDetailsProps> = ({ product, onBack }) => {
   const { id } = useParams(); 
   const navigate = useNavigate();
+  const location = useLocation();
+  
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('L');
   const [selectedColor, setSelectedColor] = useState('White');
   const [selectedCourse, setSelectedCourse] = useState('BSIT');
+  const [fetchedProduct, setFetchedProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const routeId = id ? Number(id) : undefined;
-  const location = useLocation();
-  const stateProduct = (location.state as any)?.product as Product | undefined;
-  const currentProduct = product ?? stateProduct ?? MOCK_PRODUCTS.find(p => p.id === routeId);
+  const stateProduct = (location.state as { product?: Product })?.product;
+  
+  // Fetch product from API if not provided via props or route state
+  useEffect(() => {
+    const fetchProduct = async () => {
+      // If we already have the product from props or route state, don't fetch
+      if (product || stateProduct) return;
+      
+      // If we have an ID in the URL, fetch from API
+      if (id) {
+        setLoading(true);
+        setError(null);
+        try {
+          const merchandise = await getMerchandiseById(id);
+          if (merchandise) {
+            setFetchedProduct(transformMerchandise(merchandise));
+          } else {
+            setError('Product not found');
+          }
+        } catch (err) {
+          console.error('Error fetching product:', err);
+          setError('Failed to load product');
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchProduct();
+  }, [id, product, stateProduct]);
+
+  // Determine which product to display
+  const currentProduct = product ?? stateProduct ?? fetchedProduct;
+
+  // Initialize size and color from product data
+  useEffect(() => {
+    if (currentProduct) {
+      if (currentProduct.sizes && currentProduct.sizes.length > 0) {
+        setSelectedSize(currentProduct.sizes[0]);
+      }
+      if (currentProduct.colors && currentProduct.colors.length > 0) {
+        setSelectedColor(currentProduct.colors[0]);
+      }
+    }
+  }, [currentProduct]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 mt-20">
+        <Button variant="ghost" size="sm" onClick={() => navigate('/shop')} className="mb-4 text-[#1c9dde]">← Back to shop</Button>
+        <div className="flex justify-center items-center py-20">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#1c9dde] border-r-transparent"></div>
+          <p className="ml-4 text-gray-500">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto p-6 mt-20">
+        <Button variant="ghost" size="sm" onClick={() => navigate('/shop')} className="mb-4 text-[#1c9dde]">← Back to shop</Button>
+        <div className="text-center text-red-500 py-12">
+          <p>{error}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 bg-[#1c9dde] text-white hover:bg-[#1a8acb]"
+          >
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (!currentProduct) {
     return (
@@ -212,6 +293,15 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product, onBack 
       </div>
     );
   }
+
+  // Get available sizes and colors from the product, or use defaults
+  const availableSizes = currentProduct.sizes && currentProduct.sizes.length > 0 
+    ? currentProduct.sizes 
+    : ['S', 'M', 'L', 'XL', 'XXL'];
+  const availableColors = currentProduct.colors && currentProduct.colors.length > 0 
+    ? currentProduct.colors 
+    : ['White', 'Purple'];
+  const stockCount = currentProduct.stock ?? 0;
 
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-12 mt-16 sm:mt-20 font-sans bg-transparent min-h-screen animate-in fade-in slide-in-from-right-4 duration-500">
@@ -249,9 +339,22 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product, onBack 
             {/* Color Selection */}
             <div>
               <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Color</h3>
-                <div className="flex space-x-4">
-                  <Button onClick={() => setSelectedColor('Purple')} className={cn('w-10 h-10 rounded-full p-0', selectedColor === 'Purple' ? 'ring-2 ring-offset-2 ring-purple-600 bg-purple-600' : 'border-2 border-gray-100')} aria-label="Select purple" />
-                  <Button onClick={() => setSelectedColor('White')} className={cn('w-10 h-10 rounded-full p-0', selectedColor === 'White' ? 'ring-2 ring-offset-2 ring-gray-300 bg-white' : 'border-2 border-gray-100')} aria-label="Select default color" />
+                <div className="flex flex-wrap gap-3">
+                  {availableColors.map((color) => (
+                    <Button 
+                      key={color}
+                      onClick={() => setSelectedColor(color)} 
+                      className={cn(
+                        'px-5 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all',
+                        selectedColor === color 
+                          ? 'bg-[#1c9dde] text-white shadow-lg shadow-blue-200' 
+                          : 'bg-white border border-gray-200 text-gray-600 hover:bg-[#1c9dde]/90 hover:text-white'
+                      )} 
+                      aria-label={`Select ${color}`}
+                    >
+                      {color}
+                    </Button>
+                  ))}
                 </div>
             </div>
 
@@ -267,7 +370,7 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product, onBack 
                 </button>
               </div>
               <div className="flex flex-wrap gap-2 sm:gap-3">
-                {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+                {availableSizes.map((size) => (
                   <Button
                     key={size}
                     onClick={() => setSelectedSize(size)}
@@ -310,9 +413,11 @@ export const ProductDetails: React.FC<ProductDetailsProps> = ({ product, onBack 
                 <div className="flex items-center border-2 border-gray-100 rounded-full px-4 sm:px-6 py-1 sm:py-2 space-x-4 sm:space-x-8">                  
                   <Button variant="ghost" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="text-gray-400 hover:text-gray-900 cursor-pointer text-xl sm:text-2xl font-light p-0 h-auto">−</Button>
                   <span className="text-sm sm:text-base font-bold min-w-[1.5rem] text-center">{quantity}</span>
-                  <Button variant="ghost" onClick={() => setQuantity(quantity + 1)} className="text-gray-400 hover:text-gray-900 cursor-pointer text-xl sm:text-2xl font-light p-0 h-auto">+</Button>
+                  <Button variant="ghost" onClick={() => setQuantity(Math.min(stockCount, quantity + 1))} className="text-gray-400 hover:text-gray-900 cursor-pointer text-xl sm:text-2xl font-light p-0 h-auto" disabled={quantity >= stockCount}>+</Button>
                 </div>
-                <span className="text-gray-400 text-xs sm:text-sm font-medium">436 Stocks Available</span>
+                <span className={cn("text-xs sm:text-sm font-medium", stockCount > 0 ? "text-gray-400" : "text-red-500")}>
+                  {stockCount > 0 ? `${stockCount} Stocks Available` : 'Out of Stock'}
+                </span>
               </div>
             </div>
 

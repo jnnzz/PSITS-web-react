@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useCallback, memo, type ChangeEvent } from 'react';
 import { Link } from 'react-router';
-import image from '../../../assets/awarding/1.jpg';
-import image1 from '../../../assets/awarding/2.jpg';
-import image2 from '../../../assets/awarding/3.jpg';
-import image3 from '../../../assets/awarding/4.jpg';
-import image4 from '../../../assets/awarding/5.jpg';
-import image5 from '../../../assets/awarding/6.jpg';
-import image6 from '../../../assets/awarding/7.jpg';
-import image7 from '../../../assets/awarding/8.jpg';
+import { InfinitySpin } from 'react-loader-spinner';
 import {
   InputGroup,
   InputGroupAddon,
@@ -17,52 +10,95 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { OptimizedImage } from '@/components/common/OptimizedImage';
+import { getPublishedMerchandise, type MerchandiseItem } from '../api/orders';
+
+// Fallback image for products without images
+import fallbackImage from '../../../assets/awarding/1.jpg';
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   image: string;
   isSoldOut: boolean;
   category: string;
+  description?: string;
+  sizes?: string[];
+  colors?: string[];
+  stock?: number;
 }
 
-const baseProducts = [
-  { name: 'CCS Official Polo', price: 450, category: 'Uniform', image: image },
-  { name: 'CS Department Shirt', price: 350, category: 'Apparel', image: image1 },
-  { name: 'Lanyard v1 (Black)', price: 120, category: 'Accessories', image: image3 },
-  { name: 'Organization Hoodie', price: 850, category: 'Apparel', image: image2 },
-  { name: 'CCS Sticker Pack', price: 50, category: 'Stationery', image: image4 },
-  { name: 'Tech Tote Bag', price: 180, category: 'Accessories', image: image5 },
-  { name: 'Premium Mousepad', price: 300, category: 'Tech', image: image6 },
-  { name: 'Enamel Pin Set', price: 150, category: 'Accessories', image: image7 },
-];
-
-const ALL_PRODUCTS: Product[] = Array.from({ length: 10 }, (_, i) => {
-  const base = baseProducts[i % baseProducts.length];
+// Transform API merchandise to display product
+const transformMerchandise = (item: MerchandiseItem): Product => {
+  // Backend uses 'name' field, but we also check 'product_name' for compatibility
+  const productName = item.name || item.product_name || 'Unknown Product';
+  
+  // Backend uses imageUrl array, get first image
+  const productImage = item.imageUrl?.[0] || item.imageUrl1 || fallbackImage;
+  
+  // Get sizes from selectedSizes map or sizes array
+  const sizes = item.sizes || (item.selectedSizes ? Object.keys(item.selectedSizes) : undefined);
+  
+  // Get variations/colors
+  const colors = item.colors || item.selectedVariations || item.variation;
+  
   return {
-    id: i + 1,
-    name: `${base.name} ${Math.floor(i / baseProducts.length) > 0 ? '(Batch ' + (Math.floor(i / baseProducts.length) + 1) + ')' : ''}`,
-    price: base.price,
-    image: base.image,
-    category: base.category,
-    isSoldOut: (i + 1) % 7 === 0,
+    id: item._id,
+    name: productName,
+    price: item.price,
+    image: productImage,
+    isSoldOut: (item.stocks ?? item.stock ?? 0) <= 0,
+    category: item.category || 'Merchandise',
+    description: item.description,
+    sizes,
+    colors,
+    stock: item.stocks ?? item.stock,
   };
-});
+};
 
 const PRODUCTS_PER_PAGE = 8;
 
 export const OurShop: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>('');
   const [debouncedSearch, setDebouncedSearch] = useState<string>(search);
   const [page, setPage] = useState<number>(1);
+
+  // Fetch products from API on mount
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const merchandise = await getPublishedMerchandise();
+        if (merchandise && merchandise.length > 0) {
+          const transformed = merchandise.map(transformMerchandise);
+          setProducts(transformed);
+        } else {
+          // No products available from API
+          setProducts([]);
+        }
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Failed to load products. Please try again later.');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search.trim()), 300);
     return () => clearTimeout(t);
   }, [search]);
 
-  const filtered = ALL_PRODUCTS.filter((p) =>
+  const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
     p.category.toLowerCase().includes(debouncedSearch.toLowerCase())
   );
@@ -116,7 +152,22 @@ export const OurShop: React.FC = () => {
         </div>
 
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {paginatedItems.length === 0 ? (
+          {loading ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-20">
+              <InfinitySpin width="200" color="#1c9dde" />
+              <p className="mt-4 text-gray-500">Loading products...</p>
+            </div>
+          ) : error ? (
+            <div className="col-span-full text-center py-20 text-red-500">
+              <p>{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 px-4 py-2 bg-[#1c9dde] text-white rounded-lg hover:bg-[#1a8acb]"
+              >
+                Retry
+              </button>
+            </div>
+          ) : paginatedItems.length === 0 ? (
             <div className="col-span-full text-center py-20 text-gray-400 italic">No products found.</div>
           ) : (
             paginatedItems.map((product) => (
@@ -170,12 +221,11 @@ const ProductCardInner: React.FC<{ product: Product }> = ({ product }) => {
               <Badge variant="destructive" className="uppercase tracking-tighter">Sold Out</Badge>
             </div>
           )}
-          <img
+          <OptimizedImage
             src={product.image}
             alt={product.name}
-            loading="lazy"
-            decoding="async"
-            className={`w-full h-full object-cover transition-transform duration-500 ${!product.isSoldOut && 'group-hover:scale-110'}`}
+            containerClassName="absolute inset-0 h-full w-full"
+            className={`object-cover transition-transform duration-500 ${!product.isSoldOut && 'group-hover:scale-110'}`}
           />
         </div>
 

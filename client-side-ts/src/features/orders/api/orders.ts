@@ -19,6 +19,39 @@ interface CartItem {
   batch?: string;
 }
 
+// Merchandise/Product interfaces
+export interface MerchandiseItem {
+  _id: string;
+  name: string; 
+  product_name?: string; 
+  price: number;
+  stocks?: number;
+  stock?: number;
+  imageUrl?: string[]; 
+  imageUrl1?: string; 
+  imageUrl2?: string;
+  description?: string;
+  category?: string;
+  is_active?: boolean;
+  isPublished?: boolean;
+  isDeleted?: boolean;
+  selectedSizes?: Record<string, { custom: boolean; price: string }>;
+  sizes?: string[];
+  colors?: string[];
+  selectedVariations?: string[];
+  variation?: string[];
+  batch?: string;
+  limited?: boolean;
+  start_date?: string | Date;
+  end_date?: string | Date;
+  [key: string]: unknown;
+}
+
+export interface MerchandiseResponse {
+  data: MerchandiseItem[];
+  message?: string;
+}
+
 interface PromoOrder {
   _id?: string;
   promo_name: string;
@@ -189,6 +222,48 @@ export const getAllPaidOrders = async (): Promise<OrderResponse[] | null> => {
     );
 
     return response.status === 200 ? response.data : null;
+  } catch (error) {
+    handleApiError(error, false);
+    return null;
+  }
+};
+
+export const getPublishedMerchandise = async (): Promise<MerchandiseItem[] | null> => {
+  try {
+    const response: AxiosResponse<MerchandiseResponse> = await axios.get(
+      `${backendConnection()}/api/merch/retrieve-publish-merchandise`,
+      { headers: createHeaders() }
+    );
+
+    return response.status === 200 ? response.data.data : null;
+  } catch (error) {
+    handleApiError(error, false);
+    return null;
+  }
+};
+
+export const getAllMerchandise = async (): Promise<MerchandiseItem[] | null> => {
+  try {
+    const response: AxiosResponse<MerchandiseResponse> = await axios.get(
+      `${backendConnection()}/api/merch/retrieve`,
+      { headers: createHeaders() }
+    );
+
+    return response.status === 200 ? response.data.data : null;
+  } catch (error) {
+    handleApiError(error, false);
+    return null;
+  }
+};
+
+export const getMerchandiseById = async (productId: string): Promise<MerchandiseItem | null> => {
+  try {
+    const response: AxiosResponse<{ data: MerchandiseItem }> = await axios.get(
+      `${backendConnection()}/api/merch/retrieve/${productId}`,
+      { headers: createHeaders() }
+    );
+
+    return response.status === 200 ? response.data.data : null;
   } catch (error) {
     handleApiError(error, false);
     return null;

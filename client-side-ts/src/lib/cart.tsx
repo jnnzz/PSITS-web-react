@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 
 export interface CartItem {
   uid: string; 
-  id: number; 
+  id: string | number; 
   name: string;
   price: number; 
   image: string;
@@ -43,13 +43,23 @@ function generateUid(): string {
 
 function sanitizeStoredItem(obj: any): CartItem | null {
   if (!obj || typeof obj !== 'object') return null;
-  const id = Number(obj.id);
+  
+  // Support both string IDs (MongoDB) and number IDs (legacy)
+  const rawId = obj.id;
+  let id: string | number;
+  if (typeof rawId === 'string' && rawId.length > 0) {
+    id = rawId;
+  } else {
+    const numId = Number(rawId);
+    if (!Number.isFinite(numId) || numId <= 0) return null;
+    id = numId;
+  }
+  
   const name = typeof obj.name === 'string' ? obj.name : '';
   const price = Number(obj.price);
   const image = typeof obj.image === 'string' ? obj.image : '';
   let qty = Number(obj.qty) || 0;
 
-  if (!Number.isFinite(id) || id <= 0) return null;
   if (!Number.isFinite(price) || price < 0) return null;
   qty = Math.max(1, Math.min(MAX_QTY, Math.floor(qty)));
 
@@ -80,8 +90,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         .filter((i): i is CartItem => i !== null);
       return sanitized;
     } catch (err) {
-      // If storage is corrupt or JSON fails, start with an empty cart.
-      // In production you may want to report this to your telemetry backend.
       return [];
     }
   });
@@ -95,7 +103,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const indexMapRef = React.useRef<Map<string, number>>(new Map());
 
-  const makeKey = (it: { id: number; size?: string; color?: string; course?: string }) =>
+  const makeKey = (it: { id: string | number; size?: string; color?: string; course?: string }) =>
     `${it.id}|${it.size ?? ''}|${it.color ?? ''}|${it.course ?? ''}`;
 
   const rebuildIndexMap = (arr: CartItem[]) => {

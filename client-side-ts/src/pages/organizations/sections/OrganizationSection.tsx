@@ -7,6 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { OptimizedImage } from "@/components/common/OptimizedImage";
 import { organizationSectionData, type Member } from "@/data/sections-data";
 
 export default function OrganizationSection() {
@@ -37,12 +38,11 @@ export default function OrganizationSection() {
                   { id: "advisors", label: "Advisors" },
                   { id: "officers", label: "Officers" },
                   { id: "developers", label: "Developers" },
-                  { id: "volunteers", label: "Volunteers" },
                 ].map((tab) => (
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
-                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-primary/20 hover:bg-muted/50 hover:text-foreground relative flex min-w-fit items-center gap-2 rounded-lg px-6 py-2.5 text-xs font-bold tracking-wider whitespace-nowrap transition-all duration-300 data-[state=active]:shadow-lg md:text-sm"
+                    className="data-[state=active]:bg-primary cursor-pointer data-[state=active]:text-primary-foreground data-[state=active]:shadow-primary/20 hover:bg-muted/50 hover:text-foreground relative flex min-w-fit items-center gap-2 rounded-lg px-6 py-2.5 text-xs font-bold tracking-wider whitespace-nowrap transition-all duration-300 data-[state=active]:shadow-lg md:text-sm"
                   >
                     <span className="relative z-10 uppercase">{tab.label}</span>
                   </TabsTrigger>
@@ -56,12 +56,9 @@ export default function OrganizationSection() {
                 { id: "developers", label: "Developers" },
                 { id: "volunteers", label: "Volunteers" },
               ].map((role) => {
-                // Aggregate members from all organizations for this role
                 const allMembers = organizationSectionData.tabs.reduce(
-                  (acc, org) => {
-                    const members = org[
-                      role.id as keyof typeof org
-                    ] as Member[];
+                  (acc, tab) => {
+                    const members = (tab as any)[role.id] as Member[] | undefined;
                     return members ? [...acc, ...members] : acc;
                   },
                   [] as Member[]
@@ -126,10 +123,11 @@ const MemberCarousel = ({
                 className="basis-[85%] pl-2 sm:basis-[60%] md:basis-[45%] md:pl-4 lg:basis-[35%] xl:basis-[28%]"
               >
                 <div className="group border-border/50 bg-muted relative aspect-[4/5] overflow-hidden rounded-3xl border">
-                  <img
+                  <OptimizedImage
                     src={member.image}
                     alt={member.name}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    containerClassName="absolute inset-0 h-full w-full"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 via-transparent to-transparent p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
                     <p className="text-lg leading-tight font-bold text-white">
