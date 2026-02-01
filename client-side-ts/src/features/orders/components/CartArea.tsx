@@ -4,10 +4,26 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 import { Minus, Plus, Trash } from 'lucide-react';
 import { useCart } from '@/lib/cart';
 import { useTransactions } from '@/lib/transactions';
 import { toast } from 'sonner';
+import { makeOrder } from '../api/orders';
+
+const TOAST_STYLE = {
+  background: '#1DA1F2',
+  color: '#ffffff',
+  borderRadius: '0.75rem',
+  padding: '0.75rem 1rem',
+} as const;
+
+const ERROR_TOAST_STYLE = {
+  background: '#ef4444',
+  color: '#ffffff',
+  borderRadius: '0.75rem',
+  padding: '0.75rem 1rem',
+} as const;
 
 export const Cart: React.FC = () => {
   const { items, removeItem, updateQty } = useCart();
@@ -23,8 +39,92 @@ export const Cart: React.FC = () => {
     } catch (e) {}
     return new Set();
   });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const navigate = useNavigate();
+
+  const getIdNumber = (): string | null => {
+    try {
+      const possibleKeys = ['id_number', 'IdNumber', 'idNumber', 'student_id', 'StudentId', 'user'];
+      for (const k of possibleKeys) {
+        const v = sessionStorage.getItem(k);
+        if (!v) continue;
+        if (k === 'user' || k === 'User' || v.trim().startsWith('{')) {
+          try {
+            const parsed = JSON.parse(v);
+            if (parsed && (parsed.id_number || parsed.idNumber || parsed.student_id)) {
+              return parsed.id_number || parsed.idNumber || parsed.student_id;
+            }
+          } catch (e) {}
+        }
+        return v;
+      }
+    } catch (e) {}
+    return null;
+  };
+
+  const handlePlaceOrder = async () => {
+    const selected = items.filter((i) => selectedIds.has(i.uid));
+    if (selected.length === 0) return;
+
+    const idNumber = getIdNumber();
+    if (!idNumber) {
+      toast.error('Please log in to place an order', {
+        style: ERROR_TOAST_STYLE,
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Transform cart items to API format
+      const orderItems = selected.map((s) => ({
+        product_id: String(s.id),
+        product_name: s.name,
+        price: s.price,
+        quantity: s.qty,
+        sub_total: s.price * s.qty,
+        variation: s.color ? [s.color] : undefined,
+        sizes: s.size ? [s.size] : undefined,
+      }));
+
+      const total = selected.reduce((a, b) => a + b.price * b.qty, 0);
+
+      const success = await makeOrder({
+        id_number: idNumber,
+        items: orderItems,
+        total,
+      });
+
+      if (success) {
+        // Save to local transactions as backup/history
+        addTransaction({
+          items: selected.map((s) => ({ ...s })),
+          total,
+        });
+
+        // Clear selected items from cart
+        selected.forEach((s) => removeItem(s.uid));
+        setSelectedIds(new Set());
+
+        toast.success(`Order placed for ${selected.length} item(s) successfully!`, {
+          style: TOAST_STYLE,
+        });
+      } else {
+        toast.error('Failed to place order. Please try again.', {
+          style: ERROR_TOAST_STYLE,
+        });
+      }
+    } catch (error) {
+      console.error('Order error:', error);
+      toast.error('Failed to place order. Please try again.', {
+        style: ERROR_TOAST_STYLE,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!items.length) {
     return (
@@ -156,26 +256,18 @@ export const Cart: React.FC = () => {
               }</span>
             </div>
             <Button
-              disabled={selectedIds.size === 0}
+              disabled={selectedIds.size === 0 || isSubmitting}
               className="w-full bg-[#1DA1F2] hover:bg-[#1c9dde]/ cursor-pointer text-white"
-              onClick={() => {
-                const selected = items.filter((i) => selectedIds.has(i.uid));
-                if (selected.length === 0) return;
-
-                const txnPayload = {
-                  items: selected.map((s) => ({ ...s })),
-                  total: selected.reduce((a, b) => a + b.price * b.qty, 0),
-                };
-
-                addTransaction(txnPayload);
-
-                selected.forEach((s) => removeItem(s.uid));
-                setSelectedIds(new Set());
-
-                toast.success(`Order placed for ${selected.length} item(s). Transaction saved.`);
-              }}
+              onClick={handlePlaceOrder}
             >
-              Order
+              {isSubmitting ? (
+                <>
+                  <Spinner className="size-4 mr-2" />
+                  Placing Order...
+                </>
+              ) : (
+                'Order'
+              )}
             </Button>
           </div>
         </Card>
