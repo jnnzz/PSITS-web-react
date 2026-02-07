@@ -1,10 +1,9 @@
-import { showToast } from "../../../utils/alertHelper";
-import backendConnection from "../../../api/backendApi";
+import { showToast } from "@/utils/alertHelper";
+import backendConnection from "@/api/backendApi";
 import axios, { AxiosError } from "axios";
 
 interface LoginFormData {
-  email?: string;
-  username?: string;
+  idNumber: string;
   password: string;
   [key: string]: any;
 }
@@ -128,5 +127,55 @@ export const handleLogouts = async (): Promise<boolean | null> => {
   } catch (error) {
     handleApiError(error);
     return null;
+  }
+};
+
+// V2 temporary
+
+interface LoginV2FormData {
+  idNumber: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export const loginV2 = async (
+  formData: LoginV2FormData
+): Promise<LoginResponse | false> => {
+
+  // Transform data to format compatible to backend
+  const transformedData = {
+    id_number: formData.idNumber,
+    password: formData.password,
+    remember_me: formData.rememberMe,
+  };
+
+  try {
+    const response = await axios.post<LoginResponse>(
+      `${backendConnection()}/api/v2/auth/login`,
+      transformedData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+
+    if (response.status === 200) {
+      // sessionStorage.setItem("Token", response.data.token);
+
+      return {
+        role: response.data.role,
+        campus: response.data.campus,
+        token: response.data.token,
+        message: response.data.message,
+      };
+    } else {
+      showToast("error", response.data.message);
+      return false;
+    }
+  } catch (error) {
+    handleApiError(error);
+    return false;
   }
 };

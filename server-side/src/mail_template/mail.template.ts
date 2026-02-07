@@ -128,7 +128,7 @@ export const forgotPasswordMail = async (
       console.error("Error sending email:", err.message);
       return { status: false, message: "Error sending email" };
     }
-
+    console.log("Success sent email for ", studentMail);
     return { status: true, message: "Email Sent" };
   });
 };

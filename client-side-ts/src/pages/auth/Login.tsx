@@ -1,8 +1,13 @@
 import { LoginForm, type LoginCredentials } from "@/features/auth";
+import { loginV2 } from "@/features/auth/api";
 
 export default function Login() {
   const handleLogin = (_values: LoginCredentials) => {
-    // insert login here
+    loginV2({
+      idNumber: _values.id,
+      password: _values.password,
+      rememberMe: _values.rememberMe,
+    });
   };
 
   return (
