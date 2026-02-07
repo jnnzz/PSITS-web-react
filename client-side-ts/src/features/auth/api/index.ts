@@ -1,10 +1,9 @@
-import { showToast } from "../../../utils/alertHelper";
-import backendConnection from "../../../api/backendApi";
+import { showToast } from "@/utils/alertHelper";
+import backendConnection from "@/api/backendApi";
 import axios, { AxiosError } from "axios";
 
 interface LoginFormData {
-  email?: string;
-  username?: string;
+  idNumber: string;
   password: string;
   [key: string]: any;
 }
@@ -130,3 +129,5 @@ export const handleLogouts = async (): Promise<boolean | null> => {
     return null;
   }
 };
+
+// V2 temporary
