@@ -2,10 +2,11 @@ import {
   ForgotPasswordForm,
   type ForgotPasswordCredentials,
 } from "@/features/auth";
+import { forgotPassword } from "@/features/auth/api/forgot";
 
 export default function ForgotPassword() {
   const handleForgotPassword = (_values: ForgotPasswordCredentials) => {
-    // insert login here
+    forgotPassword(_values.email, _values.id);
   };
 
   return (

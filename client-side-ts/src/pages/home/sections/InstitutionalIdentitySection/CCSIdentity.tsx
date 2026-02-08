@@ -5,6 +5,7 @@ import announcement from "@/assets/announcement.png";
 import { InsitutionalIdentityContent } from "./InsitutionalIdentityContent";
 import { Card } from "@/components/ui/card";
 import { OptimizedImage } from "@/components/common/OptimizedImage";
+import { motion } from "framer-motion";
 
 interface Props {
   data: CCSData;
@@ -22,22 +23,35 @@ export const CCSIdentity = ({ data }: Props) => {
           blur={false}
         />
       </div>
-
       <div className="relative z-10 container px-4 py-12 md:px-6 md:py-24">
         <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-start lg:gap-24">
           {/* Left Column: Title */}
-          <Card className="w-full border-none bg-transparent shadow-none lg:w-3/5">
-            <InsitutionalIdentityContent
-              title={data.subtitle}
-              subtitle={data.title}
-              mission={data.mission}
-              vision={data.vision}
-              headerClassName="text-center lg:text-left"
-            />
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="w-full lg:w-3/5"
+          >
+            <Card className="w-full border-none bg-transparent shadow-none">
+              <InsitutionalIdentityContent
+                title={data.subtitle}
+                subtitle={data.title}
+                mission={data.mission}
+                vision={data.vision}
+                headerClassName="text-center lg:text-left"
+              />
+            </Card>
+          </motion.div>
 
           {/* Right Column: Content */}
-          <div className="relative h-100 w-full sm:h-125 lg:h-auto lg:w-2/5 lg:self-stretch">
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative h-100 w-full sm:h-125 lg:h-auto lg:w-2/5 lg:self-stretch"
+          >
             {/* Clipped Background Area */}
             <div className="absolute inset-0 z-10 h-full w-full overflow-hidden rounded-4xl lg:translate-x-0">
               <div
@@ -103,7 +117,7 @@ export const CCSIdentity = ({ data }: Props) => {
                 className="relative z-40 h-full w-full object-cover"
               />
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

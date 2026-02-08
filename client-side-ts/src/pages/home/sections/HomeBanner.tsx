@@ -11,7 +11,7 @@ import { OptimizedImage } from "@/components/common/OptimizedImage";
 
 export const HomeBanner = () => {
   return (
-    <section className="flex flex-col items-center justify-center gap-8 pt-14 pb-12 sm:pt-20 md:gap-10 md:pt-24 lg:gap-14 lg:pt-32">
+    <section className="flex flex-col items-center justify-center gap-8 pt-30 pb-12 sm:pt-20 md:gap-10 md:pt-24 lg:gap-14 lg:pt-32">
       <Card className="container flex flex-col items-center border-none bg-transparent py-0 text-center shadow-none">
         <CardContent className="flex max-w-[900px] flex-col items-center gap-6 p-0">
           <CardTitle className="text-4xl leading-[1.1] font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
