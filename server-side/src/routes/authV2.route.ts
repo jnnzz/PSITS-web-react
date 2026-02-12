@@ -4,9 +4,7 @@ import {
   loginV2Controller,
   refreshV2Controller,
   logoutV2Controller,
-  meV2Controller,
 } from "../controllers/authV2.controller";
-import { requireAccessTokenV2 } from "../middlewares/authV2.middleware";
 
 const router: Router = Router();
 
@@ -27,12 +25,5 @@ router.post("/refresh", refreshV2Controller);
  * Clear refresh token cookie (stateless; token remains valid until expiry)
  */
 router.post("/logout", logoutV2Controller);
-
-// TODO (auth): Remove this, only for testing purposes
-/**
- * GET /v2/auth/me
- * Get current user profile (requires valid access token)
- */
-router.get("/me", requireAccessTokenV2, meV2Controller);
 
 export default router;

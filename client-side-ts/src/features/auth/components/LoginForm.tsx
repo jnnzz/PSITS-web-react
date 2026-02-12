@@ -27,9 +27,10 @@ export type LoginCredentials = z.infer<typeof formSchema>;
 
 export interface LoginFormProps {
   onLogin?: (values: LoginCredentials) => void;
+  isSubmitting?: boolean;
 }
 
-export default function LoginForm({ onLogin }: LoginFormProps) {
+export default function LoginForm({ onLogin, isSubmitting }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm({
@@ -196,9 +197,10 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="h-11 w-full rounded-full bg-[#1C9DDE] text-base font-semibold shadow-sm hover:bg-sky-600"
+                disabled={isSubmitting}
+                className="h-11 w-full rounded-full bg-[#1C9DDE] text-base font-semibold shadow-sm hover:bg-sky-600 disabled:opacity-50"
               >
-                Sign in
+                {isSubmitting ? "Signing in..." : "Sign in"}
               </Button>
             </FieldGroup>
           </form>
