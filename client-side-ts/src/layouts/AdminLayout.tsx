@@ -1,35 +1,69 @@
+import React, { useState } from "react";
 import { Outlet } from "react-router";
+import { Menu, X } from "lucide-react";
+import { AdminSidebar } from "../features/admin/components";
+import { Button } from "@/components/ui/button";
 
 export const AdminLayout = () => {
-  return (
-    <div className="flex min-h-screen flex-col bg-gray-100 dark:bg-gray-900">
-      <div className="flex flex-1">
-        {/* Sidebar placeholder */}
-        <aside className="hidden w-64 border-r border-gray-200 bg-white p-4 md:block dark:border-gray-700 dark:bg-gray-800">
-          <div className="mb-6 text-lg font-bold">Admin Panel</div>
-          <nav className="space-y-2">
-            <div className="cursor-pointer rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-              Dashboard
-            </div>
-            <div className="cursor-pointer rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-              Users
-            </div>
-            <div className="cursor-pointer rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-              Settings
-            </div>
-          </nav>
-        </aside>
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-        <main className="flex-grow p-6">
-          <header className="mb-6 flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-            <div className="h-8 w-8 rounded-full bg-blue-500"></div>
-          </header>
-          <div className="min-h-[500px] rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <Outlet />
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex overflow-hidden">
+      {/* Hamburger button for mobile */}
+      <Button
+        variant="ghost"
+        size="icon-lg"
+        className="fixed top-4 left-4 z-50 lg:hidden"
+        onClick={toggleSidebar}
+        aria-label="Open sidebar"
+      >
+        <Menu className="w-7 h-7" />
+      </Button>
+
+      {/* Sidebar drawer and overlay for mobile */}
+      {isSidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-transparent bg-opacity-50 z-40 lg:hidden"
+            onClick={toggleSidebar}
+          />
+          <div
+            className={
+              `fixed inset-y-0 left-0 z-50 bg-background w-64 shadow-lg lg:hidden ` +
+              `transition-transform duration-300 ease-in-out ` +
+              `${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
+            }
+          >
+            <AdminSidebar collapsed={false} onToggleCollapse={toggleCollapse} />
           </div>
-        </main>
+        </>
+      )}
+
+      {/* Sidebar for desktop */}
+      <div
+        className={`fixed lg:relative inset-y-0 left-0 z-50 transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0 transition-transform duration-300 ease-in-out lg:block hidden`}
+      >
+        <AdminSidebar collapsed={isCollapsed} onToggleCollapse={toggleCollapse} />
       </div>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">        
+        {/* Page Content */}
+        <div className="flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
+      </main>
     </div>
   );
 };
