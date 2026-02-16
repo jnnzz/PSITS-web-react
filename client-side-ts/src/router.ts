@@ -11,7 +11,8 @@ import { Cart } from "./pages/orders/components/Cart";
 import OTPCode from "./pages/auth/OtpCode";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { TermsOfCondition } from "./pages/TermsOfCondition";
-import { Dashboard } from "./features/admin/Dashboard";
+import Dashboard  from "./features/admin/Dashboard";
+import EventManagement from "./features/admin/EventManagement";
 import { ErrorPage } from "./pages/ErrorPage";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/SignUp";
@@ -70,14 +71,10 @@ export default createBrowserRouter([
       {
         path: "admin",
         Component: AdminLayout,
-        children: [{ index: true, Component: Dashboard }],
-      },
-      
-      // Admin Routes
-      {
-        path: "admin",
-        Component: AdminLayout,
-        children: [{ index: true, Component: Dashboard }],
+        children: [
+          { index: true, Component: Dashboard },
+          { path: "events/:eventId", Component: EventManagement },
+        ],
       },
     ],
   },
