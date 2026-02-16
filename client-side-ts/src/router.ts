@@ -22,6 +22,7 @@ import AccountSettings from "./features/student/components/AccountSettings";
 import EventAttendance from "./features/student/components/EventAttendance";
 import MyOrders from "./features/student/components/MyOrders";
 import StudentLayout from "./layouts/StudentLayout";
+import { AdminRouteGuard } from "./components/common/RouteGuards";
 
 export default createBrowserRouter([
   {
@@ -50,7 +51,6 @@ export default createBrowserRouter([
               { path: "account-settings", Component: AccountSettings },
             ],
           },
-
         ],
       },
       // Static Pages (No Header/Footer)
@@ -70,10 +70,15 @@ export default createBrowserRouter([
       // Admin Routes
       {
         path: "admin",
-        Component: AdminLayout,
+        Component: AdminRouteGuard,
         children: [
-          { index: true, Component: Dashboard },
-          { path: "events/:eventId", Component: EventManagement },
+          {
+            Component: AdminLayout,
+            children: [
+              { index: true, Component: Dashboard },
+              { path: "events", Component: EventManagement },
+            ],
+          },
         ],
       },
     ],
