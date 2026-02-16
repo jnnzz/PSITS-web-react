@@ -122,7 +122,8 @@ const handleApiError = (error: unknown, shouldReload: boolean = false): false =>
     const axiosError = error as AxiosError<ApiErrorResponse>;
     if (axiosError.response?.data) {
       if (shouldReload) {
-        window.location.reload();
+        //uncomment the line if its not error
+        // window.location.reload();
       }
       console.error("Error:", axiosError.response.data.message || "An error occurred");
     } else {
@@ -170,6 +171,35 @@ export const createEvent = async (data: CreateEventData): Promise<CreateEventRes
     return response.data;
   } catch (error) {
     return handleApiError(error, true);
+  }
+};
+
+export const updateEvent = async (eventId: string, data: Partial<Event>): Promise<boolean> => {
+  try {
+    const token = getAuthToken();
+    const response = await axios.put(
+      `${backendConnection()}/api/events/update-event/${eventId}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 200) {
+      showToast("success", "Event updated successfully!");
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error updating event:", error);
+    const errorMessage = axios.isAxiosError(error)
+      ? error.response?.data?.message || "Failed to update event"
+      : "Failed to update event";
+    showToast("error", errorMessage);
+    return false;
   }
 };
 
