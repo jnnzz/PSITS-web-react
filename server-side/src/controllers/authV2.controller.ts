@@ -332,33 +332,3 @@ export const logoutV2Controller = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "An error occurred during logout" });
   }
 };
-
-/**
- * GET /v2/auth/me
- * Returns current user profile based on access token (middleware attaches req.userV2).
- */
-export const meV2Controller = async (req: Request, res: Response) => {
-  try {
-    // Access token claims are attached by middleware
-    const { sub, role } = req.userV2!;
-
-    let user: IStudentDocument | IAdminDocument | null = null;
-
-    if (role === "Admin") {
-      user = await Admin.findById(sub);
-    } else {
-      user = await Student.findById(sub);
-    }
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    return res.status(200).json({
-      user: toUserResponse(user, role),
-    });
-  } catch (error) {
-    console.error("Me endpoint error:", error);
-    return res.status(500).json({ message: "An error occurred" });
-  }
-};
