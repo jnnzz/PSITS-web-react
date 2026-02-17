@@ -104,7 +104,7 @@
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-full max-w-4xl sm:max-w-2xl max-h-[90vh] overflow-hidden p-0 gap-0 rounded-lg sm:rounded-xl" showCloseButton={false}>
+        <DialogContent className="w-full max-w-4xl sm:max-w-2xl h-[90vh] max-h-[90vh] flex flex-col overflow-y-auto p-0 gap-0 rounded-lg sm:rounded-xl" showCloseButton={false}>
             <DialogHeader className="px-6 py-4 border-b">
                 <div className="flex items-center justify-between">
                 <DialogTitle className="text-xl font-semibold leading-6">Add Event</DialogTitle>
@@ -119,41 +119,41 @@
             </div>
             </DialogHeader>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-            <TabsList className="w-full justify-start rounded-none border-b bg-transparent px-6 py-0 h-auto">
-                <TabsTrigger
-                value="event-info"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#1C9DDE] data-[state=active]:bg-transparent data-[state=active]:text-[#1C9DDE] data-[state=active]:shadow-none px-4 py-3"
-                >
-                Event Info
-                </TabsTrigger>
-                <TabsTrigger
-                value="session-setup"
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#1C9DDE] data-[state=active]:bg-transparent data-[state=active]:text-[#1C9DDE] data-[state=active]:shadow-none px-4 py-3"
-                >
-                Session Setup
-                </TabsTrigger>
-            </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          <TabsList className="w-full justify-start rounded-none border-b bg-transparent px-6 py-0 h-auto">
+            <TabsTrigger
+              value="event-info"
+              className="rounded-none cursor-pointer border-b-2 border-transparent  data-[state=active]:bg-transparent data-[state=active]:text-[#1C9DDE] data-[state=active]:shadow-none px-4 py-3"
+            >
+              Event Info
+            </TabsTrigger>
+            <TabsTrigger
+              value="session-setup"
+              className="rounded-none cursor-pointer border-b-2 border-blue border-transparent data-[state=active]:border-b[#1C9DDE] data-[state=active]:bg-transparent data-[state=active]:text-[#1C9DDE] data-[state=active]:shadow-none px-4 py-3"
+            >
+              Session Setup
+            </TabsTrigger>
+          </TabsList>
 
-            <div className="flex-1 overflow-y-auto px-6 py-6">
-                <TabsContent value="event-info" className="mt-0">
-                <EventInfoTab formData={formData} setFormData={setFormData} />
-                </TabsContent>
+          <div className="flex-1 min-h-0 overflow-y-auto px-6 py-6">
+            <TabsContent value="event-info" className="mt-0">
+              <EventInfoTab formData={formData} setFormData={setFormData} />
+            </TabsContent>
 
-                <TabsContent value="session-setup" className="mt-0">
-                <SessionSetupTab formData={formData} setFormData={setFormData} />
-                </TabsContent>
-            </div>
+            <TabsContent value="session-setup" className="mt-0">
+              <SessionSetupTab formData={formData} setFormData={setFormData} />
+            </TabsContent>
+          </div>
 
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t bg-background">
-                <Button variant="outline" onClick={handleCancel}>
-                Cancel
-                </Button>
-                <Button onClick={handleSubmit} className="bg-[#1C9DDE] hover:bg-[#1C9DDE]">
-                Add Event
-                </Button>
-            </div>
-            </Tabs>
+          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t bg-background">
+            <Button variant="outline" onClick={handleCancel} className="cursor-pointer">
+              Cancel
+            </Button>
+              <Button onClick={handleSubmit} className="bg-[#1C9DDE] hover:bg-[#1C9DDE] cursor-pointer">
+              Add Event
+            </Button>
+          </div>
+        </Tabs>
         </DialogContent>
         </Dialog>
     );
