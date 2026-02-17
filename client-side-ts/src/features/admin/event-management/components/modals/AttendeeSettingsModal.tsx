@@ -59,7 +59,7 @@ export const AttendeeSettingsModal: React.FC<AttendeeSettingsModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-2xl sm:max-w-lg h-[80vh] max-h-[90vh] p-0 gap-0 rounded-lg sm:rounded-xl flex flex-col overflow-hidden" showCloseButton={false}>
+      <DialogContent className="w-full max-w-2xl sm:max-w-lg max-h-[80vh] flex flex-col overflow-y-auto p-0 gap-0 rounded-lg sm:rounded-xl" showCloseButton={false}>
         <DialogHeader className="px-6 py-4 border-b flex-none">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-semibold leading-6">Attendee Settings</DialogTitle>

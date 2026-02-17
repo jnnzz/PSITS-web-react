@@ -104,18 +104,21 @@ const EventManagement: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className=" bg-background px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className=" bg-background px-6 pt-15 py-5 sm:py-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold">Event Management</h1>
             <p className="text-sm text-muted-foreground"> 
               Edit event details and manage attendees
             </p>
           </div>
-          <Button variant="outline" onClick={handleAttendeeSettings} className="cursor-pointer">
-            <Settings className="h-4 w-4 mr-2" />
-            Attendee Settings
-          </Button>
+
+          <div className="w-full sm:w-auto flex justify-end">
+            <Button variant="outline" onClick={handleAttendeeSettings} className="cursor-pointer">
+              <Settings className="h-4 w-4 mr-2" />
+              Attendee Settings
+            </Button>
+          </div>
         </div>
       </div>
 

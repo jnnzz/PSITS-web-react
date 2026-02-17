@@ -61,18 +61,19 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Logo and Collapse Button */}
         <div className="p-4">
           <div className="flex items-center gap-3 justify-between">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center shrink-0">
-                <img src={logo} alt="PSITS Logo" className="w-10 h-10 rounded-full" />
-              </div>
-              {!collapsed && (
-                  <div className="truncate">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
+                  <img src={logo} alt="PSITS Logo" className="w-full h-full rounded-full object-contain" />
+                </div>
+                {!collapsed && (
+                  // hide long text on very small screens to avoid overflow
+                  <div className="truncate hidden sm:block">
                     <h1 className="font-semibold text-xs m-0 leading-tight">Philippines Society of</h1>
                     <h2 className="font-semibold text-xs m-0 leading-tight">Information Technology</h2>
                     <h3 className="font-semibold text-xs m-0 leading-tight">Students</h3>
                   </div>
-              )}
-            </div>
+                )}
+              </div>
             {onToggleCollapse && (
               <Button 
                 variant="ghost" 
