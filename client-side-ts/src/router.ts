@@ -77,6 +77,7 @@ export default createBrowserRouter([
             children: [
               { index: true, Component: Dashboard },
               { path: "events", Component: EventManagement },
+              { path: "events/:eventId", Component: EventManagement },
             ],
           },
         ],

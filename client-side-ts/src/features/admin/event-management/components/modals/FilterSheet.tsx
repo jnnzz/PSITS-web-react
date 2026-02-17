@@ -80,7 +80,7 @@ export const FilterSheet: React.FC<FilterSheetProps> = ({ open, onOpenChange, on
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-md h-[90vh] max-h-[90vh] flex flex-col overflow-hidden p-0 gap-0 rounded-lg sm:rounded-xl" showCloseButton={false}>
+      <DialogContent className="w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden p-0 gap-0 rounded-lg sm:rounded-xl" showCloseButton={false}>
         <DialogHeader className="px-6 py-4 border-b flex-none">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-semibold">Filter</DialogTitle>

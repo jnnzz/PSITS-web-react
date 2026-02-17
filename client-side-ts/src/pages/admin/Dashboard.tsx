@@ -14,8 +14,57 @@ const Dashboard: React.FC = () => {
   const { logout, user } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Events data from API
-  const [events, setEvents] = useState<Event[]>([]);
+  // Mock events for local testing (used when API returns no data)
+  const MOCK_EVENTS: Event[] = [
+    {
+      id: 'm1',
+      title: 'Mock: Developer Meetup',
+      date: '02-25-2026',
+      image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=600&fit=crop',
+      status: 'manage',
+      description: 'A local meetup for developers to network and share knowledge.',
+      location: 'Tech Hub Auditorium',
+      locationAddress: '123 Dev Street',
+      startDate: 'Wed, 25 February 2026',
+      startTime: '6:00 PM',
+      endDate: 'Wed, 25 February 2026',
+      endTime: '9:00 PM',
+      venues: ['Tech Hub Auditorium']
+    },
+    {
+      id: 'm2',
+      title: 'Mock: Hackathon',
+      date: '03-10-2026',
+      image: 'https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?w=800&h=600&fit=crop',
+      status: 'view',
+      description: '24 hour hackathon for students to build cool projects.',
+      location: 'Innovation Lab',
+      locationAddress: '456 Code Ave',
+      startDate: 'Tue, 10 March 2026',
+      startTime: '9:00 AM',
+      endDate: 'Wed, 11 March 2026',
+      endTime: '9:00 AM',
+      venues: ['Innovation Lab']
+    },
+    {
+      id: 'm3',
+      title: 'Mock: UI/UX Workshop',
+      date: '04-05-2026',
+      image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=600&fit=crop',
+      status: 'view',
+      description: 'Hands-on workshop covering modern UI/UX techniques.',
+      location: 'Design Studio',
+      locationAddress: '789 Creative Blvd',
+      startDate: 'Mon, 5 April 2026',
+      startTime: '1:00 PM',
+      endDate: 'Mon, 5 April 2026',
+      endTime: '4:00 PM',
+      venues: ['Design Studio']
+    }
+  ];
+
+  // Events data from API (default to mock data for local testing)
+  const [events, setEvents] = useState<Event[]>(MOCK_EVENTS);
 
   // Fetch events on component mount
   useEffect(() => {
@@ -23,7 +72,7 @@ const Dashboard: React.FC = () => {
       setIsLoading(true);
       try {
         const result = await getEvents();
-        if (result && Array.isArray(result)) {
+        if (result && Array.isArray(result) && result.length > 0) {
           // Map API data to Event interface
           const mappedEvents: Event[] = result.map((event: any) => ({
             id: event.eventId || event._id || String(Date.now()),
@@ -43,7 +92,8 @@ const Dashboard: React.FC = () => {
           setEvents(mappedEvents);
           showToast('success', 'Events loaded successfully');
         } else {
-          showToast('error', 'Failed to load events');
+          // Keep using mock events when API returns empty or fails
+          showToast('info', 'Using mock events for testing');
         }
       } catch (error) {
         console.error('Error fetching events:', error);

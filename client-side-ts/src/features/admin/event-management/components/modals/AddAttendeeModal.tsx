@@ -108,7 +108,7 @@ export const AddAttendeeModal: React.FC<AddAttendeeModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-4xl sm:max-w-2xl h-[90vh] max-h-[90vh] flex flex-col overflow-hidden p-0 gap-0 rounded-lg sm:rounded-xl" showCloseButton={false}>
+      <DialogContent className="w-full max-w-4xl sm:max-w-2xl max-h-[80vh] flex flex-col overflow-hidden p-0 gap-0 rounded-lg sm:rounded-xl" showCloseButton={false}>
         <DialogHeader className="px-6 py-4 border-b flex-none">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-semibold leading-6">Add Attendee</DialogTitle>

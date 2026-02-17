@@ -41,11 +41,8 @@ export const EventCard: React.FC<EventCardProps> = ({
   onViewRaffle,
 }) => {
   const handleMainAction = () => {
-    if (event.status === 'manage') {
-      onManageEvent?.(event.id);
-    } else {
-      onViewEvent?.(event.id);
-    }
+    // Always open the event management page when the main button is clicked
+    onManageEvent?.(event.id);
   };
 
   return (
@@ -71,7 +68,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             onClick={handleMainAction}
             className="flex-1 bg-[#1C9DDE] cursor-pointer rounded-2xl hover:bg-[#1C9DDE]"
           >
-            {event.status === 'manage' ? 'Manage Event' : 'View Event'}
+            Manage Event
           </Button>
           
           <DropdownMenu>
