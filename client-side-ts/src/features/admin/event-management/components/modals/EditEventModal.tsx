@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/button';
 import { EventInfoTab } from './EventInfoTab';
 import { SessionSetupTab } from './SessionSetupTab';
 import type { EventFormData } from './AddEventModal';
+import { updateEvent } from '@/features/events/api/event';
+import { showToast } from '@/utils/alertHelper';
 
 interface EditEventModalProps {
   open: boolean;
@@ -33,6 +35,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
   eventData,
 }) => {
   const [activeTab, setActiveTab] = useState('event-info');
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<EventFormData>({
     eventName: '',
     eventDescription: '',
@@ -56,39 +59,78 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
     }
   }, [eventData, open]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!eventData) return;
 
-    const eventDate = formData.eventSchedule || new Date();
-    const updatedEvent = {
-      id: eventData.id,
-      title: formData.eventName,
-      date: eventDate.toLocaleDateString(),
-      image: formData.image ? URL.createObjectURL(formData.image) : eventData.image,
-      status: 'view' as const,
-      description: formData.eventDescription,
-      location: formData.location,
-      locationAddress: formData.location,
-      startDate: eventDate.toLocaleDateString('en-US', {
-        weekday: 'short',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
-      startTime: formData.sessions[0]?.morningSession.startTime || '8:00 AM',
-      endDate: eventDate.toLocaleDateString('en-US', {
-        weekday: 'short',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
-      endTime:
-        formData.sessions[formData.sessions.length - 1]?.eveningSession.endTime || '5:00 PM',
-      venues: [formData.location],
-    };
+    // Validate required fields
+    if (!formData.eventName.trim()) {
+      showToast('error', 'Event name is required');
+      return;
+    }
 
-    if (onSaveEvent) onSaveEvent(updatedEvent);
-    onOpenChange(false);
+    if (!formData.eventSchedule) {
+      showToast('error', 'Event schedule is required');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Prepare API payload
+      const eventDate = formData.eventSchedule;
+      const updatePayload: any = {
+        eventName: formData.eventName,
+        eventDescription: formData.eventDescription,
+        eventDate: eventDate.toISOString(),
+        location: formData.location,
+      };
+
+      // Add session configuration if needed
+      if (formData.sessions.length > 0) {
+        updatePayload.sessionConfig = formData.sessions;
+      }
+
+      // Call update API
+      const success = await updateEvent(eventData.id, updatePayload);
+
+      if (success) {
+        // Prepare updated event for local state update
+        const updatedEvent = {
+          id: eventData.id,
+          title: formData.eventName,
+          date: eventDate.toLocaleDateString(),
+          image: formData.image ? URL.createObjectURL(formData.image) : eventData.image,
+          status: 'view' as const,
+          description: formData.eventDescription,
+          location: formData.location,
+          locationAddress: formData.location,
+          startDate: eventDate.toLocaleDateString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }),
+          startTime: formData.sessions[0]?.morningSession.startTime || '8:00 AM',
+          endDate: eventDate.toLocaleDateString('en-US', {
+            weekday: 'short',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }),
+          endTime:
+            formData.sessions[formData.sessions.length - 1]?.eveningSession.endTime || '5:00 PM',
+          venues: [formData.location],
+        };
+
+        if (onSaveEvent) onSaveEvent(updatedEvent);
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error('Error updating event:', error);
+      showToast('error', 'Failed to update event');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -140,11 +182,11 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({
           </div>
 
           <div className="flex items-center justify-end gap-3 px-6 py-4 border-t bg-background">
-            <Button variant="outline" onClick={handleCancel} className="cursor-pointer">
+            <Button variant="outline" onClick={handleCancel} className="cursor-pointer" disabled={isLoading}>
               Cancel
             </Button>
-              <Button onClick={handleSubmit} className="bg-[#1C9DDE] hover:bg-[#1C9DDE] cursor-pointer">
-              Save Changes
+              <Button onClick={handleSubmit} className="bg-[#1C9DDE] hover:bg-[#1C9DDE] cursor-pointer" disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </Tabs>

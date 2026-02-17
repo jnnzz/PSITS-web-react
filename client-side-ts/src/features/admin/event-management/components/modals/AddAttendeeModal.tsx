@@ -16,11 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { addAttendee } from '@/features/events/api/event';
+import { showToast } from '@/utils/alertHelper';
 
 interface AddAttendeeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddAttendee: (attendee: AttendeeFormData) => void;
+  onAddAttendee?: (attendee: AttendeeFormData) => void;
+  eventId: string;
 }
 
 export interface AttendeeFormData {
@@ -47,7 +50,9 @@ export const AddAttendeeModal: React.FC<AddAttendeeModalProps> = ({
   open,
   onOpenChange,
   onAddAttendee,
+  eventId,
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<AttendeeFormData>({
     studentId: '',
     firstName: '',
@@ -70,16 +75,83 @@ export const AddAttendeeModal: React.FC<AddAttendeeModalProps> = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = () => {
-    // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+  const handleSubmit = async () => {
+    // Validate required fields
+    if (!formData.studentId.trim()) {
+      showToast('error', 'Student ID is required');
       return;
     }
 
-    onAddAttendee(formData);
-    handleReset();
-    onOpenChange(false);
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      showToast('error', 'First name and last name are required');
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      showToast('error', 'Email is required');
+      return;
+    }
+
+    if (!formData.campus || !formData.course || !formData.yearLevel) {
+      showToast('error', 'Campus, course, and year level are required');
+      return;
+    }
+
+    if (!formData.shirtSize) {
+      showToast('error', 'Shirt size is required');
+      return;
+    }
+
+    if (!formData.shirtPrice) {
+      showToast('error', 'Shirt price is required');
+      return;
+    }
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      showToast('error', 'Passwords do not match');
+      return;
+    }
+
+    if (!formData.password.trim()) {
+      showToast('error', 'Password is required');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Prepare API payload
+      const attendeeData = {
+        eventId: eventId,
+        attendeeId: formData.studentId,
+        name: `${formData.firstName} ${formData.middleName} ${formData.lastName}`.trim(),
+        email: formData.email,
+        campus: formData.campus,
+        course: formData.course,
+        year: parseInt(formData.yearLevel.charAt(0)),
+        shirtSize: formData.shirtSize,
+        shirtPrice: parseFloat(formData.shirtPrice),
+        password: formData.password,
+      };
+
+      // Call add attendee API
+      const success = await addAttendee(attendeeData);
+
+      if (success) {
+        // Call parent callback if provided (for local state update)
+        if (onAddAttendee) {
+          onAddAttendee(formData);
+        }
+        handleReset();
+        onOpenChange(false);
+      }
+    } catch (error) {
+      console.error('Error adding attendee:', error);
+      showToast('error', 'Failed to add attendee');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -315,11 +387,11 @@ export const AddAttendeeModal: React.FC<AddAttendeeModalProps> = ({
 
         {/* Footer */}
         <div className="flex-none flex items-center justify-end gap-3 px-6 py-4 border-t bg-background">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} className="bg-[#1C9DDE] hover:bg-[#1C9DDE]">
-            Add Event
+          <Button onClick={handleSubmit} className="bg-[#1C9DDE] hover:bg-[#1C9DDE]" disabled={isLoading}>
+            {isLoading ? 'Adding...' : 'Add Attendee'}
           </Button>
         </div>
       </DialogContent>

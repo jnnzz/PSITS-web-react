@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Download, Plus, Filter } from 'lucide-react';
-import { getAttendees, addAttendee as addAttendeeAPI, markAsPresent } from '@/features/events/api/event';
+import { getAttendees, markAsPresent } from '@/features/events/api/event';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -192,40 +192,23 @@ export const AttendeesTable: React.FC<AttendeesTableProps> = ({ venue, eventId }
     setIsAddAttendeeOpen(true);
   };
 
-  const handleAddAttendeeSubmit = async (attendee: AttendeeFormData) => {
-    if (!eventId) return;
-
-    const attendeeData = {
-      eventId: eventId,
-      attendeeId: attendee.studentId,
+  const handleAddAttendeeSubmit = (attendee: AttendeeFormData) => {
+    // Modal now handles API call, this just updates local state
+    const newAttendee: Attendee = {
+      id: attendee.studentId,
       name: `${attendee.firstName} ${attendee.middleName} ${attendee.lastName}`.trim(),
       email: attendee.email,
+      studentId: attendee.studentId,
+      status: 'present',
+      courseYear: `${attendee.course} - ${attendee.yearLevel.charAt(0)}`,
+      confirmedOn: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + '\n' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      confirmedBy: 'Admin',
       campus: attendee.campus,
-      course: attendee.course,
-      year: parseInt(attendee.yearLevel.charAt(0)),
       shirtSize: attendee.shirtSize,
-      shirtPrice: parseFloat(attendee.shirtPrice),
+      shirtPrice: attendee.shirtPrice,
     };
-
-    const result = await addAttendeeAPI(attendeeData);
-    if (result) {
-      // Add to local state as well
-      const newAttendee: Attendee = {
-        id: attendee.studentId,
-        name: attendeeData.name,
-        email: attendee.email,
-        studentId: attendee.studentId,
-        status: 'present',
-        courseYear: `${attendee.course} - ${attendee.yearLevel.charAt(0)}`,
-        confirmedOn: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + '\n' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-        confirmedBy: 'Admin',
-        campus: attendee.campus,
-        shirtSize: attendee.shirtSize,
-        shirtPrice: attendee.shirtPrice,
-      };
-      setAttendees((prev) => [newAttendee, ...prev]);
-      setCurrentPage(1);
-    }
+    setAttendees((prev) => [newAttendee, ...prev]);
+    setCurrentPage(1);
   };
 
   const handleScanQR = () => {
@@ -550,6 +533,7 @@ export const AttendeesTable: React.FC<AttendeesTableProps> = ({ venue, eventId }
       <AddAttendeeModal
         open={isAddAttendeeOpen}
         onOpenChange={setIsAddAttendeeOpen}
+        eventId={eventId}
         onAddAttendee={handleAddAttendeeSubmit}
       />
       <StudentDetailsModal
