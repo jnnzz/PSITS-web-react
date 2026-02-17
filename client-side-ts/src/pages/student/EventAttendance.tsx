@@ -1,5 +1,5 @@
 import React from 'react'
-import image1 from '../../../assets/awarding/2.jpg';
+import image1 from '@/assets/awarding/2.jpg';
 import {
   Card,
   CardHeader,

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth';
 import { showToast } from '@/utils/alertHelper';
-import { EventsHeader, ViewToggle, EventsGrid, AddEventModal } from './components';
-import type { Event } from './components';
-import { getEvents, createEvent, updateEvent, removeEvent } from '../events/api/event';
+import { EventsHeader, ViewToggle, EventsGrid, AddEventModal } from '@/features/admin/event-management';
+import type { Event } from '@/features/admin/event-management';
+import { getEvents, createEvent, updateEvent, removeEvent } from '@/features/events/api/event';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();

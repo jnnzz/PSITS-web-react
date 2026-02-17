@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getOrder, cancelOrder } from '../../orders/api/orders';
+import { getOrder, cancelOrder } from '@/features/orders/api/orders';
 
 interface OrderItem {
   id: string;

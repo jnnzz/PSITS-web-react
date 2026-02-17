@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Download, Plus, Filter } from 'lucide-react';
-import { getAttendees, addAttendee as addAttendeeAPI, markAsPresent } from '../../../features/events/api/event';
+import { getAttendees, addAttendee as addAttendeeAPI, markAsPresent } from '@/features/events/api/event';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';

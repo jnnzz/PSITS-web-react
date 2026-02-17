@@ -60,7 +60,7 @@ export const EventInfoTab: React.FC<EventInfoTabProps> = ({ formData, setFormDat
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
       {/* Left Column - Image Upload + Location */}
       <div className="flex flex-col">
         <Label className="mb-2 text-sm font-medium">Event Image</Label>
@@ -69,13 +69,13 @@ export const EventInfoTab: React.FC<EventInfoTabProps> = ({ formData, setFormDat
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           className={cn(
-            "border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center transition-colors",
+            "border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center transition-colors max-h-[320px] w-full",
             isDragging ? "border-[#1C9DDE] bg-[#1C9DDE]/10" : "border-gray-300",
             imagePreview && "p-0 border-solid"
           )}
         >
           {imagePreview ? (
-            <div className="relative w-full h-full min-h-[300px]">
+            <div className="relative w-full h-[280px]">
               <img
                 src={imagePreview}
                 alt="Preview"
@@ -139,7 +139,7 @@ export const EventInfoTab: React.FC<EventInfoTabProps> = ({ formData, setFormDat
       </div>
 
       {/* Right Column - Form Fields */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 h-full">
         {/* Event Name */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="eventName" className="text-sm font-medium">

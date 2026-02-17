@@ -355,7 +355,7 @@ export const SessionSetupTab: React.FC<SessionSetupTabProps> = ({ formData, setF
   };
 
   return (
-    <div className="space-y-3 max-w-3xl">
+    <div className="space-y-3 w-full h-full">
       {formData.sessions.map((session, index) => (
         <SessionItem key={session.date} date={session.date} session={session} onUpdate={(updated) => handleSessionUpdate(index, updated)} />
       ))}

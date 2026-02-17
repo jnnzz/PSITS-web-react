@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router';
 import { ArrowLeft, MapPin, Calendar, Settings } from 'lucide-react';
-import { updateEvent } from '../events/api/event';
+import { updateEvent } from '@/features/events/api/event';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,8 +13,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { AttendeesTable } from './components';
-import { AttendeeSettingsModal, EditEventModal } from './components/modals';
+import { AttendeesTable } from '@/features/admin/event-management';
+import { AttendeeSettingsModal, EditEventModal } from '@/features/admin/event-management/components/modals';
 
 interface EventDetails {
   id: string;
