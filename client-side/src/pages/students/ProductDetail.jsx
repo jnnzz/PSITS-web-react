@@ -458,32 +458,38 @@ const ProductDetail = () => {
               )}
             </div>
             <div className="flex items-center gap-2 py-5">
-              <input
-                type="text"
-                placeholder="Enter code"
-                value={code}
-                disabled={promoVerified}
-                onChange={(e) => setCode(e.target.value)}
-                className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="flex flex-col">
+                <input
+                  type="text"
+                  placeholder="Enter voucher code (optional)"
+                  value={code}
+                  disabled={promoVerified}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label="Voucher code (optional)"
+                />
+              </div>
+
               <button
-                onClick={
-                  promoVerified ? () => handleClear() : () => handleVerify()
-                }
+                onClick={promoVerified ? () => handleClear() : () => handleVerify()}
+                disabled={!promoVerified && code.trim() === ""}
                 className={`${
                   promoVerified
                     ? "bg-red-600 hover:bg-red-700"
+                    : code.trim() === ""
+                    ? "bg-gray-300 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700"
                 } text-white px-4 py-2 rounded-lg  transition`}
+                aria-label={promoVerified ? "Clear voucher" : "Verify voucher"}
               >
                 {promoVerified ? "Clear" : "Verify"}
               </button>
 
               {isVerified === true && (
-                <FaCheckCircle className="text-green-500 text-xl" />
+                <FaCheckCircle className="text-green-500 text-xl ml-2" />
               )}
               {isVerified === false && (
-                <FaTimesCircle className="text-red-500 text-xl" />
+                <FaTimesCircle className="text-red-500 text-xl ml-2" />
               )}
             </div>
 
@@ -527,7 +533,7 @@ const ProductDetail = () => {
             {/* Buy Now Pop Up Details Modal */}
 
             <div className="flex gap-2">
-              {!cartLimited && orderId !== _id && !promoVerified && (
+              {!cartLimited && orderId !== _id && (
                 <button
                   onClick={handleCart}
                   className={`flex gap-2 px-4 py-3 font-medium 
