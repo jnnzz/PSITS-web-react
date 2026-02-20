@@ -52,6 +52,10 @@ export const EventCard: React.FC<EventCardProps> = ({
           src={event.image}
           alt={event.title}
           className="w-full h-full object-cover rounded-lg"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f1f5f9'/%3E%3Cg transform='translate(200,150)'%3E%3Crect x='-40' y='-32' width='80' height='64' rx='6' fill='%23cbd5e1'/%3E%3Ccircle cx='0' cy='-6' r='14' fill='%23f1f5f9'/%3E%3Cellipse cx='0' cy='26' rx='22' ry='14' fill='%23f1f5f9'/%3E%3C/g%3E%3C/svg%3E`;
+          }}
         />
       </div>
       <CardContent className="p-4">
@@ -70,7 +74,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           >
             Manage Event
           </Button>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">

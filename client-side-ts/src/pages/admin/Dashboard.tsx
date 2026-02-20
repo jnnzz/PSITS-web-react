@@ -90,10 +90,8 @@ const Dashboard: React.FC = () => {
             venues: event.venues || [event.location || 'TBD']
           }));
           setEvents(mappedEvents);
-          showToast('success', 'Events loaded successfully');
         } else {
           // Keep using mock events when API returns empty or fails
-          showToast('info', 'Using mock events for testing');
         }
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -115,7 +113,7 @@ const Dashboard: React.FC = () => {
         location: newEvent.location,
         eventImage: newEvent.image,
       };
-      
+
       const result = await createEvent(eventData);
       if (result) {
         // Create the event with the returned ID from the API
@@ -211,9 +209,9 @@ const Dashboard: React.FC = () => {
       const result = await updateEvent(eventId, cleanedData);
       if (result) {
         // Update the event in local state
-        setEvents((prev) => 
-          prev.map(event => 
-            event.id === eventId 
+        setEvents((prev) =>
+          prev.map(event =>
+            event.id === eventId
               ? { ...event, ...updatedEventData }
               : event
           )
@@ -244,12 +242,12 @@ const Dashboard: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col">
       <EventsHeader onAddEvent={handleAddEvent} />
-      
-      <ViewToggle 
-        viewMode={viewMode} 
-        onViewModeChange={setViewMode} 
+
+      <ViewToggle
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
-      
+
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
@@ -270,8 +268,8 @@ const Dashboard: React.FC = () => {
         />
       )}
 
-      <AddEventModal 
-        open={isAddEventModalOpen} 
+      <AddEventModal
+        open={isAddEventModalOpen}
         onOpenChange={setIsAddEventModalOpen}
         onAddEvent={handleAddEventToList}
       />

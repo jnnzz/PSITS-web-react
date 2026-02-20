@@ -85,7 +85,7 @@ const EventManagement: React.FC = () => {
       eventDate: updatedEvent.startDate,
       location: updatedEvent.location,
     };
-    
+
     const result = await updateEvent(eventDetails.id, eventData);
     if (result) {
       setEventDetails(updatedEvent);
@@ -104,11 +104,11 @@ const EventManagement: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className=" bg-background px-6 pt-15 py-5 sm:py-4">
+      <div className="bg-background px-6 py-5 sm:py-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-semibold">Event Management</h1>
-            <p className="text-sm text-muted-foreground"> 
+            <p className="text-sm text-muted-foreground">
               Edit event details and manage attendees
             </p>
           </div>
@@ -172,8 +172,8 @@ const EventManagement: React.FC = () => {
                         eventDetails.status === 'ongoing'
                           ? 'default'
                           : eventDetails.status === 'ended'
-                          ? 'secondary'
-                          : 'outline'
+                            ? 'secondary'
+                            : 'outline'
                       }
                       className="capitalize"
                     >
@@ -243,10 +243,10 @@ const EventManagement: React.FC = () => {
 
           {/* Attendees Section - campuses tabs */}
           <div className="space-y-4">
-            <Tabs value={activeCampus} onValueChange={setActiveCampus}> 
+            <Tabs value={activeCampus} onValueChange={setActiveCampus}>
               <TabsList className="w-full overflow-x-auto px-0 flex gap-2 bg-transparent rounded-none">
                 {CAMPUSES.map((campus) => (
-                 <TabsTrigger
+                  <TabsTrigger
                     key={campus}
                     value={campus}
                     className="whitespace-nowrap px-4 py-3 mx-1 cursor-pointer bg-transparent !bg-transparent hover:bg-transparent focus:bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-[#1C9DDE] data-[state=active]:underline data-[state=active]:decoration-[#1C9DDE] data-[state=active]:decoration-2 data-[state=active]:underline-offset-11 data-[state=active]:font-semibold rounded-none"

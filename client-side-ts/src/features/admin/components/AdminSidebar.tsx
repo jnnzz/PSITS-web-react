@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Grid, Calendar, BarChart3, MoreVertical, PanelLeft } from 'lucide-react';
+import { Grid, Calendar, BarChart3, MoreVertical, PanelLeft, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -61,22 +61,22 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Logo and Collapse Button */}
         <div className="p-4">
           <div className="flex items-center gap-3 justify-between">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
-                  <img src={logo} alt="PSITS Logo" className="w-full h-full rounded-full object-contain" />
-                </div>
-                {!collapsed && (
-                  // hide long text on very small screens to avoid overflow
-                  <div className="truncate hidden sm:block">
-                    <h1 className="font-semibold text-xs m-0 leading-tight">Philippines Society of</h1>
-                    <h2 className="font-semibold text-xs m-0 leading-tight">Information Technology</h2>
-                    <h3 className="font-semibold text-xs m-0 leading-tight">Students</h3>
-                  </div>
-                )}
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
+                <img src={logo} alt="PSITS Logo" className="w-full h-full rounded-full object-contain" />
               </div>
+              {!collapsed && (
+                // hide long text on very small screens to avoid overflow
+                <div className="truncate hidden sm:block">
+                  <h1 className="font-semibold text-xs m-0 leading-tight">Philippines Society of</h1>
+                  <h2 className="font-semibold text-xs m-0 leading-tight">Information Technology</h2>
+                  <h3 className="font-semibold text-xs m-0 leading-tight">Students</h3>
+                </div>
+              )}
+            </div>
             {onToggleCollapse && (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon-sm"
                 onClick={onToggleCollapse}
                 className="hidden lg:flex shrink-0 transition-all duration-300"
@@ -91,11 +91,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </div>
         </div>
 
-      {/* <Separator /> */}
+        {/* <Separator /> */}
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-2">
-        <div className="mb-4">
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-2">
+          <div className="mb-4">
             {!collapsed && (
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
                 Navigation
@@ -327,7 +327,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 <div className="flex justify-center">
                   <Avatar className="w-10 h-10 cursor-pointer">
                     <AvatarFallback className="bg-orange-400 text-white font-semibold">
-                      {user?.name?.split(" ").map(n => n[0]).slice(0,2).join("") || userInitials}
+                      {user?.name?.split(" ").map(n => n[0]).slice(0, 2).join("") || userInitials}
                     </AvatarFallback>
                   </Avatar>
                 </div>
@@ -343,7 +343,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             <div className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
                 <AvatarFallback className="bg-orange-400 text-white font-semibold">
-                  {user?.name?.split(" ").map(n => n[0]).slice(0,2).join("") || userInitials}
+                  {user?.name?.split(" ").map(n => n[0]).slice(0, 2).join("") || userInitials}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
@@ -351,8 +351,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 <p className="text-xs text-muted-foreground truncate">{user?.role || userRole}</p>
               </div>
               <div className="relative" ref={menuRef}>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="icon-sm"
                   onClick={() => setMenuOpen((s) => !s)}
                   aria-label="More options"
@@ -360,11 +360,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   <MoreVertical className="w-5 h-5" />
                 </Button>
                 {menuOpen && (
-                  <div className="absolute bottom-full mb-2 md:bottom-auto md:top-full md:mt-2 right-0 w-40 bg-white text-black rounded-md shadow-lg z-50 border border-gray-200">
+                  <div className="absolute bottom-full mb-2 right-0 w-40 bg-white text-black rounded-md z-50 border border-gray-200">
                     <button
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm font-medium transition-colors"
+                      className="w-full text-left cursor-pointer px-4 py-2 hover:bg-gray-100 text-sm font-medium transition-colors flex items-center gap-2"
                       onClick={handleLogout}
                     >
+                      <LogOut className="w-4 h-4" />
                       Logout
                     </button>
                   </div>
