@@ -82,7 +82,7 @@ const PromoDashboard = () => {
 
 
   const isUnlimited = (limit, qty) => {
-    return limit === "Unlimited" ? "Unlimited" : qty < 0 ? "Out of Stocks" : qty;
+    return limit === "Unlimited" ? "Unlimited" : qty <= 0 ? "Out of Stocks" : qty;
   }
 
   const columns = [
