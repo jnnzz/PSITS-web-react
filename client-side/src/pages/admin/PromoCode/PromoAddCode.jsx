@@ -4,6 +4,7 @@ import ConfirmationModal from "../../../components/common/modal/ConfirmationModa
 import { ConfirmActionType } from "../../../enums/commonEnums";
 import { createPromoCode } from "../../../api/promo";
 import { showToast } from "../../../utils/alertHelper";
+import { TEAM_ROLES } from "./promo_functions";
 
 const PromoAddCode = ({ onCancel }) => {
   const [type, setType] = useState("");
@@ -130,8 +131,8 @@ const PromoAddCode = ({ onCancel }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-lg space-y-4 rounded-2xl bg-white p-6 shadow-lg">
+    <div className="fixed max-h-[100vh] overflow-y-auto inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="w-full max-w-lg overflow-y-auto space-y-4 rounded-2xl bg-white p-6 shadow-lg">
         <h2 className="text-center text-xl font-semibold text-gray-800">
           Add Promo Code
         </h2>
@@ -268,7 +269,7 @@ const PromoAddCode = ({ onCancel }) => {
               Sub Members
             </p>
             <div className="flex flex-wrap gap-3">
-              {["Officers", "Media", "Developers", "Volunteers"].map((org) => (
+              {TEAM_ROLES.map((org) => (
                 <label key={org} className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -276,7 +277,7 @@ const PromoAddCode = ({ onCancel }) => {
                     onChange={() => handleOrgChange(org)}
                     className="accent-blue-600"
                   />
-                  <span className="text-sm text-gray-700">{org}</span>
+                  <span className="text-sm text-gray-700">{org.toUpperCase()}</span>
                 </label>
               ))}
             </div>

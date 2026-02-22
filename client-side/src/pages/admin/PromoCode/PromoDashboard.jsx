@@ -80,6 +80,11 @@ const PromoDashboard = () => {
     setIsPromoLog(true);
   };
 
+
+  const isUnlimited = (limit, qty) => {
+    return limit === "Unlimited" ? "Unlimited" : qty <= 0 ? "Out of Stocks" : qty;
+  }
+
   const columns = [
     {
       key: "promo_name",
@@ -92,11 +97,7 @@ const PromoDashboard = () => {
       label: "Type",
       sortable: true,
     },
-    {
-      key: "limit_type",
-      label: "Limit Type",
-      sortable: true,
-    },
+   
     {
       key: "discount",
       label: "Discount",
@@ -118,7 +119,7 @@ const PromoDashboard = () => {
             fontWeight: row.quantity <= 0 ? "bold" : "normal",
           }}
         >
-          {row.quantity <= 0 ? "Out of Stocks" : `${row.quantity} `}
+          {isUnlimited(row.limit_type, row.quantity)}
         </div>
       ),
     },
