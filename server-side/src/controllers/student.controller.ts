@@ -290,7 +290,7 @@ export const changeStudentPassword = async (req: Request, res: Response) => {
     });
 
     await log.save();
-    //console.log("Action logged successfully.");
+  
 
     res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {

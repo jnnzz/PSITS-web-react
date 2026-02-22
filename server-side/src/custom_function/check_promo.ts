@@ -11,7 +11,7 @@ export const checkPromos = async () => {
     });
 
     if (!invalidPromos.length) {
-      console.log("✅ No invalid promos found.");
+   
       await PromoLog.create({ description: "No invalid promos found." });
       return;
     }
@@ -35,18 +35,18 @@ export const checkPromos = async () => {
         });
 
         const message = `🗑️ Deleted ${result.deletedCount} pending orders using expired promo "${promo.promo_name}". ♻️ Restocked to quantity: ${newQuantity}`;
-        console.log(message);
+        
 
         await PromoLog.create({ description: message });
       } else {
         const message = `⚠️ No pending orders found using promo "${promo.promo_name}".`;
-        console.log(message);
+  
 
         await PromoLog.create({ description: message });
       }
     }
 
-    console.log("🎯 Promo check and restock completed.");
+   
     await PromoLog.create({
       description: "Promo check and restock completed.",
     });

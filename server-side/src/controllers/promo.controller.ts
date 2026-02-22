@@ -169,8 +169,10 @@ export const deletePromo = async (req: Request, res: Response) => {
 export const verifyPromo = async (req: Request, res: Response) => {
   try {
     const { promo_code, merchId } = req.params;
+    
     const student = req.both;
     const currentDate = new Date();
+   
 
     const promo = await Promo.findOne({ promo_name: promo_code });
     if (!promo) return res.status(404).json({ message: "Promo not found" });

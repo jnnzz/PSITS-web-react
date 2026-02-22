@@ -92,11 +92,7 @@ const PromoDashboard = () => {
       label: "Type",
       sortable: true,
     },
-    {
-      key: "limit_type",
-      label: "Limit Type",
-      sortable: true,
-    },
+   
     {
       key: "discount",
       label: "Discount",
@@ -118,7 +114,7 @@ const PromoDashboard = () => {
             fontWeight: row.quantity <= 0 ? "bold" : "normal",
           }}
         >
-          {row.quantity <= 0 ? "Out of Stocks" : `${row.quantity} `}
+          {row.limit_type === "Unlimited" ? "Unlimited" : row.quantity <= 0 ? "Out of Stocks" :   `${row.quantity} `}
         </div>
       ),
     },

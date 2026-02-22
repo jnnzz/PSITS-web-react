@@ -196,7 +196,7 @@ export const studentAndAdminOrderController = async (
         itemSubtotal = itemSubtotal - itemSubtotal * 0.05; // 5%
         finalMembershipDiscount = true;
       }
-      console.log(itemSubtotal);
+      
 
       const processedItem = {
         product_id: item.product_id,
@@ -264,7 +264,7 @@ export const studentAndAdminOrderController = async (
       role: both.role,
     };
 
-    console.log("==========Final Order==========", finalOrder);
+   
 
     const newOrder = new Orders(finalOrder);
     await newOrder.save({ session });
@@ -340,7 +340,7 @@ export const cancelOrderController = async (req: Request, res: Response) => {
 
   try {
     const order = await Orders.findById(productId).session(session);
-    console.log(order);
+  
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }

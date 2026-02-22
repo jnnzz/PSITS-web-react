@@ -852,7 +852,7 @@ export const setNewAdminAccessController = async (
 export const getMembershipPrice = async (req: Request, res: Response) => {
   try {
     const settings = await Settings.findOne();
-    console.log(settings);
+    
     if (settings) {
       res.status(200).json({ data: settings });
     } else {
