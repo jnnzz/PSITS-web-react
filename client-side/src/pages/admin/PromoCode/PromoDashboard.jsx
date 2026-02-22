@@ -80,6 +80,11 @@ const PromoDashboard = () => {
     setIsPromoLog(true);
   };
 
+
+  const isUnlimited = (limit, qty) => {
+    return limit === "Unlimited" ? "Unlimited" : qty < 0 ? "Out of Stocks" : qty;
+  }
+
   const columns = [
     {
       key: "promo_name",
@@ -114,7 +119,7 @@ const PromoDashboard = () => {
             fontWeight: row.quantity <= 0 ? "bold" : "normal",
           }}
         >
-          {row.limit_type === "Unlimited" ? "Unlimited" : row.quantity <= 0 ? "Out of Stocks" :   `${row.quantity} `}
+          {isUnlimited(row.limit_type, row.quantity)}
         </div>
       ),
     },

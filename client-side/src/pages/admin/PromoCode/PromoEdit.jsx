@@ -4,9 +4,10 @@ import ConfirmationModal from "../../../components/common/modal/ConfirmationModa
 import { ConfirmActionType } from "../../../enums/commonEnums";
 import { updatePromoCode } from "../../../api/promo";
 import { showToast } from "../../../utils/alertHelper";
+import { TEAM_ROLES } from "./promo_functions";
 
 const PromoEdit = ({ data, onCancel }) => {
-  console.log(data);
+  
   const [type, setType] = useState(
     data.type === "All Students" || data.type === "Specific"
       ? "Students"
@@ -59,7 +60,7 @@ const PromoEdit = ({ data, onCancel }) => {
 
         return unique;
       });
-      console.log(data);
+      //console.log(data);
     } catch (error) {
       console.error(error);
     }
@@ -72,7 +73,7 @@ const PromoEdit = ({ data, onCancel }) => {
         return showToast("error", "No Student Found!");
       }
       setStudentSearched(data ? data : []);
-      console.log(data);
+      //console.log(data);
       setErrorName("Not Found");
     } catch (error) {
       console.error(error);
@@ -136,10 +137,10 @@ const PromoEdit = ({ data, onCancel }) => {
       setConfirmModal(false);
     }
 
-    console.log(selectedMerchandise);
+    //console.log(selectedMerchandise);
 
     for (let [key, value] of promoFormData.entries()) {
-      console.log(`${key}:`, value);
+      //console.log(`${key}:`, value);
     }
     onCancel();
   };
@@ -163,7 +164,7 @@ const PromoEdit = ({ data, onCancel }) => {
 
   useEffect(() => {
     fetchData();
-    console.log(data);
+    //console.log(data);
   }, []);
 
   return (
@@ -183,7 +184,7 @@ const PromoEdit = ({ data, onCancel }) => {
             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-blue-200 outline-none"
             placeholder="Enter promo name"
             value={promoName}
-            onChange={(e) => setPromoName(e.target.value)}
+            disabled
           />
         </div>
 
@@ -305,7 +306,7 @@ const PromoEdit = ({ data, onCancel }) => {
               Sub Members
             </p>
             <div className="flex flex-wrap gap-3">
-              {["Officers", "Media", "Developers", "Volunteers"].map((org) => (
+              {TEAM_ROLES.map((org) => (
                 <label key={org} className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -313,7 +314,7 @@ const PromoEdit = ({ data, onCancel }) => {
                     onChange={() => handleOrgChange(org)}
                     className="accent-blue-600"
                   />
-                  <span className="text-gray-700 text-sm">{org}</span>
+                  <span className="text-gray-700 text-sm">{org.toUpperCase()}</span>
                 </label>
               ))}
             </div>

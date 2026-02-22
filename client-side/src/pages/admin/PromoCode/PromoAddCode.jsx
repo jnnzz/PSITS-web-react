@@ -4,6 +4,7 @@ import ConfirmationModal from "../../../components/common/modal/ConfirmationModa
 import { ConfirmActionType } from "../../../enums/commonEnums";
 import { createPromoCode } from "../../../api/promo";
 import { showToast } from "../../../utils/alertHelper";
+import { TEAM_ROLES } from "./promo_functions";
 
 const PromoAddCode = ({ onCancel }) => {
   const [type, setType] = useState("");
@@ -268,7 +269,7 @@ const PromoAddCode = ({ onCancel }) => {
               Sub Members
             </p>
             <div className="flex flex-wrap gap-3">
-              {["officers", "media", "developer", "volunteer"].map((org) => (
+              {TEAM_ROLES.map((org) => (
                 <label key={org} className="flex items-center gap-2">
                   <input
                     type="checkbox"
