@@ -17,7 +17,7 @@ function SearchModal({ position, onClose }) {
     setTimeout(() => {
       if (response) {
         setResult(
-          `Result: ${response.data.first_name + " " + response.data.last_name}`
+          `Result: ${response.data.name}`
         );
         setResponse(true);
         setLoading(false);
@@ -79,11 +79,10 @@ function SearchModal({ position, onClose }) {
         <button
           onClick={handleSearch}
           disabled={loading}
-          className={`mt-4 w-full p-2 rounded-lg text-white transition ${
-            loading
+          className={`mt-4 w-full p-2 rounded-lg text-white transition ${loading
               ? "bg-blue-300 cursor-not-allowed"
               : "bg-blue-500 hover:bg-blue-600"
-          }`}
+            }`}
         >
           {loading ? "Searching..." : "Search"}
         </button>
