@@ -154,7 +154,11 @@ export const deletePromo = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid promo ID" });
     }
 
-    const promo = await Promo.findByIdAndDelete(new Types.ObjectId(id));
+    const promo = await Promo.findByIdAndUpdate(
+      new Types.ObjectId(id),
+      { status: "Deleted" },
+      { new: true }
+    );
 
     if (!promo) {
       return res.status(404).json({ message: "Promo not found" });
@@ -169,10 +173,10 @@ export const deletePromo = async (req: Request, res: Response) => {
 export const verifyPromo = async (req: Request, res: Response) => {
   try {
     const { promo_code, merchId } = req.params;
-    
+
     const student = req.both;
     const currentDate = new Date();
-   
+
 
     const promo = await Promo.findOne({ promo_name: promo_code });
     if (!promo) return res.status(404).json({ message: "Promo not found" });
