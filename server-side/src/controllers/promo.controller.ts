@@ -177,9 +177,10 @@ export const verifyPromo = async (req: Request, res: Response) => {
     const student = req.both;
     const currentDate = new Date();
 
-
     const promo = await Promo.findOne({ promo_name: promo_code });
-    if (!promo) return res.status(404).json({ message: "Promo not found" });
+    if (!promo || promo.status === "Deleted") {
+      return res.status(404).json({ message: "Promo not found or deleted" });
+    }
 
     if (currentDate < promo.start_date || currentDate > promo.end_date) {
       return res.status(400).json({ message: "Expired Promo Code" });
